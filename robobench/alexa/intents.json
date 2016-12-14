@@ -1,0 +1,30 @@
+{
+  "intents": [{
+    "intent": "HelloIntent",
+    "slots": [{
+      "name": "firstname",
+      "type": "AMAZON.US_FIRST_NAME"
+    }]
+  }, {
+    "intent": "DilutionSeriesIntent",
+    "slots": [{
+      "name": "count",
+      "type": "AMAZON.NUMBER"
+    }, {
+      "name": "ratio",
+      "type": "AMAZON.NUMBER"
+    }]
+  }, {
+    "intent": "MoveLiquidIntent",
+    "slots": [{
+      "name": "start",
+      "type": "PLATECOORD"
+    }, {
+      "name": "end",
+      "type": "PLATECOORD"
+    }, {
+      "name": "volume",
+      "type": "AMAZON.NUMBER"
+    }]
+  }]
+}
