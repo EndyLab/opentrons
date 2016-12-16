@@ -1,13 +1,16 @@
 from opentrons import robot, containers, instruments
+# from opentrons_sdk.helpers.helpers import import_calibration_json
 
-tiprack = containers.load('tiprack-200ul', 'A1')
-plate = containers.load('96-flat', 'B2')
-ddH2O = containers.load('point', 'B3')
-trash = containers.load('point', 'C3', 'holywastedplasticbatman')
+PORT = '/dev/tty.usbmodem621'
+
+tiprack = containers.load('tiprack-200ul', 'B2')
+plate = containers.load('96-flat', 'B1')
+ddH2O = containers.load('point', 'B3', 'ddH2O-trough')
+trash = containers.load('point', 'C2', 'holywastedplasticbatman')
 
 p200 = instruments.Pipette(
-    axis='b',
-    max_volume=200,
+    axis='a',
+    max_volume=230,
     min_volume=20,
     tip_racks=[tiprack],
     trash_container=trash,
@@ -15,16 +18,28 @@ p200 = instruments.Pipette(
     name='p200-8'
 )
 
+robot.connect(PORT)
+robot.home()
+#
+# with open('./calibrations/calibrations.json', 'r') as c:
+#     import_calibration_json(c, robot, True)
+
 def move_liquid(start, end, volume):
+    # robot.home(enqueue=True)
+    robot.clear_commands()
+
     p200.pick_up_tip()
     p200.aspirate(volume, plate[start])
-    p200.dispense(plate[end])
+    p200.dispense(volume, plate[end])
     p200.drop_tip()
 
     print(robot.commands())
-    robot.simulate()
+    robot.run()
+    robot.clear_commands()
 
 def dilution_series(dilution_frac=1e-1, num_tubes=5):
+    robot.clear_commands()
+
     robot.home(enqueue=True)
 
     volume = 200 # ul
@@ -44,4 +59,5 @@ def dilution_series(dilution_frac=1e-1, num_tubes=5):
         p200.drop_tip()
 
     print(robot.commands())
-    robot.simulate()
+    robot.run()
+    robot.clear_commands()

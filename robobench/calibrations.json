@@ -1,0 +1,80 @@
+{
+    "a:p200-8": {
+        "max_volume": 200,
+        "positions": {
+            "top": 9.2,
+            "bottom": 22.2,
+            "blow_out": 22.7,
+            "drop_tip": 25.7
+        },
+        "calibration_data": {
+            "B2": {
+                "children": {
+                    "tiprack-200ul": {
+                        "delta": "{\"y\": 13.460000000000008, \"z\": -28.80000000000001, \"x\": -23.289999999999992}"
+                    }
+                }
+            },
+            "B1": {
+                "children": {
+                    "96-flat": {
+                        "delta": "{\"y\": 10.609999999999978, \"z\": -32.30000000000001, \"x\": -19.739999999999995}"
+                    }
+                }
+            },
+            "C2": {
+                "children": {
+                    "holywastedplasticbatman": {
+                        "delta": "{\"y\": 67.25, \"z\": 0.0, \"x\": -10.0}"
+                    }
+                }
+            },
+            "B3": {
+                "children": {
+                    "ddH2O-trough": {
+                        "delta": "{\"y\": 87.25, \"z\": -20.0, \"x\": 0.0}"
+                    }
+                }
+            }
+        }
+    },
+    "b:p200-8": {
+        "max_volume": 200,
+        "positions": {
+            "top": null,
+            "bottom": null,
+            "drop_tip": null,
+            "blow_out": null
+        },
+        "calibration_data": {
+            "B2": {
+                "children": {
+                    "tiprack-200ul": {
+                        "delta": "{\"y\": 14.159999999999997, \"z\": -25.0, \"x\": -29.989999999999995}"
+                    }
+                }
+            },
+            "B1": {
+                "children": {
+                    "96-flat": {
+                        "delta": "{\"y\": 10.21, \"z\": -32.0, \"x\": -29.439999999999998}"
+                    }
+                }
+            },
+            "C2": {
+                "children": {
+                    "holywastedplasticbatman": {
+                        "delta": "{\"y\": 67.25, \"z\": -30.0, \"x\": -15.0}"
+                    }
+                }
+            },
+            "B3": {
+                "children": {
+                    "ddH2O-trough": {
+                        "delta": "{\"y\": 87.25, \"z\": -20.0, \"x\": -5.0}"
+                    }
+                }
+            }
+        }
+    }
+}

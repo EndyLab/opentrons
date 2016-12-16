@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 from flask_ask import Ask, statement, question
 import robocontroller
+import threading
 
 app = Flask(__name__)
 ask = Ask(app, '/')
@@ -21,11 +22,14 @@ def moveliquid(start, end, volume):
     if start is None or end is None:
         return question("Please tell me where to move things. For example, Alexa, tell Robo Bench to move 100 microlitres of A 1 to C 1")
 
+    start = start.upper().replace(" ", "")
+    end = end.upper().replace(" ", "")
+
     print("Starting move from {} to {}: {} ul".format(start, end, volume))
 
-    robocontroller.move_liquid(start, end, volume)
+    threading.Thread(target=robocontroller.move_liquid, args=(start, end, volume)).start()    # robocontroller.move_liquid(start, end, volume)
 
-    return statement("Moved {} microlitres from {} to {}".format(volume, start, end))
+    return statement("Moving {} microlitres from {} to {}".format(volume, start, end))
 
 @ask.intent('DilutionSeriesIntent', convert={'count': int, 'ratio': int})
 def protocol(count, ratio):
@@ -34,7 +38,9 @@ def protocol(count, ratio):
 
     print("Starting dilution series with count {} and ratio 1:{}".format(count, ratio))
 
-    robocontroller.dilution_series(1/ratio, count)
+    threading.Thread(target=robocontroller.dilution_series, args=(1/ratio, count)).start()    # robocontroller.move_liquid(start, end, volume)
+
+    # robocontroller.dilution_series(1/ratio, count)
 
     return statement("Okay, making a 1 in {} dilution series with {} tubes".format(ratio, count)) \
         .simple_card(
