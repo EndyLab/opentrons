@@ -13,7 +13,7 @@ To install and use the Robobench Alexa/Echo integration, you need to download an
   * The Amazon intents and utterances are in the robobench/alexa subdirectory.
   * Run `ngrok http 5000` to build a tunnel, and point the Alexa endpoint at the URL it gives you.
 * Run the controller locally:
-** Set the OpenTrons data directory so we pick up calibration data: `export APP_DATA_DIR=<otone_dir>`. On OS X this is in ~/Library/OT One App 2/otone_data
-** Run the controller: `python ./alexa.py`
+ * Set the OpenTrons data directory so we pick up calibration data: `export APP_DATA_DIR=<otone_dir>`. On OS X this is in ~/Library/OT One App 2/otone_data
+ * Run the controller: `python ./alexa.py`
 
 Note that it is helpful to set up a .py protocol matching the deck layout in alexa.py, so that you can calibrate locations through the app.
