@@ -1,0 +1,3 @@
+opentrons>=2.0.1
+flask_ask
+cryptography==1.4
