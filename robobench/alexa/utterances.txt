@@ -1,4 +1,10 @@
-HelloIntent Hello my name is {firstname}
-HelloIntent Hi my name is {firstname}
-HelloIntent Hi I.m {firstname}
-HelloIntent Hello I.m {firstname}
+MoveLiquidIntent move from {start} to {end}
+MoveLiquidIntent move {volume} microliters from {start} to {end}
+
+DilutionSeriesIntent dilution series {count} tubes one in {ratio}
+DilutionSeriesIntent one in {ratio} dilution with {count} tubes
+DilutionSeriesIntent one to {ratio} dilution with {count} tubes
+DilutionSeriesIntent make a dilution series one in {ratio} with {count} tubes
+DilutionSeriesIntent make a one in {ratio} dilution with {count} tubes
+DilutionSeriesIntent make a one in {ratio} dilution
+DilutionSeriesIntent one in {ratio} dilution
