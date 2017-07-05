@@ -4,7 +4,7 @@ from opentrons import robot, instruments
 
 # from mess import FixedRatio
 
-INCR = 10
+GLOBAL_INCR = 10
 
 # ports = robot.get_serial_ports_list()
 # print(ports)
@@ -28,10 +28,9 @@ def get_coords():
 
 def mouse_callback(event):
     msg.set("clicked at " + str(event.x) + " " + str(event.y))
-    move_to(float(event.x), float(event.y), 100)
     print(msg.get())
 
-def move_axis_by(axis, incr):
+def move_by(axis, incr):
     msg.set("moving axis: " + str(axis) + " by " + str(incr) + " amount")
     print(msg.get())
 
@@ -54,34 +53,22 @@ def move_to(x, y, z):
     pos_str.set("x: " + str(x) + "\ny: " + str(y) + "\nz: " + str(z))
 
 def key_to_cmd(event):
-    key_dict_robot = {
-        'Up': ('y', INCR), 
-        'Down': ('y', -1*INCR), 
-        'Left': ('x', -1*INCR), 
-        'Right': ('x', INCR), 
-        'Return': ('z', INCR), 
-        'Shift_R': ('z', -1*INCR)
+    key_dict = {
+        'w': ('plunger', 10), 
+        's': ('plunger', -10), 
+        'a': ('pip choice',-10), 
+        'd': ('pip choice', 10), 
+        'Up': ('y', 10), 
+        'Down': ('y', -10), 
+        'Left': ('x', -10), 
+        'Right': ('x', 10), 
+        'Return': ('z', 10), 
+        'Shift_R': ('z', -10)
     }
-
-    key_dict_pipette = {
-        'w': ('plunger', INCR), 
-        's': ('plunger', -1*INCR), 
-        'a': ('pip choice',-1*INCR), 
-        'd': ('pip choice', INCR), 
-    }
-    # motor.speed(speed)
-    # motor.move(destination)
     
-    for key in key_dict_robot.keys():
+    for key in key_dict.keys():
         if event.keysym == key:
-            move_axis_by(key_dict_robot[key][0], key_dict_robot[key][1])
-            break
-
-    for key in key_dict_pipette.keys():
-        if event.keysym == key:
-            # motor.move()
-            break
-
+            move_by(key_dict[key][0], key_dict[key][1])
 
 #Create & Configure root 
 win = Tk()
@@ -97,7 +84,6 @@ msg = StringVar()
 msg.set("status message...")
 
 pos_str = StringVar()
-pos_str.set("x: \ny: \nz:")
 
 # keyboard focus
 win.focus_set()
@@ -117,17 +103,6 @@ mid_frame.grid(row=0, column=1, sticky=N+S+E+W)
 c = Canvas(mid_frame, bg="white", width=200, height=200)
 c.pack()
 c.bind("<Button-1>", mouse_callback)
-
-#cross
-def draw_cross(x, y, len, thickness):
-    c.create_line(x-len, y, x+len, y, fill="#476042", width=thickness)
-    c.create_line(x, y-len, x, y+len, fill="#476042", width=thickness)
-
-step=50
-for x in range(0,200,step):
-    for y in range(0,200,step):
-        draw_cross(x,y,5,3)
-        # print("x:",x,"y:",y)  
 
 # pos stats
 right_frame = Frame(win, bd=1)
@@ -153,10 +128,11 @@ button_right = Button(left_frame, text=">", height=1, width=2).grid(row=5, colum
 l1 = Label(right_frame, text = "x: ").grid(row=0, sticky=E)
 l2 = Label(right_frame, text = "y: ").grid(row=1, sticky=E)
 l3 = Label(right_frame, text = "z: ").grid(row=2, sticky=E)
+
+entry = []
 x_entry = DoubleVar()
 y_entry = DoubleVar()
 z_entry = DoubleVar()
-entry = []
 entry_vars = [x_entry, y_entry, z_entry]
 for j in range(0,3):
     entry.append(Entry(right_frame, textvariable=entry_vars[j]).grid(row=j,column=1))
@@ -167,17 +143,6 @@ coords = get_coords()
 pos_text = Label(right_frame, textvariable=pos_str)
 pos_text.grid(columnspan=2, sticky=W)
 pos_text.config(justify=LEFT)
-
-# incr slider
-ticks = [1,2,5,10,20]
-def slider_set(value):
-    new_value = min(ticks, key=lambda x:abs(x-float(value)))
-    slider.set(new_value)
-    global INCR 
-    INCR = int(float(new_value))
-
-slider = Scale(right_frame, from_=1, to=20, orient=HORIZONTAL, command=slider_set)
-slider.grid(row=5, columnspan=2)
 
 # status message
 status = Label(bottom_frame, textvariable=msg, bd=1, relief=SUNKEN, anchor=W)
