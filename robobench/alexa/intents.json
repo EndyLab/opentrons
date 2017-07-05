@@ -20,5 +20,8 @@
       "name": "volume",
       "type": "AMAZON.NUMBER"
     }]
-  }]
+  }, {
+    "intent": "HomeIntent",
+    "slots": []
+    }]
 }

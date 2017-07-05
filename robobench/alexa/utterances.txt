@@ -3,8 +3,18 @@ MoveLiquidIntent move {volume} microliters from {start} to {end}
 
 DilutionSeriesIntent dilution series {count} tubes one in {ratio}
 DilutionSeriesIntent one in {ratio} dilution with {count} tubes
+DilutionSeriesIntent one in {ratio} dilution series with {count} tubes
 DilutionSeriesIntent one to {ratio} dilution with {count} tubes
+DilutionSeriesIntent one to {ratio} dilution  series with {count} tubes
 DilutionSeriesIntent make a dilution series one in {ratio} with {count} tubes
 DilutionSeriesIntent make a one in {ratio} dilution with {count} tubes
+DilutionSeriesIntent make a one in {ratio} dilution series with {count} tubes
 DilutionSeriesIntent make a one in {ratio} dilution
+DilutionSeriesIntent make a one in {ratio} dilution series
 DilutionSeriesIntent one in {ratio} dilution
+
+HomeIntent home
+HomeIntent home the robot
+HomeIntent reset
+HomeIntent zero
+HomeIntent rehome
