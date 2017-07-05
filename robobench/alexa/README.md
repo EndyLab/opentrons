@@ -1,4 +1,6 @@
 # Robobench v1
+# Robobench V2
+We're robobench even better!
 
 Welcome to RoboBench! We're interested in ways to make lab automation more accessible, so that it can be incorporated into everyday lab workflows rather than only used for large repetitive projects.
 
