@@ -4,7 +4,7 @@ from opentrons import robot, instruments
 
 # from mess import FixedRatio
 
-INCR = 10
+INCR = 2
 
 # ports = robot.get_serial_ports_list()
 # print(ports)
@@ -53,6 +53,55 @@ def move_to(x, y, z):
     print("moving robot to: x= ",x," y= ",y, " z= ",z, sep='')
     pos_str.set("x: " + str(x) + "\ny: " + str(y) + "\nz: " + str(z))
 
+PIPETTE_AXIS = 'a'
+
+# "active pipette: \nplunger pos: \npipette a:\n pipette b:"
+# arg format: (arg type, arg, ...)
+# pip_desc = {
+#     "active pipette: ": "",
+#     "\nplunger pos: " : "",
+#     "\npipette a: "   : "",
+#     "\npipette b: "   : ""
+# }
+def update_pipette_str(*arg):
+    key = ""
+    res = pipette_str.get()
+    for j in range(0, len(arg),2):
+        if arg[j] == "axis":
+            key = "active pipette: "
+        elif arg[j] == "pos_active":
+            key = "\nplunger pos: "
+        elif arg[j] == "pos_a":
+            key = "\npipette a: "
+        elif arg[j] == "pos_b":
+            key = "\npipette b: "
+        else:
+            print("error: not valid pipette var")
+
+        pip_desc[key] = arg[j+1]
+
+    dict_to_str(pip_desc)
+
+
+def pipette_select(axis):
+    global PIPETTE_AXIS
+    PIPETTE_AXIS = axis
+    msg.set("axis: " + axis + " selected")
+    update_pipette_str("axis", axis)
+    # pipette_str.set("active pipette: " + axis + "\nplunger pos: \npipette a:\npipette b:")
+
+
+def depress_pipette(incr):
+    # moves A axis to position 5
+    if PIPETTE_AXIS == 'a':
+        robot._driver.move_plunger(mode='absolute', a=incr)
+        update_pipette_str("pos_a", str(incr),"pos_active", str(incr))
+    elif PIPETTE_AXIS == 'b':
+        robot._driver.move_plunger(mode='absolute', b=incr)
+        update_pipette_str("pos_b", str(incr),"pos_active", str(incr)) 
+
+    msg.set("pipette "+PIPETTE_AXIS+" plunger pos changed by "+str(incr))
+
 def key_to_cmd(event):
     key_dict_robot = {
         'Up': ('y', INCR), 
@@ -64,13 +113,11 @@ def key_to_cmd(event):
     }
 
     key_dict_pipette = {
-        'w': ('plunger', INCR), 
-        's': ('plunger', -1*INCR), 
-        'a': ('pip choice',-1*INCR), 
-        'd': ('pip choice', INCR), 
+        'w': (depress_pipette, INCR), 
+        's': (depress_pipette, -1*INCR), 
+        'a': (pipette_select, 'a'), 
+        'd': (pipette_select, 'b'), 
     }
-    # motor.speed(speed)
-    # motor.move(destination)
     
     for key in key_dict_robot.keys():
         if event.keysym == key:
@@ -79,7 +126,7 @@ def key_to_cmd(event):
 
     for key in key_dict_pipette.keys():
         if event.keysym == key:
-            # motor.move()
+            key_dict_pipette[key][0](key_dict_pipette[key][1])
             break
 
 
@@ -99,6 +146,21 @@ msg.set("status message...")
 pos_str = StringVar()
 pos_str.set("x: \ny: \nz:")
 
+pipette_str = StringVar()
+pip_desc = {
+    "active pipette: "  : "",
+    "\nplunger pos: "   : "",
+    "\npipette a: "      : "",
+    "\npipette b: "      : ""
+}
+
+def dict_to_str(strdict):
+    res = ""
+    for key in strdict.keys():
+        res += (key + strdict[key])
+    pipette_str.set(res)
+
+dict_to_str(pip_desc)
 # keyboard focus
 win.focus_set()
 win.bind('<Key>', key_to_cmd)
@@ -162,12 +224,6 @@ for j in range(0,3):
     entry.append(Entry(right_frame, textvariable=entry_vars[j]).grid(row=j,column=1))
 move_button = Button(right_frame, text = "Move", command = lambda: move_to(x_entry.get(), y_entry.get(), z_entry.get())).grid(columnspan=2)
 
-# pos stats text
-coords = get_coords()
-pos_text = Label(right_frame, textvariable=pos_str)
-pos_text.grid(columnspan=2, sticky=W)
-pos_text.config(justify=LEFT)
-
 # incr slider
 ticks = [1,2,5,10,20]
 def slider_set(value):
@@ -177,7 +233,19 @@ def slider_set(value):
     INCR = int(float(new_value))
 
 slider = Scale(right_frame, from_=1, to=20, orient=HORIZONTAL, command=slider_set)
-slider.grid(row=5, columnspan=2)
+slider.grid(columnspan=2)
+
+# pos stats text
+coords = get_coords()
+pos_txt = Label(right_frame, textvariable=pos_str)
+pos_txt.grid(columnspan=2, sticky=W)
+pos_txt.config(justify=LEFT)
+
+# pipette stats text
+pipette_txt = Label(right_frame, textvariable=pipette_str)
+pipette_txt.grid(columnspan=2, sticky=W)
+pipette_txt.config(justify=LEFT)
+
 
 # status message
 status = Label(bottom_frame, textvariable=msg, bd=1, relief=SUNKEN, anchor=W)
