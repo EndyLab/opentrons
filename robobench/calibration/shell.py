@@ -1,6 +1,6 @@
 """ TODO:
         [x] canvas graphical indication DONE
-        [ ] out of bounds handling
+        [x] out of bounds handling
         [ ] robot disconnect command
         [ ] gui shell input (commands)
         [ ] link buttons to commands
@@ -13,7 +13,6 @@ import warnings
 
 # treat warnings like errors
 warnings.filterwarnings("error")
-
 
 def opentrons_connect():
     try:
