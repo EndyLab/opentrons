@@ -1,9 +1,9 @@
 """ TODO:
-        canvas graphical indication
-        out of bounds handling
-        robot disconnect command
-        gui shell input (commands)
-        link buttons to commands
+        [x] canvas graphical indication DONE
+        [ ] out of bounds handling
+        [ ] robot disconnect command
+        [ ] gui shell input (commands)
+        [ ] link buttons to commands
 """
 
 from tkinter import *
@@ -50,17 +50,22 @@ def move_axis_by(axis, increment):
     pos[axis_dict[str(axis)]] = coords[axis_dict[str(axis)]]+increment
     move_to(pos[0], pos[1], pos[2])
 
-def move_marker(canvas, marker, x, y):
-    m_pos = canvas.coords(marker)
-    dx = (x-marker_size/2) - m_pos[0] 
-    dy = (y-marker_size/2) - m_pos[1] 
-    canvas.move(marker, dx, dy)
+# box dimensions
+# x: 0, 310
+# y: -145, 400
+def move_marker(x1, y1, x2, y2):
+    dx = x2 - x1 
+    dy = y2 - y1
+    c.move(marker, dx, dy)
 
 def move_to(x, y, z):
+    old_x = get_coords().x
+    old_y = get_coords().y
     robot.move_head(x=x, y=y, z=z)
     print("moving robot to: x= ",x," y= ",y, " z= ",z, sep='')
     pos_str.set("x: " + str(x) + "\ny: " + str(y) + "\nz: " + str(z))
-
+    move_marker(old_x, old_y, x, y)
+ 
 
 # arg format: (arg type, arg, ...)
 # pip_desc = {
@@ -137,120 +142,6 @@ def key_to_cmd(event):
 #Create & Configure root 
 win = Tk()
 
-##############
-# LEFT FRAME #
-##############
-def left_frame_setup():
-    left_frame_setup = Frame(win, bd=1)
-    left_frame_setup.grid(row=0, column=0, sticky=N)
-
-    # wasd
-    button_w = Button(left_frame_setup, text="W", height=1, width=2).grid(row=0, column=1)
-    button_a = Button(left_frame_setup, text="A", height=1, width=2).grid(row=1, column=0)
-    button_s = Button(left_frame_setup, text="S", height=1, width=2).grid(row=1, column=1)
-    button_d = Button(left_frame_setup, text="D", height=1, width=2).grid(row=1, column=2)
-
-    # arrow keys
-    button_up = Button(left_frame_setup, text="^", height=1, width=2).grid(row=4, column=1)
-    button_left = Button(left_frame_setup, text="<", height=1, width=2).grid(row=5, column=0)
-    button_down = Button(left_frame_setup, text="|", height=1, width=2).grid(row=5, column=1)
-    button_right = Button(left_frame_setup, text=">", height=1, width=2).grid(row=5, column=2)
-
-    # shift and enter
-    button_enter = Button(left_frame_setup, text="Enter", height=1).grid(row=6, column=0, columnspan=3)
-    button_shift = Button(left_frame_setup, text="Shift", height=1).grid(row=7, column=0, columnspan=3)
-
-
-#############
-# MID FRAME #
-#############
-def mid_frame_setup():
-    mid_frame_setup = Frame(win, bd=1, relief=SUNKEN, width=200, height=200)
-    mid_frame_setup.grid(row=0, column=1, sticky=N+S+E+W)
-    c = Canvas(mid_frame_setup, bg="white", width=200, height=200)
-    c.pack()
-    c.bind("<Button-1>", mouse_callback)
-
-    #cross
-    def draw_cross(x, y, len, thickness):
-        c.create_line(x-len, y, x+len, y, fill="#476042", width=thickness)
-        c.create_line(x, y-len, x, y+len, fill="#476042", width=thickness)
-
-    step=50
-    for x in range(0,200,step):
-        for y in range(0,200,step):
-            draw_cross(x,y,5,3)
-            # print("x:",x,"y:",y) 
-
-    coords = get_coords()
-    curr_x = coords.x
-    curr_y = coords.y
-    marker = c.create_rectangle(curr_x-marker_size/2,y-marker_size/2,curr_x+marker_size/2,y+marker_size/2, fill="blue")
-    # move_marker(c, marker, x, y)
-    
-###############
-# RIGHT FRAME #
-###############
-def right_frame_setup():
-    # pos stats
-    right_frame_setup = Frame(win, bd=1)
-    right_frame_setup.grid(row=0, column=2, sticky=N)
-
-    # enter coords
-    l1 = Label(right_frame_setup, text = "x: ").grid(row=0, sticky=E)
-    l2 = Label(right_frame_setup, text = "y: ").grid(row=1, sticky=E)
-    l3 = Label(right_frame_setup, text = "z: ").grid(row=2, sticky=E)
-    x_entry = DoubleVar()
-    y_entry = DoubleVar()
-    z_entry = DoubleVar()
-    entry = []
-    entry_vars = [x_entry, y_entry, z_entry]
-    for j in range(0,3):
-        entry.append(Entry(right_frame_setup, textvariable=entry_vars[j]).grid(row=j,column=1))
-    move_button = Button(right_frame_setup, text = "Move", command = lambda: move_to(x_entry.get(), y_entry.get(), z_entry.get())).grid(columnspan=2)
-
-    # increment slider
-    ticks = [1,2,5,10,20]
-    def slider_set(value):
-        new_value = min(ticks, key=lambda x:abs(x-float(value)))
-        slider.set(new_value)
-        global increment 
-        increment = int(float(new_value))
-
-    slider = Scale(right_frame_setup, from_=1, to=20, orient=HORIZONTAL, command=slider_set)
-    slider.grid(columnspan=2)
-
-    # pos stats text
-    coords = get_coords()
-    pos_txt = Label(right_frame_setup, textvariable=pos_str)
-    pos_txt.grid(columnspan=2, sticky=W)
-    pos_txt.config(justify=LEFT)
-
-    # pipette stats text
-    pipette_txt = Label(right_frame_setup, textvariable=pipette_str)
-    pipette_txt.grid(columnspan=2, sticky=W)
-    pipette_txt.config(justify=LEFT)
-
-################
-# BOTTOM FRAME #
-################
-def bottom_frame_setup():
-    # error message
-    bottom_frame_setup = Frame(win)
-    bottom_frame_setup.grid(row=1, column=0, columnspan=3, sticky=S+W)
-
-    # status message
-    status = Label(bottom_frame_setup, textvariable=status_str, bd=1, relief=SUNKEN, anchor=W)
-    status.grid(row=0,column=0, sticky=W)
-
-    opentrons_connect()
-
-    # configure app window
-    Grid.rowconfigure(win, 0, weight=1)
-    Grid.columnconfigure(win, 0, weight=1)
-    Grid.columnconfigure(win, 1, weight=1)    
-    Grid.columnconfigure(win, 2, weight=1)   
-
 ####################
 # INIT GLOBAL VARS #
 ####################
@@ -293,9 +184,123 @@ win.focus_set()
 win.bind('<Key>', key_to_cmd)
 
 # frames
-left_frame_setup()
-mid_frame_setup()
-right_frame_setup()
-bottom_frame_setup()
+# left_frame_setup()
+# mid_frame_setup()
+# right_frame_setup()
+# bottom_frame_setup()
+
+##############
+# LEFT FRAME #
+##############
+# def left_frame_setup():
+left_frame_setup = Frame(win, bd=1)
+left_frame_setup.grid(row=0, column=0, sticky=N)
+
+# wasd
+button_w = Button(left_frame_setup, text="W", height=1, width=2).grid(row=0, column=1)
+button_a = Button(left_frame_setup, text="A", height=1, width=2).grid(row=1, column=0)
+button_s = Button(left_frame_setup, text="S", height=1, width=2).grid(row=1, column=1)
+button_d = Button(left_frame_setup, text="D", height=1, width=2).grid(row=1, column=2)
+
+# arrow keys
+button_up = Button(left_frame_setup, text="^", height=1, width=2).grid(row=4, column=1)
+button_left = Button(left_frame_setup, text="<", height=1, width=2).grid(row=5, column=0)
+button_down = Button(left_frame_setup, text="|", height=1, width=2).grid(row=5, column=1)
+button_right = Button(left_frame_setup, text=">", height=1, width=2).grid(row=5, column=2)
+
+# shift and enter
+button_enter = Button(left_frame_setup, text="Enter", height=1).grid(row=6, column=0, columnspan=3)
+button_shift = Button(left_frame_setup, text="Shift", height=1).grid(row=7, column=0, columnspan=3)
+
+
+#############
+# MID FRAME #
+#############
+# def mid_frame_setup():
+mid_frame_setup = Frame(win, bd=1, relief=SUNKEN, width=200, height=200)
+mid_frame_setup.grid(row=0, column=1, sticky=N+S+E+W)
+c = Canvas(mid_frame_setup, bg="white", width=200, height=200)
+c.pack()
+c.bind("<Button-1>", mouse_callback)
+
+#cross
+def draw_cross(x, y, len, thickness):
+    c.create_line(x-len, y, x+len, y, fill="#476042", width=thickness)
+    c.create_line(x, y-len, x, y+len, fill="#476042", width=thickness)
+
+step=50
+for x in range(0,200,step):
+    for y in range(0,200,step):
+        draw_cross(x,y,5,3)
+        # print("x:",x,"y:",y) 
+
+# marker
+coords = get_coords()
+curr_x = coords.x
+curr_y = coords.y
+marker = c.create_rectangle(curr_x-marker_size/2,y-marker_size/2,curr_x+marker_size/2,y+marker_size/2, fill="blue")
+    
+###############
+# RIGHT FRAME #
+###############
+# def right_frame_setup():
+# pos stats
+right_frame_setup = Frame(win, bd=1)
+right_frame_setup.grid(row=0, column=2, sticky=N)
+
+# enter coords
+l1 = Label(right_frame_setup, text = "x: ").grid(row=0, sticky=E)
+l2 = Label(right_frame_setup, text = "y: ").grid(row=1, sticky=E)
+l3 = Label(right_frame_setup, text = "z: ").grid(row=2, sticky=E)
+x_entry = DoubleVar()
+y_entry = DoubleVar()
+z_entry = DoubleVar()
+entry = []
+entry_vars = [x_entry, y_entry, z_entry]
+for j in range(0,3):
+    entry.append(Entry(right_frame_setup, textvariable=entry_vars[j]).grid(row=j,column=1))
+move_button = Button(right_frame_setup, text = "Move", command = lambda: move_to(x_entry.get(), y_entry.get(), z_entry.get())).grid(columnspan=2)
+
+# increment slider
+ticks = [1,2,5,10,20]
+def slider_set(value):
+    new_value = min(ticks, key=lambda x:abs(x-float(value)))
+    slider.set(new_value)
+    global increment 
+    increment = int(float(new_value))
+
+slider = Scale(right_frame_setup, from_=1, to=20, orient=HORIZONTAL, command=slider_set)
+slider.grid(columnspan=2)
+
+# pos stats text
+coords = get_coords()
+pos_txt = Label(right_frame_setup, textvariable=pos_str)
+pos_txt.grid(columnspan=2, sticky=W)
+pos_txt.config(justify=LEFT)
+
+# pipette stats text
+pipette_txt = Label(right_frame_setup, textvariable=pipette_str)
+pipette_txt.grid(columnspan=2, sticky=W)
+pipette_txt.config(justify=LEFT)
+
+################
+# BOTTOM FRAME #
+################
+# def bottom_frame_setup():
+# error message
+bottom_frame_setup = Frame(win)
+bottom_frame_setup.grid(row=1, column=0, columnspan=3, sticky=S+W)
+
+# status message
+status = Label(bottom_frame_setup, textvariable=status_str, bd=1, relief=SUNKEN, anchor=W)
+status.grid(row=0,column=0, sticky=W)
+
+opentrons_connect()
+
+# configure app window
+Grid.rowconfigure(win, 0, weight=1)
+Grid.columnconfigure(win, 0, weight=1)
+Grid.columnconfigure(win, 1, weight=1)    
+Grid.columnconfigure(win, 2, weight=1)   
 
 win.mainloop()
