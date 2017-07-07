@@ -55,7 +55,7 @@ def move_axis_by(axis, increment):
 # y: -145, 400
 def move_marker(x1, y1, x2, y2):
     dx = x2 - x1 
-    dy = y2 - y1
+    dy = (y2 - y1)*-1
     c.move(marker, dx, dy)
 
 def move_to(x, y, z):
@@ -234,11 +234,8 @@ for x in range(0,200,step):
         draw_cross(x,y,5,3)
         # print("x:",x,"y:",y) 
 
-# marker
-coords = get_coords()
-curr_x = coords.x
-curr_y = coords.y
-marker = c.create_rectangle(curr_x-marker_size/2,y-marker_size/2,curr_x+marker_size/2,y+marker_size/2, fill="blue")
+# marker initialize
+marker = c.create_rectangle(0,0,marker_size,marker_size, fill="blue")
     
 ###############
 # RIGHT FRAME #
