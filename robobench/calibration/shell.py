@@ -14,6 +14,7 @@ import warnings
 # treat warnings like errors
 warnings.filterwarnings("error")
 
+
 def opentrons_connect():
     try:
         # physical robot
@@ -39,7 +40,7 @@ def get_coords():
     return pos
 
 def in_bounds(x,y,z):
-    return (x > 0 and x < 310) and (y > -145 and y < 400)
+    return (x >= X_MIN and x <= X_MAX) and (y >= Y_MIN and y <= Y_MAX)
 
 def mouse_callback(event):
     status_str.set("clicked at " + str(event.x) + " " + str(event.y))
@@ -48,19 +49,24 @@ def mouse_callback(event):
     # cant use move_marker bc mouse y coords are not flipped like the robot coords are
     x1 = pos[0]
     y1 = pos[1]
+
     x2 = event.x
     y2 = event.y
+
     dx = x2 - x1 
     dy = y2 - y1
+
     print("x1:",x1,"y1:",y1,"x2:",x2,"y2:",y2,"dx:",dx,"dy:",dy)
-    c.move(marker, dx, dy)
+    
     x = x2
-    y = y2*-1
+    y = Y_MAX - Y_MIN - y2
     z = get_coords().z
-    # if in_bounds(x,y,z):
-    robot.move_head(x=x, y=y, z=z)
-    print("moving robot to: x= ",x," y= ",y, " z= ",z, sep='')
-    pos_str.set("x: " + str(x) + "\ny: " + str(y) + "\nz: " + str(z))
+    print("MPUSE x:", x,"y:",y,"z",z)
+    if in_bounds(x,y,z):
+        c.move(marker, dx, dy)
+        robot.move_head(x=x, y=y, z=z)
+        print("moving robot to: x= ",x," y= ",y, " z= ",z, sep='')
+        pos_str.set("x: " + str(x) + "\ny: " + str(y) + "\nz: " + str(z))
     print(status_str.get())
 
 
@@ -89,17 +95,17 @@ def move_marker(x1, y1, x2, y2):
     c.move(marker, dx, dy)
 
 def move_to(x, y, z):
-    # try: 
-    old_x = get_coords().x
-    old_y = get_coords().y
-    move_marker(old_x, old_y, x, y)
-    robot.move_head(x=x, y=y, z=z)
-    print("moving robot to: x= ",x," y= ",y, " z= ",z, sep='')
-    pos_str.set("x: " + str(x) + "\ny: " + str(y) + "\nz: " + str(z))
-    # except RuntimeWarning:
-        # print("about to crash pls move in the opposite direction")
-    # except RuntimeError:
-        # print("rip")
+    try: 
+        old_x = get_coords().x
+        old_y = get_coords().y
+        move_marker(old_x, old_y, x, y)
+        robot.move_head(x=x, y=y, z=z)
+        print("moving robot to: x= ",x," y= ",y, " z= ",z, sep='')
+        pos_str.set("x: " + str(x) + "\ny: " + str(y) + "\nz: " + str(z))
+    except RuntimeWarning:
+        print("about to crash pls move in the opposite direction")
+    except RuntimeError:
+        print("rip")
  
 
 # arg format: (arg type, arg, ...)
@@ -198,7 +204,7 @@ shell_input.set(">")
 
 # xyz pos message
 pos_str = StringVar()
-pos_str.set("x: \ny: \nz:")
+pos_str.set("x: "+str(get_coords().x)+"\ny: "+str(get_coords().y)+"\nz:"+str(get_coords().z))
 
 # pipette pos/info message
 pipette_str = StringVar()
@@ -259,8 +265,18 @@ button_home = Button(left_frame, text="home", height=1, command=lambda: robot.ho
 # def mid_frame():
 # x: 0, 310
 # y: -145, 400
-x_dim = 310 + 2*marker_size
-y_dim = 545 + 2*marker_size
+# slow box
+# x: 0, 373
+# y: 16, 400
+
+# robo dimensions
+X_MIN = 0
+X_MAX = 373
+Y_MIN = 16
+Y_MAX = 400
+
+y_dim = Y_MAX - Y_MIN + marker_size
+x_dim = X_MAX - X_MIN + marker_size
 mid_frame = Frame(win, bd=1, relief=SUNKEN, width=x_dim, height=y_dim)
 mid_frame.grid(row=0, column=1, sticky=N+S+E+W)
 c = Canvas(mid_frame, bg="white", width=x_dim, height=y_dim)
@@ -279,8 +295,16 @@ for x in range(0,x_dim,step):
         # print("x:",x,"y:",y) 
 
 # marker initialize
-marker = c.create_rectangle(0,0,marker_size,marker_size, fill="blue")
-    
+# marker = c.create_rectangle(0,0,marker_size,marker_size, fill="blue")
+
+# def map_marker(x_robo, y_robo):
+    # c.create_rectangle(0,0,marker_size,marker_size, fill="blue")
+x = get_coords().x - X_MIN
+y = get_coords().y - Y_MAX
+print("X:",x,"Y:",y)
+marker = c.create_rectangle(x, y, x+marker_size, y+marker_size, fill="blue")
+# map_marker(get_coords().x, get_coords().y)
+
 ###############
 # RIGHT FRAME #
 ###############
