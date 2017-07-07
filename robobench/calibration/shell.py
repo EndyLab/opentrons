@@ -251,15 +251,15 @@ button_down = Button(left_frame, text="|", height=1, width=2).grid(row=5, column
 button_right = Button(left_frame, text=">", height=1, width=2).grid(row=5, column=2)
 
 # shift and enter
-# def robot_stats():
-#     print(robot.versions())
-button_enter = Button(left_frame_setup, text="r", height=1).grid(row=6, column=0, columnspan=3)
-button_shift = Button(left_frame_setup, text="f", height=1).grid(row=7, column=0, columnspan=3)
+def robot_stats():
+    print(robot.versions())
+button_enter = Button(left_frame, text="r", height=1).grid(row=6, column=0, columnspan=3)
+button_shift = Button(left_frame, text="f", height=1).grid(row=7, column=0, columnspan=3)
 
-button_enter = Button(left_frame, text="Enter", height=1, command=robot_stats).grid(row=6, column=0, columnspan=3)
+# button_enter = Button(left_frame, text="Enter", height=1, command=robot_stats).grid(row=6, column=0, columnspan=3)
 # button_shift = Button(left_frame, text="Shift", height=1).grid(row=7, column=0, columnspan=3)
 
-button_home = Button(left_frame, text="home", height=1, command=lambda: robot.home('xyzab')).grid(row=7, column=0, columnspan=3)
+button_home = Button(left_frame, text="home", height=1, command=lambda: robot.home('xyzab')).grid(row=8, column=0, columnspan=3)
 
 #############
 # MID FRAME #
