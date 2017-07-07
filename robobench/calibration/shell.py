@@ -1,10 +1,13 @@
+""" TODO:
+        canvas graphical indication
+        robot disconnect command
+        gui shell input (commands)
+        link buttons to commands
+"""
+
 from tkinter import *
 import collections
 from opentrons import robot, instruments
-
-# from mess import FixedRatio
-
-INCR = 10
 
 def opentrons_connect():
     # ports = robot.get_serial_ports_list()
@@ -32,8 +35,8 @@ def mouse_callback(event):
     move_to(float(event.x), float(event.y), 100)
     print(status_str.get())
 
-def move_axis_by(axis, incr):
-    status_str.set("moving axis: " + str(axis) + " by " + str(incr) + " amount")
+def move_axis_by(axis, increment):
+    status_str.set("moving axis: " + str(axis) + " by " + str(increment) + " amount")
     print(status_str.get())
 
     axis_dict = {
@@ -43,7 +46,7 @@ def move_axis_by(axis, incr):
     }
     coords = get_coords()
     pos = [coords.x, coords.y, coords.z]
-    pos[axis_dict[str(axis)]] = coords[axis_dict[str(axis)]]+incr
+    pos[axis_dict[str(axis)]] = coords[axis_dict[str(axis)]]+increment
     move_to(pos[0], pos[1], pos[2])
 
 def move_to(x, y, z):
@@ -53,7 +56,6 @@ def move_to(x, y, z):
 
 PIPETTE_AXIS = 'a'
 
-# "active pipette: \nplunger pos: \npipette a:\n pipette b:"
 # arg format: (arg type, arg, ...)
 # pip_desc = {
 #     "active pipette: ": "",
@@ -87,30 +89,31 @@ def pipette_select(axis):
     update_pipette_str("axis", axis)
     # pipette_str.set("active pipette: " + axis + "\nplunger pos: \npipette a:\npipette b:")
 
-def depress_pipette(incr):
+def depress_pipette(increment):
     # moves A axis to position 5
     if PIPETTE_AXIS == 'a':
-        robot._driver.move_plunger(mode='relative', a=incr)
-        update_pipette_str("pos_a", str(incr),"pos_active", str(incr))
+        robot._driver.move_plunger(mode='relative', a=increment)
+        update_pipette_str("pos_a", str(increment),"pos_active", str(increment))
     elif PIPETTE_AXIS == 'b':
-        robot._driver.move_plunger(mode='relative', b=incr)
-        update_pipette_str("pos_b", str(incr),"pos_active", str(incr)) 
+        robot._driver.move_plunger(mode='relative', b=increment)
+        update_pipette_str("pos_b", str(increment),"pos_active", str(increment)) 
 
-    status_str.set("pipette "+PIPETTE_AXIS+" plunger pos changed by "+str(incr))
+    status_str.set("pipette "+PIPETTE_AXIS+" plunger pos changed by "+str(increment))
 
+# translates keyboard input into robot commands
 def key_to_cmd(event):
     key_dict_robot = {
-        'Up': ('y', INCR), 
-        'Down': ('y', -1*INCR), 
-        'Left': ('x', -1*INCR), 
-        'Right': ('x', INCR), 
-        'Return': ('z', INCR), 
-        'Shift_R': ('z', -1*INCR)
+        'Up': ('y', increment), 
+        'Down': ('y', -1*increment), 
+        'Left': ('x', -1*increment), 
+        'Right': ('x', increment), 
+        'Return': ('z', increment), 
+        'Shift_R': ('z', -1*increment)
     }
 
     key_dict_pipette = {
-        'w': (depress_pipette, -1*INCR), 
-        's': (depress_pipette, 1*INCR), 
+        'w': (depress_pipette, -1*increment), 
+        's': (depress_pipette, 1*increment), 
         'a': (pipette_select, 'a'), 
         'd': (pipette_select, 'b'), 
     }
@@ -195,13 +198,13 @@ def right_frame_setup():
         entry.append(Entry(right_frame_setup, textvariable=entry_vars[j]).grid(row=j,column=1))
     move_button = Button(right_frame_setup, text = "Move", command = lambda: move_to(x_entry.get(), y_entry.get(), z_entry.get())).grid(columnspan=2)
 
-    # incr slider
+    # increment slider
     ticks = [1,2,5,10,20]
     def slider_set(value):
         new_value = min(ticks, key=lambda x:abs(x-float(value)))
         slider.set(new_value)
-        global INCR 
-        INCR = int(float(new_value))
+        global increment 
+        increment = int(float(new_value))
 
     slider = Scale(right_frame_setup, from_=1, to=20, orient=HORIZONTAL, command=slider_set)
     slider.grid(columnspan=2)
@@ -240,6 +243,8 @@ def bottom_frame_setup():
 ####################
 # INIT GLOBAL VARS #
 ####################
+# increment for pipette and xyz movement
+increment = 10
 
 # status bar message
 status_str = StringVar()
@@ -254,8 +259,8 @@ pipette_str = StringVar()
 pip_desc = {
     "active pipette: "  : "",
     "\nplunger pos: "   : "",
-    "\npipette a: "      : "",
-    "\npipette b: "      : ""
+    "\npipette a: "     : "",
+    "\npipette b: "     : ""
 }
 
 def dict_to_str(strdict):
@@ -265,7 +270,10 @@ def dict_to_str(strdict):
     pipette_str.set(res)
 
 dict_to_str(pip_desc)
+##########################
+# END OF GLOBAL VAR INIT #
 
+# gui loop
 # keyboard focus to app
 win.focus_set()
 win.bind('<Key>', key_to_cmd)
