@@ -1,5 +1,6 @@
 """ TODO:
         canvas graphical indication
+        out of bounds handling
         robot disconnect command
         gui shell input (commands)
         link buttons to commands
@@ -49,12 +50,17 @@ def move_axis_by(axis, increment):
     pos[axis_dict[str(axis)]] = coords[axis_dict[str(axis)]]+increment
     move_to(pos[0], pos[1], pos[2])
 
+def move_marker(canvas, marker, x, y):
+    m_pos = canvas.coords(marker)
+    dx = (x-marker_size/2) - m_pos[0] 
+    dy = (y-marker_size/2) - m_pos[1] 
+    canvas.move(marker, dx, dy)
+
 def move_to(x, y, z):
     robot.move_head(x=x, y=y, z=z)
     print("moving robot to: x= ",x," y= ",y, " z= ",z, sep='')
     pos_str.set("x: " + str(x) + "\ny: " + str(y) + "\nz: " + str(z))
 
-PIPETTE_AXIS = 'a'
 
 # arg format: (arg type, arg, ...)
 # pip_desc = {
@@ -128,7 +134,6 @@ def key_to_cmd(event):
             key_dict_pipette[key][0](key_dict_pipette[key][1])
             break
 
-
 #Create & Configure root 
 win = Tk()
 
@@ -175,8 +180,14 @@ def mid_frame_setup():
     for x in range(0,200,step):
         for y in range(0,200,step):
             draw_cross(x,y,5,3)
-            # print("x:",x,"y:",y)  
+            # print("x:",x,"y:",y) 
 
+    coords = get_coords()
+    curr_x = coords.x
+    curr_y = coords.y
+    marker = c.create_rectangle(curr_x-marker_size/2,y-marker_size/2,curr_x+marker_size/2,y+marker_size/2, fill="blue")
+    # move_marker(c, marker, x, y)
+    
 ###############
 # RIGHT FRAME #
 ###############
@@ -245,6 +256,9 @@ def bottom_frame_setup():
 ####################
 # increment for pipette and xyz movement
 increment = 10
+marker_size = 10
+
+PIPETTE_AXIS = 'a'
 
 # status bar message
 status_str = StringVar()
