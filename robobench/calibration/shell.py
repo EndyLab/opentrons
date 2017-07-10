@@ -1,6 +1,6 @@
 """ TODO:
         [x] canvas graphical indication DONE
-        [ ] out of bounds handling
+        [x] out of bounds handling
         [ ] robot disconnect command
         [ ] gui shell input (commands)
         [ ] link buttons to commands
@@ -13,7 +13,6 @@ import warnings
 
 # treat warnings like errors
 warnings.filterwarnings("error")
-
 
 def opentrons_connect():
     try:
@@ -59,7 +58,7 @@ def mouse_callback(event):
     print("x1:",x1,"y1:",y1,"x2:",x2,"y2:",y2,"dx:",dx,"dy:",dy)
     
     x = x2
-    y = Y_MAX - Y_MIN - y2
+    y = Y_MAX - y2
     z = get_coords().z
     print("MPUSE x:", x,"y:",y,"z",z)
     if in_bounds(x,y,z):
@@ -293,7 +292,7 @@ def draw_cross(x, y, len, thickness):
 step=50
 for x in range(0,x_dim,step):
     for y in range(0,y_dim,step):
-        draw_cross(x,y,5,3)
+        draw_cross(x,y,5,2)
         # print("x:",x,"y:",y) 
 
 # marker initialize
@@ -363,7 +362,7 @@ status = Label(bottom_frame, textvariable=status_str, bd=1, relief=SUNKEN, ancho
 status.grid(row=0,column=0, sticky=W)
 
 # shell input
-shell = Entry(bottom_frame, textvariable=shell_input).grid(row=1,column=0, sticky=W)
+# shell = Entry(bottom_frame, textvariable=shell_input).grid(row=1,column=0, sticky=W)
 
 # connect to robot
 opentrons_connect()
