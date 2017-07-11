@@ -1,7 +1,26 @@
 import numpy as np
 import cv2
 from imutils import perspective
+from imutils import contours
 from skimage import exposure
+
+DIGITS_LOOKUP = {
+    (1, 1, 1, 0, 1, 1, 1): 0,
+    (0, 0, 1, 0, 0, 1, 0): 1,
+    (1, 0, 1, 1, 1, 1, 0): 2,
+    (1, 0, 1, 1, 0, 1, 1): 3,
+    (0, 1, 1, 1, 0, 1, 0): 4,
+    (1, 1, 0, 1, 0, 1, 1): 5,
+    (1, 1, 0, 1, 1, 1, 1): 6,
+    (1, 0, 1, 0, 0, 1, 0): 7,
+    (1, 1, 1, 1, 1, 1, 1): 8,
+    (1, 1, 1, 1, 0, 1, 1): 9,
+
+    (0, 0, 1, 0, 1, 0, 0): 10,
+    (0, 1, 0, 1, 0, 1, 0): 11,
+    (0, 0, 1, 0, 0, 0, 0): 12,
+    (0, 0, 0, 0, 0, 0, 0): 13
+}
 
 def get_points(contourPoints):
     x = []
@@ -146,19 +165,86 @@ for c in cnts:
     temp = draw_rect(temp, hull)
     """
     (x, y, w, h) = cv2.boundingRect(c)
-    print("coords",(x, y, w, h))
+    rect_coords = (x,y,w,h)
+    print("coords",rect_coords)
 
     # if the contour is sufficiently large, it must be a digit
     if (w >= 15 or w >= 0 and w <=10) and (h >= 40 and h <= 50):
+        #""" optional - drawing the bounding box is for visual clarity
         # compute the bounding box of the contour
-        res = cv2.rectangle(warped,(x,y),(x+w,y+h),(0,255,0),2)
+
+        # the digit 1
+        if (w <= 10):
+            rect_coords = (x-10,y,w+10,h)
+            res = cv2.rectangle(warped,(x-10,y),(x+w,y+h),(0,255,0),2)
+        else:
+            res = cv2.rectangle(warped,(x,y),(x+w,y+h),(0,255,0),2)
         cv2.imshow("RECT TEST", res)
         print("coords that passed",(x, y, w, h))
+        #"""
 
         # add digit coords to lsit
         digits.append(c)
+        # digits.append(rect_coords)
 
 # identify digits
+# sort digits left to right
+digits = contours.sort_contours(digits,method="left-to-right")[0]
+
+# loop over digit contours
+num=0
+identified = []
+for c in digits:
+    # extract the digit from the screen picture
+    (x, y, w, h) = cv2.boundingRect(c)
+    roi = thresh[y:y + h, x:x + w]
+    title = "cropped"+str(num)
+    cv2.imshow(title, roi)
+
+    # compute the width and height of each of the 7 segments
+    # we are going to examine
+    (roiH, roiW) = roi.shape
+    (dW, dH) = (int(roiW * 0.25), int(roiH * 0.15))
+    dHC = int(roiH * 0.05)
+
+    # define the set of 7 segments
+    segments = [
+        ((0, 0), (w, dH)),  # top
+        ((0, 0), (dW, h // 2)), # top-left
+        ((w - dW, 0), (w, h // 2)), # top-right
+        ((0, (h // 2) - dHC) , (w, (h // 2) + dHC)), # center
+        ((0, h // 2), (dW, h)), # bottom-left
+        ((w - dW, h // 2), (w, h)), # bottom-right
+        ((0, h - dH), (w, h))   # bottom
+    ]
+
+    on = [0] * len(segments)
+    # loop over the segments
+    for (i, ((xA, yA), (xB, yB))) in enumerate(segments):
+        # extract the segment ROI, count the total number of
+        # thresholded pixels in the segment, and then compute
+        # the area of the segment
+        segROI = roi[yA:yB, xA:xB]
+        title="segment rip" + str(i)
+        # cv2.imshow(title, roi[yA:yB, xA:xB])
+        total = cv2.countNonZero(segROI)
+        area = (xB - xA) * (yB - yA)
+ 
+        # if the total number of non-zero pixels is greater than
+        # 50% of the area, mark the segment as "on"
+        if total / float(area) > 0.5:
+            on[i]= 1
+ 
+    # lookup the digit and draw it on the image
+    print("tuple",tuple(on))
+    number = DIGITS_LOOKUP[tuple(on)]
+    identified.append(number)
+    cv2.rectangle(warped, (x, y), (x + w, y + h), (0, 255, 0), 1)
+    cv2.putText(warped, str(number), (x - 30, y + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 0), 2)
+
+    num=num+1
+
+cv2.imshow("result", warped)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
