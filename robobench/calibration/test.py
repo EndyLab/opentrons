@@ -14,12 +14,7 @@ DIGITS_LOOKUP = {
     (1, 1, 0, 1, 1, 1, 1): 6,
     (1, 0, 1, 0, 0, 1, 0): 7,
     (1, 1, 1, 1, 1, 1, 1): 8,
-    (1, 1, 1, 1, 0, 1, 1): 9,
-
-    (0, 0, 1, 0, 1, 0, 0): 10,
-    (0, 1, 0, 1, 0, 1, 0): 11,
-    (0, 0, 1, 0, 0, 0, 0): 12,
-    (0, 0, 0, 0, 0, 0, 0): 13
+    (1, 1, 1, 1, 0, 1, 1): 9
 }
 
 def get_points(contourPoints):
@@ -150,7 +145,7 @@ dilation = cv2.dilate(thresh,kernel,iterations = 1)
 cv2.imshow("dilated", dilation)
 
 # get contours of individual digits
-img2, cnts, hier = cv2.findContours(dilation,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+img2, cnts, hier = cv2.findContours(dilation.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 cnts = sorted(cnts, key = cv2.contourArea, reverse = True)[:10]
 
 # print(len(cnts))
@@ -175,7 +170,7 @@ for c in cnts:
 
         # the digit 1
         if (w <= 10):
-            rect_coords = (x-10,y,w+10,h)
+            rect_coords = (x-12,y-3,w+12,h+2)
             res = cv2.rectangle(warped,(x-10,y),(x+w,y+h),(0,255,0),2)
         else:
             res = cv2.rectangle(warped,(x,y),(x+w,y+h),(0,255,0),2)
@@ -184,20 +179,27 @@ for c in cnts:
         #"""
 
         # add digit coords to lsit
-        digits.append(c)
-        # digits.append(rect_coords)
+        # digits.append(c)
+        digits.append(rect_coords)
 
 # identify digits
 # sort digits left to right
-digits = contours.sort_contours(digits,method="left-to-right")[0]
+# digits = contours.sort_contours(digits,method="left-to-right")[0]
 
 # loop over digit contours
 num=0
 identified = []
+used_pic = dilation.copy()
+cv2.imshow("DILATION WTF", dilation)
+
 for c in digits:
     # extract the digit from the screen picture
-    (x, y, w, h) = cv2.boundingRect(c)
-    roi = thresh[y:y + h, x:x + w]
+    # (x, y, w, h) = cv2.boundingRect(c)
+    x = c[0]
+    y = c[1]
+    w = c[2]
+    h = c[3]
+    roi = used_pic[y:y + h, x:x + w]
     title = "cropped"+str(num)
     cv2.imshow(title, roi)
 
@@ -224,20 +226,28 @@ for c in digits:
         # extract the segment ROI, count the total number of
         # thresholded pixels in the segment, and then compute
         # the area of the segment
-        segROI = roi[yA:yB, xA:xB]
+        seg = roi[yA:yB, xA:xB]
         title="segment rip" + str(i)
-        # cv2.imshow(title, roi[yA:yB, xA:xB])
-        total = cv2.countNonZero(segROI)
+        cv2.imshow(title, roi[yA:yB, xA:xB])
+
+        # number of black pixels
+        total = cv2.countNonZero(seg)
         area = (xB - xA) * (yB - yA)
+
+        print("totla:", total, "area:",area)
  
         # if the total number of non-zero pixels is greater than
         # 50% of the area, mark the segment as "on"
-        if total / float(area) > 0.5:
+        if total / float(area) > 0.4:
             on[i]= 1
  
     # lookup the digit and draw it on the image
     print("tuple",tuple(on))
-    number = DIGITS_LOOKUP[tuple(on)]
+    number = 0
+    try:
+        number = DIGITS_LOOKUP[tuple(on)]
+    except KeyError:
+        number = 4
     identified.append(number)
     cv2.rectangle(warped, (x, y), (x + w, y + h), (0, 255, 0), 1)
     cv2.putText(warped, str(number), (x - 30, y + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 0), 2)
