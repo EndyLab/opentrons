@@ -134,52 +134,31 @@ cv2.imshow("dilated", dilation)
 img2, cnts, hier = cv2.findContours(dilation,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 cnts = sorted(cnts, key = cv2.contourArea, reverse = True)[:10]
 
-print(len(cnts))
-hull = cv2.convexHull(cnts[5])
-cv2.imshow("bounding rect digits", draw_rect(warped, hull))
+# print(len(cnts))
+# hull = cv2.convexHull(cnts[5])
+# cv2.imshow("bounding rect digits", draw_rect(warped, hull))
 
-# for c in cnts:
-#     hull = cv2.convexHull(cnts[1])
-#     draw_rect(warped, hull)
-""" 
-    # approx contour as polygon
-    epsilon = 0.1*cv2.arcLength(c,True)
-    approx = cv2.approxPolyDP(c,epsilon,True)
-
+# get digits
+digits = []
+for c in cnts:
+    """ hull vs rect?
     hull = cv2.convexHull(c)
+    temp = draw_rect(temp, hull)
+    """
+    (x, y, w, h) = cv2.boundingRect(c)
+    print("coords",(x, y, w, h))
 
-    cv2.drawContours(warped,hull,-1,(0,255,0),3)
-    cv2.imshow("TEMP contours", warped)
+    # if the contour is sufficiently large, it must be a digit
+    if (w >= 15 or w >= 0 and w <=10) and (h >= 40 and h <= 50):
+        # compute the bounding box of the contour
+        res = cv2.rectangle(warped,(x,y),(x+w,y+h),(0,255,0),2)
+        cv2.imshow("RECT TEST", res)
+        print("coords that passed",(x, y, w, h))
 
-    # if our approximated contour has four points, then we can assume that we have found our screen
-    if len(approx) == 4:
-        screenContour = approx
-        # print(screenContour)
-        temp = warped.copy()
-        cv2.drawContours(temp,screenContour,-1,(0,255,0),3)
-        cv2.imshow("TEMP", temp)
-        break
-# """
+        # add digit coords to lsit
+        digits.append(c)
 
-# cv2.imshow("test", img2)
+# identify digits
 
-# cnts = sorted(cnts, key = cv2.contourArea, reverse = True)[:10]
-# print(cnts[0])
-
-# cv2.drawContours(warped,cnts[0],-1,(0,255,0),3)
-# cv2.imshow("detected", warped)
-
-# # loop over the digit area candidates
-# digitCnts = []
-# for c in cnts:
-#     # compute the bounding box of the contour
-#     (x, y, w, h) = cv2.boundingRect(c)
- 
-#     # if the contour is sufficiently large, it must be a digit
-#     if w >= 15 and (h >= 30 and h <= 40):
-#         digitCnts.append(c)
-
-
- 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
