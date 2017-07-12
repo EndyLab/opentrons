@@ -84,36 +84,6 @@ def find_screen(img):
 ratio = 0.2
 img = cv2.imread("test.jpg")
 img_scaled = cv2.resize(img,None,fx=ratio,fy=ratio,interpolation=cv2.INTER_LINEAR)
-"""
-img_gray = cv2.cvtColor(img_scaled,cv2.COLOR_BGR2GRAY)
-ret,thresh = cv2.threshold(img_gray,64,255,0)
-img2, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-
-# loop over contours
-contours = sorted(contours, key = cv2.contourArea, reverse = True)[:10]
-# largest contour is img box for test image remove for real camera
-contours = contours[1:]
-for contour in contours:
-    # approximate the contour
-    peri = cv2.arcLength(contour, True)
-    approx = cv2.approxPolyDP(contour, 0.02 * peri, True)
- 
-    # if our approximated contour has four points, then we can assume that we have found our screen
-    if len(approx) == 4:
-        screenContour = approx
-        # print(screenContour)
-        cv2.drawContours(img_scaled,screenContour,-1,(0,255,0),3)
-        cv2.imshow("screen", img_scaled)
-        break
-
-# perspective transform
-print(type(screenContour))
-# pts = np.array(screenContour)
-pts = np.array([(110, 575), (305, 575), (310, 672), (102, 672)])
-print(pts)
-warped = perspective.four_point_transform(img_scaled, pts)
-cv2.imshow("transform", warped)
-"""
 
 # crop the screen
 pts = find_screen(img_scaled)
@@ -182,15 +152,14 @@ for c in cnts:
         # digits.append(c)
         digits.append(rect_coords)
 
-# identify digits
-# sort digits left to right
-# digits = contours.sort_contours(digits,method="left-to-right")[0]
-
 # loop over digit contours
 num=0
 identified = []
 used_pic = dilation.copy()
 cv2.imshow("DILATION WTF", dilation)
+
+# the result image with the identified numbers
+res = img_scaled.copy()
 
 for c in digits:
     # extract the digit from the screen picture
@@ -247,14 +216,28 @@ for c in digits:
     try:
         number = DIGITS_LOOKUP[tuple(on)]
     except KeyError:
-        number = 4
+        number = -1
     identified.append(number)
-    cv2.rectangle(warped, (x, y), (x + w, y + h), (0, 255, 0), 1)
+    print("POINTS:", pts)
+    top_left = pts[0]
+    bot_left = pts[1]
+    top_right = pts[2]
+    bot_right = pts[3]
+
+    x_temp = x+top_left[0]
+    y_temp = y+top_left[1]
+    start_coords = (x_temp,y_temp)
+    end_coords = (x_temp+w, y_temp+h)
+
+    cv2.rectangle(res, start_coords, end_coords, (0, 255, 0), 1)
+    cv2.putText(res, str(number), (x_temp, y_temp - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 0), 2)
+
+    cv2.rectangle(warped, (x,y), (x+w,y+h), (0, 255, 0), 1)
     cv2.putText(warped, str(number), (x - 30, y + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 0), 2)
 
     num=num+1
 
-cv2.imshow("result", warped)
-
+cv2.imshow("result", res)
+cv2.imshow("display", warped)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
