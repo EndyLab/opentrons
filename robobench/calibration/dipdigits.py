@@ -272,11 +272,11 @@ def process_digits_img(img):
     cv2.imshow("THERE IT IS", res)
     cv2.imshow("display", warped)
 
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
 # main function
 ratio = 0.2
-img = cv2.imread("test.jpg")
+img = cv2.imread("test2.jpg")
 img_scaled = cv2.resize(img,None,fx=ratio,fy=ratio,interpolation=cv2.INTER_LINEAR)
 process_digits_img(img_scaled)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
