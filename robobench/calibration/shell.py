@@ -8,16 +8,19 @@
 
 from tkinter import *
 import collections
-from opentrons import robot, instruments
+from opentrons import robot, instruments, containers
+import MyDialog as md
 
 def opentrons_connect():
-    # ports = robot.get_serial_ports_list()
-    # print(ports)
-    # robot.connect(ports[0])
-
-    # simulator
-    robot.connect('Virtual Smoothie')
-    robot.home(now=True)
+    try:
+        # physical robot
+        ports = robot.get_serial_ports_list()
+        print(ports)
+        robot.connect(ports[0])
+    except IndexError:
+        # simulator
+        robot.connect('Virtual Smoothie')
+        robot.home(now=True)
 
     pipette = instruments.Pipette(axis='a')
 
@@ -211,6 +214,65 @@ button_right = Button(left_frame_setup, text=">", height=1, width=2).grid(row=5,
 # shift and enter
 button_enter = Button(left_frame_setup, text="r", height=1).grid(row=6, column=0, columnspan=3)
 button_shift = Button(left_frame_setup, text="f", height=1).grid(row=7, column=0, columnspan=3)
+
+'''
+Simple calibration implementation to explore API for future CV implementation
+'''
+
+# BROWSE guarantees at most one selection at a time
+listbox = Listbox(left_frame_setup, selectmode=BROWSE)
+listbox.grid(row=8, column=0)
+
+def create_container():
+    dialog = md.MyDialog(win)
+    if dialog.name not in listbox.get(0, END):
+        try:
+            containers.load(dialog.container_type, dialog.slot, dialog.name)
+            listbox.insert(END, dialog.name)
+            print(dialog.name)
+            print(listbox.get(0, END))
+        except ValueError:
+            status_str.set('Container type not found')
+    
+    print(robot.containers())
+
+def get_selected_container():
+    if len(listbox.curselection()) == 0:
+        return None
+    print('Selected: {}'.format(listbox.get(ACTIVE)))
+    selection = listbox.get(ACTIVE)
+    return robot.containers().get(selection)
+
+def calibrate():
+    curr_container = get_selected_container()
+    if curr_container is not None:
+        rel_pos = curr_container.from_center(x=0,y=0,z=-1, reference=curr_container)
+        print('Current position: ' + str(robot._driver.get_head_position()['current']))
+        # currently only one instrument
+        robot.get_instruments()[0][1].calibrate_position((curr_container, rel_pos))
+
+def move_to_container():
+    curr_container = get_selected_container()
+    if curr_container is not None:
+        pipette = robot.get_instruments()[0][1]
+        robot.clear_commands()
+        # has default location based on slot even if not set
+        pipette.move_to(curr_container)
+        print(robot.commands())
+        robot.run()
+        coords = get_coords()
+        pos_str.set("x: " + str(coords.x) + "\ny: " + str(coords.y) + "\nz: " + str(coords.z))
+
+def remove_container():
+    if len(listbox.curselection()) == 0:
+        return
+    listbox.delete(listbox.curselection()[0])
+
+
+button_add = Button(left_frame_setup, text="+", height=1, width=1, command=create_container).grid(row=12, column=0)
+button_remove = Button(left_frame_setup, text="-", height=1, width=1, command=remove_container).grid(row=12, column=1)
+button_calibrate = Button(left_frame_setup, text="Calibrate", height=1, command=calibrate).grid(row=13, column=0)
+button_moveto = Button(left_frame_setup, text="Move To", height=1, command=move_to_container).grid(row=13, column=1)
 
 
 #############
