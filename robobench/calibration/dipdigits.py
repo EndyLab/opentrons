@@ -12,7 +12,7 @@ DIGITS_LOOKUP = {
     (0, 1, 1, 1, 0, 1, 0): 4,
     (1, 1, 0, 1, 0, 1, 1): 5,
     (1, 1, 0, 1, 1, 1, 1): 6,
-    (1, 0, 1, 0, 0, 1, 0): 7,
+    (1, 1, 1, 0, 0, 1, 0): 7,
     (1, 1, 1, 1, 1, 1, 1): 8,
     (1, 1, 1, 1, 0, 1, 1): 9
 }
@@ -35,10 +35,11 @@ def draw_rect(img, contour):
     # bounding rectangle
     rect = cv2.minAreaRect(contour)
     box = cv2.boxPoints(rect)
+    print("box points!!!:", box)
     box = np.int0(box)
     img2 = img.copy()
     cv2.drawContours(img2,[box],0,(0,0,255),2)
-    return img2
+    return img2, box
 
 def find_screen(img):
     # turn img gray
@@ -76,7 +77,8 @@ def find_screen(img):
     pts = get_points(screenContour)
 
     # bounding rectangle
-    cv2.imshow("bounding rect", draw_rect(img, screenContour))
+    temp, box =  draw_rect(img, screenContour)
+    cv2.imshow("bounding rect", temp)
     return pts
 
 def transform_img(img):
@@ -145,14 +147,8 @@ def find_digits(img):
 def identify_digits(img, digitCoords):
     num=0
     identified = []
-    # used_pic = dilation.copy()
-    # cv2.imshow("DILATION WTF", dilation)
-
-    # the result image with the identified numbers
-    # res = img_scaled.copy()
     for c in digitCoords:
         # extract the digit from the screen picture
-        # (x, y, w, h) = cv2.boundingRect(c)
         x = c[0]
         y = c[1]
         w = c[2]
@@ -191,7 +187,7 @@ def identify_digits(img, digitCoords):
             total = cv2.countNonZero(seg)
             area = (xB - xA) * (yB - yA)
 
-            print("totla:", total, "area:",area)
+            # print("totla:", total, "area:",area)
      
             # if the total number of non-zero pixels is greater than
             # 50% of the area, mark the segment as "on"
@@ -206,29 +202,33 @@ def identify_digits(img, digitCoords):
         except KeyError:
             number = -1
         identified.append(number)
-        # print("POINTS:", pts)
-        # top_left = pts[0]
-        # bot_left = pts[1]
-        # top_right = pts[2]
-        # bot_right = pts[3]
-
-        # x_temp = x+top_left[0]
-        # y_temp = y+top_left[1]
-        # start_coords = (x_temp,y_temp)
-        # end_coords = (x_temp+w, y_temp+h)
-
-        # cv2.rectangle(res, start_coords, end_coords, (0, 255, 0), 1)
-        # cv2.putText(res, str(number), (x_temp, y_temp - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 0), 2)
-
-        # cv2.rectangle(warped, (x,y), (x+w,y+h), (0, 255, 0), 1)
-        # cv2.putText(warped, str(number), (x - 30, y + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.65, (0, 255, 0), 2)
 
         num=num+1
     return identified
 
+def find_top_left_point(rect_coords):
+    # put everything in a list
+    ordered = []
+    for p in rect_coords:
+        ordered.append(tuple(p))
+
+    print("ordered:", ordered)
+
+    # sort ascending x
+    ordered.sort(key=lambda tup: tup[0])
+    print("after sort:", ordered)
+    ordered = ordered[:2]
+
+    # sort descending y
+    ordered.sort(key=lambda tup: tup[1])
+    print("after sort:", ordered[0])
+
+    return ordered[0]
+            
+
 def display_digits(orig_img, screenCoords, digitCoords, identified):
     print("SCREEN COORDS POINTS:", screenCoords)
-    top_left = screenCoords[0]
+    top_left = find_top_left_point(screenCoords)
 
     for j, c in enumerate(digitCoords):
         x = c[0]
@@ -274,9 +274,8 @@ def process_digits_img(img):
 
 # main function
 ratio = 0.2
-img = cv2.imread("test2.jpg")
+img = cv2.imread("test3.jpg")
 img_scaled = cv2.resize(img,None,fx=ratio,fy=ratio,interpolation=cv2.INTER_LINEAR)
 process_digits_img(img_scaled)
-
 cv2.waitKey(0)
 cv2.destroyAllWindows()
