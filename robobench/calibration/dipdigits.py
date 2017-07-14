@@ -2,15 +2,20 @@ import numpy as np
 import cv2
 from imutils import perspective
 from imutils import contours
+import imutils
 from skimage import exposure
 from skimage.filters import threshold_otsu, threshold_local
 from matplotlib import pyplot as plt
 import glob, os
 
+import pytesseract
+pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files (x86)/Tesseract-OCR/tesseract'
+from PIL import Image
+
 DIGITS_LOOKUP = {
     (1, 1, 1, 0, 1, 1, 1): 0,
     (0, 0, 1, 0, 0, 1, 0): 1,
-    (1, 0, 1, 1, 1, 1, 0): 2,
+    (1, 0, 1, 1, 1, 0, 1): 2,
     (1, 0, 1, 1, 0, 1, 1): 3,
     (0, 1, 1, 1, 0, 1, 0): 4,
     (1, 1, 0, 1, 0, 1, 1): 5,
@@ -58,7 +63,7 @@ def find_screen(img):
     # edges
     # egde works better
     edges = cv2.Canny(img,100,200)
-    cv2.imshow("edge", edges)
+    # cv2.imshow("edge", edges)
     img2, contours, hierarchy = cv2.findContours(edges,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 
     # sort contours
@@ -94,12 +99,12 @@ def binarize_img(img):
     # cv2.imshow("binary adaptive", binary_adaptive)
 
     # blur might not be necessary
-    # blur = img_gray
-    # blur = cv2.GaussianBlur(img_gray,(3,3),0)
-    # cv2.imshow("grayblur", blur)
+    blur = img_gray
+    blur = cv2.GaussianBlur(img_gray,(3,3),0)
+    cv2.imshow("grayblur", blur)
 
     # make into binary image
-    ret,otsu_thresh = cv2.threshold(img_gray, 0, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+    ret,otsu_thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
     adapt_thresh = cv2.adaptiveThreshold(img_gray,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY_INV,11,2)
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(3,3))
     opening = cv2.morphologyEx(adapt_thresh, cv2.MORPH_OPEN, kernel)
@@ -107,14 +112,27 @@ def binarize_img(img):
     # cv2.imshow("cleaned up pt 2", opening)
 
     # dilate to join together segments
-    kernel2 = cv2.getStructuringElement(cv2.MORPH_RECT,(1,5))
+    kernel1 = cv2.getStructuringElement(cv2.MORPH_RECT,(3,5))
+    kernel2 = cv2.getStructuringElement(cv2.MORPH_RECT,(3,3))
     # kernel2 = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (1, 5))
-    otsu_dilated = cv2.dilate(otsu_thresh,kernel2,iterations = 1)
-    # cv2.imshow("dilated", otsu_dilated)
+    otsu_dilated = cv2.dilate(otsu_thresh,kernel1,iterations = 1)
+    adapt_dilated = cv2.dilate(opening,kernel1,iterations = 1)
+    # cv2.imshow("dilated222", adapt_dilated)
+    
+    # erode
+    otsu_eroded= cv2.erode(otsu_dilated,kernel2,iterations = 1)
+    adapt_eroded = cv2.erode(adapt_dilated,kernel2,iterations = 1)
 
-    adapt_dilated = cv2.dilate(opening,kernel2,iterations = 1)
+    # dilate/erode again
+    otsu_dilated = cv2.dilate(otsu_eroded,kernel1,iterations = 1)
+    adapt_dilated = cv2.dilate(adapt_eroded,kernel1,iterations = 1)
     # cv2.imshow("dilated222", adapt_dilated)
 
+    # erode
+    otsu_eroded= cv2.erode(otsu_dilated,kernel2,iterations = 1)
+    adapt_eroded = cv2.erode(adapt_dilated,kernel2,iterations = 1)
+
+    
     titles = ['gray', 'adaptive thresholding','otsu thresh','opened adaptive img', 'dilated otsu', 'dilated adaptive']
     images = [img_gray, adapt_thresh, otsu_thresh, opening, otsu_dilated, adapt_dilated]
 
@@ -126,7 +144,7 @@ def binarize_img(img):
     plt.show()
 
     """
-    return otsu_dilated
+    return adapt_eroded
 
 
 def find_digits(img):
@@ -294,56 +312,180 @@ def process_digits_img(img):
     cv2.imshow("THERE IT IS", output_img)
     cv2.imshow("display", warped)
 
-    return identifiedDigits, output_img, screen_pts, processed_screen
+    raw_screen = warped
+    return identifiedDigits, output_img, screen_pts, raw_screen, processed_screen
+
+def digit_match(img, templates):
+    # img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img_gray = img
+    cv2.imshow('res.pnsdsdsdg',img_gray)
+
+    height, width = img.shape 
+    print("IMG y:",height,"x:",width)
+
+    # print("TEMPLATES", templates)
+    for img_file in templates:
+        # loop over the scales of the image
+        template = cv2.imread(img_file,0)
+        cv2.imshow('template',template)
+        t_height, t_width = template.shape 
+        print("TEMPLATE y:",t_height,"x:",t_width)
+        found = (0,0,0)
+        for scale in np.linspace(0.2, 1.0, 20)[::-1]:
+            # resize the image according to the scale, and keep track
+            # of the ratio of the resizing
+            resized = imutils.resize(template, width = int(template.shape[1] * scale))
+            r = template.shape[1] / float(resized.shape[1])
+     
+            # if the resized image is smaller than the template, then break
+            # from the loop
+            if resized.shape[0] < height or resized.shape[1] < width:
+                break
+            # detect edges in the resized, grayscale image and apply template
+            # matching to find the template in the image
+            result = cv2.matchTemplate(img_gray, resized, TM_CCOEFF_NORMED)
+            (_, maxVal, _, maxLoc) = cv2.minMaxLoc(result)
+
+            # if we have found a new maximum correlation value, then ipdate
+            # the bookkeeping variable
+            if found is None or maxVal > found[0]:
+                found = (maxVal, maxLoc, r)
+ 
+        # unpack the bookkeeping varaible and compute the (x, y) coordinates
+        # of the bounding box based on the resized ratio
+        (_, maxLoc, r) = found
+        (startX, startY) = (int(maxLoc[0] * r), int(maxLoc[1] * r))
+        (endX, endY) = (int((maxLoc[0] + tW) * r), int((maxLoc[1] + tH) * r))
+     
+        # draw a bounding box around the detected result and display the image
+        cv2.rectangle(img_gray, (startX, startY), (endX, endY), (0, 0, 255), 2)
+        cv2.imshow("Image", img_gray)
+
+        # template = cv2.Canny(template, 50, 200)
+
+        # (tH, tW) = template.shape[:2]
+        # cv2.imshow("Template", template)
+
+        # w, h = template.shape[::-1]
+
+        # res = cv2.matchTemplate(img_gray,template,cv2.TM_CCOEFF_NORMED)
+        # threshold = 0.8
+        # loc = np.where( res >= threshold)
+
+        # for pt in zip(*loc[::-1]):
+        #     cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0,255,255), 2)
+        #     cv2.imshow('Detected',img)
+
+    cv2.imshow('res.png',img_gray)
+
+# return binarized images
+def binarize_img_dir(img_dir):
+    test_images = []
+    if os.path.exists(img_dir):
+        os.chdir(img_dir)
+        for file in glob.glob("*.jpg"):
+            # test files
+            if 'test' in file:
+                test_images.append(img_dir+'/'+str(file))
+
+        ratio = 0.2
+        bin_images = []
+        for j in range(0,len(test_images)):
+            img = cv2.imread(test_images[j])
+            img_scaled = cv2.resize(img,None,fx=ratio,fy=ratio,interpolation=cv2.INTER_LINEAR)
+            # crop the screen
+            screen_pts = find_screen(img_scaled)
+            # transform image so it is easier to parse
+            warped = perspective.four_point_transform(img_scaled, screen_pts)
+            processed_screen = binarize_img(warped)
+            bin_images.append(processed_screen)
+
+    return bin_images
+
 
 # main function
-ratio = 0.2
+if __name__ == '__main__':
+    ratio = 0.2
 
-test_images = []
-res_images = []
-bin_images = []
-screen_pts = []
-solution = [(0,5,1,1)]
+    test_images = []
+    res_images = []
+    screen_images = []
+    bin_images = []
+    screen_pts = []
+    solution = [(0,5,1,1)]
+    templates = []
 
-# load test files
-img_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/test_imgs" 
-if os.path.exists(img_dir):
-    os.chdir(img_dir)
-    for file in glob.glob("*.jpg"):
-        print(file)
-        test_images.append(img_dir+'/'+str(file))
+    # load test files
+    img_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/test_imgs" 
+    template_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/templates" 
+    if os.path.exists(template_dir):
+        print("yeasss")
+        os.chdir(template_dir)
+        for file in glob.glob("*.jpg"):
+            # templates
+            print(file)
+            if 'template' in file:
+                templates.append(template_dir+'/'+str(file))
 
-for j in range(0,len(test_images)):
-    img = cv2.imread(test_images[j])
-    img_scaled = cv2.resize(img,None,fx=ratio,fy=ratio,interpolation=cv2.INTER_LINEAR)
-    numbers, res, pts, binary_img = process_digits_img(img_scaled)
-    print("RESULT:",numbers)
-    res_images.append(res)
-    bin_images.append(binary_img)
-    screen_pts.append(find_top_left_point(pts))
+    if os.path.exists(img_dir):
+        os.chdir(img_dir)
+        for file in glob.glob("*.jpg"):
+            # test files
+            if 'test' in file:
+                test_images.append(img_dir+'/'+str(file))
+            
 
-for i in range(0,len(test_images)):
-    pt = screen_pts[i]
-    x = pt[0]
-    y = pt[1]
-    w = 200
-    h = 100
-    crop_img = res_images[i][y-50:y+h, x-50:x+w] 
-    plt.subplot(3,3,i+1),plt.imshow(crop_img)
-    plt.title(test_images[i])
-    plt.xticks([]),plt.yticks([])
-plt.show()
+    for j in range(0,len(test_images)):
+        img = cv2.imread(test_images[j])
+        img_scaled = cv2.resize(img,None,fx=ratio,fy=ratio,interpolation=cv2.INTER_LINEAR)
+        numbers, res, pts, screen, binary_img = process_digits_img(img_scaled)
+        print("RESULT:",numbers)
+        res_images.append(res)
+        screen_images.append(screen)
+        bin_images.append(binary_img)
+        screen_pts.append(find_top_left_point(pts))
 
-for i in range(0,len(test_images)):
-    pt = screen_pts[i]
-    x = pt[0]
-    y = pt[1]
-    w = 200
-    h = 100
-    plt.subplot(3,3,i+1),plt.imshow(bin_images[i])
-    plt.title("binary img"+str(i))
-    plt.xticks([]),plt.yticks([])
-plt.show()
+    for i in range(0,len(test_images)):
+        pt = screen_pts[i]
+        x = pt[0]
+        y = pt[1]
+        w = 200
+        h = 100
 
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+        plt.subplot(3,3,i+1),plt.imshow(bin_images[i])
+        plt.title("binary img"+str(i))
+        plt.xticks([]),plt.yticks([])
+
+        # tesseract ocr
+        name = "bin"+str(i)+".jpg"
+        cv2.imwrite(name,bin_images[i])
+        # print("OCR:",pytesseract.image_to_string(Image.open(name)))
+
+    plt.show()
+
+    # for i in range(0,len(test_images)):
+    #     name = img_dir+"/bin"+str(i)+".jpg"
+    #     bin_img = cv2.imread(name)
+    #     img_gray = cv2.cvtColor(bin_img, cv2.COLOR_BGR2GRAY)
+    #     cv2.imshow("display GRAY SDSD", img_gray)
+    #     # template = cv2.imread(templates[0],0)
+    #     # cv2.imshow('template',template)
+    #     digit_match(img_gray, templates)
+
+    for i in range(0,len(test_images)):
+        pt = screen_pts[i]
+        x = pt[0]
+        y = pt[1]
+        w = 200
+        h = 100
+        crop_img = res_images[i][y-50:y+h, x-50:x+w] 
+
+        plt.subplot(3,3,i+1),plt.imshow(crop_img)
+        plt.title(test_images[i])
+        plt.xticks([]),plt.yticks([])
+    plt.show()
+
+
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
