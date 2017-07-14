@@ -1,6 +1,7 @@
 """ TODO:
         [x] canvas graphical indication DONE
         [x] out of bounds handling
+        [x] handle calibration
         [ ] robot disconnect command
         [ ] gui shell input (commands)
         [ ] link buttons to commands
@@ -10,7 +11,7 @@ from tkinter import *
 import collections
 from opentrons import robot, instruments, containers
 import MyDialog as md
-
+import warnings
 # treat warnings like errors
 warnings.filterwarnings("error")
 
@@ -263,7 +264,7 @@ Simple calibration implementation to explore API for future CV implementation
 '''
 
 # BROWSE guarantees at most one selection at a time
-listbox = Listbox(left_frame_setup, selectmode=BROWSE)
+listbox = Listbox(left_frame, selectmode=BROWSE)
 listbox.grid(row=8, column=0)
 
 def create_container():
@@ -312,10 +313,10 @@ def remove_container():
     listbox.delete(listbox.curselection()[0])
 
 
-button_add = Button(left_frame_setup, text="+", height=1, width=1, command=create_container).grid(row=12, column=0)
-button_remove = Button(left_frame_setup, text="-", height=1, width=1, command=remove_container).grid(row=12, column=1)
-button_calibrate = Button(left_frame_setup, text="Calibrate", height=1, command=calibrate).grid(row=13, column=0)
-button_moveto = Button(left_frame_setup, text="Move To", height=1, command=move_to_container).grid(row=13, column=1)
+button_add = Button(left_frame, text="+", height=1, width=1, command=create_container).grid(row=12, column=0)
+button_remove = Button(left_frame, text="-", height=1, width=1, command=remove_container).grid(row=12, column=1)
+button_calibrate = Button(left_frame, text="Calibrate", height=1, command=calibrate).grid(row=13, column=0)
+button_moveto = Button(left_frame, text="Move To", height=1, command=move_to_container).grid(row=13, column=1)
 
 
 #############
