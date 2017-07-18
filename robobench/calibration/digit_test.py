@@ -29,7 +29,8 @@ for file in glob.glob("*.jpg"):
 
 
 for img in bimgs:
-	img_to_digit(img, template_imgs)
+	result = img_to_digit(img, template_imgs)
+	print(len(result))
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
