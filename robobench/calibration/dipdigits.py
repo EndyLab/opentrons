@@ -7,6 +7,7 @@ from skimage import exposure
 from skimage.filters import threshold_otsu, threshold_local
 from matplotlib import pyplot as plt
 import glob, os
+from bradley_thresh import faster_bradley_threshold
 
 import pytesseract
 pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files (x86)/Tesseract-OCR/tesseract'
@@ -28,16 +29,19 @@ DIGITS_LOOKUP = {
 def get_points(contourPoints):
     x = []
     y = []
-    for point in contourPoints:
-        coord = point[0]
-        x.append(coord[0])
-        y.append(coord[1])
-        # print(coord)
+    try:
+        for point in contourPoints:
+            coord = point[0]
+            x.append(coord[0])
+            y.append(coord[1])
+            # print(coord)
 
-    # print("x:", x,"y:",y)
-    pts = np.array([(x[0], y[0]), (x[1], y[1]), (x[2], y[2]), (x[3], y[3])])
-    # print(pts)
-    return pts
+        # print("x:", x,"y:",y)
+        pts = np.array([(x[0], y[0]), (x[1], y[1]), (x[2], y[2]), (x[3], y[3])])
+        # print(pts)
+        return pts
+    except TypeError:
+        return
 
 def draw_rect(img, contour):
     # bounding rectangle
@@ -49,45 +53,89 @@ def draw_rect(img, contour):
     cv2.drawContours(img2,[box],0,(0,0,255),2)
     return img2, box
 
-def find_screen(img):
+def within(val, target, error):
+    return abs(val-target) < error
+
+def find_screen(img, debug='off'):
     # turn img gray
     img2 = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-    cv2.imshow("gray", img2)
+    if debug=='on':
+        cv2.imshow("gray", img2)
 
-    # threshold
-    # ret, thresh = cv2.threshold(img2,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    # img processing
+    blur = cv2.GaussianBlur(img2,(5,5),0)
 
+    ret,otsu_thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+
+    if debug=='on':
+        cv2.imshow("otsu", otsu_thresh)
+    adapt_thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY_INV,11,2)
+    kernel = np.ones((1,3),np.uint8)
+    opening = cv2.morphologyEx(otsu_thresh, cv2.MORPH_OPEN, kernel)
+    cv2.imshow("adaptive thresh - opening", opening)
+    
     # get contours
-    # img2, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-
-    # edges
-    # egde works better
-    edges = cv2.Canny(img,100,200)
+    img3, contours, hierarchy = cv2.findContours(otsu_thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    img3, contours1, hierarchy = cv2.findContours(adapt_thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    img3, contours2, hierarchy = cv2.findContours(opening,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    contours = contours1
+    """
+    # bradley thresh
+    blur2 = cv2.GaussianBlur(img2,(5,3),0)
+    pil_im = Image.fromarray(blur2)
+    pil_im.show()
+    bradley_thresh = faster_bradley_threshold(pil_im, 60)
+    open_cv_image = np.array(bradley_thresh) 
+    cv2.imshow("bradley", open_cv_image)
+    bradley_thresh.show()
+    """
+    # egde works better?? 
+    # edges = cv2.Canny(img,100,200)
     # cv2.imshow("edge", edges)
-    img2, contours, hierarchy = cv2.findContours(edges,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    # img2, contours, hierarchy = cv2.findContours(edges,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 
     # sort contours
     contours = sorted(contours, key = cv2.contourArea, reverse = True)[:10]
 
+    lcd_cascade = cv2.CascadeClassifier('lcd_screen_detector.xml')
+
+    # faces = lcd_cascade.detectMultiScale(img2, 1.3, 5)
+    # for (x,y,w,h) in faces:
+    #     cv2.rectangle(img2,(x,y),(x+w,y+h),(255,0,0),2)
+    #     roi_gray = img2[y:y+h, x:x+w]
+    # cv2.imshow('img',img2)
+
     # loop over contours
     screenContour = None
+    windowH, windowW = img2.shape
+    window_area = windowW*windowH
     for contour in contours:
         # approximate the contour
         peri = cv2.arcLength(contour, True)
         approx = cv2.approxPolyDP(contour, 0.02 * peri, True)
      
         # if our approximated contour has four points, then we can assume that we have found our screen
-        if len(approx) == 4:
+        area = cv2.contourArea(approx)
+        print("len:", len(approx), "loop area:", area)
+        if len(approx) == 4 and area < window_area//4:
             screenContour = approx
             cv2.drawContours(img,screenContour,-1,(0,255,0),3)
+            area = cv2.contourArea(screenContour)
+            print("area:", area, "window:", window_area)
             break
 
+    area = cv2.contourArea(screenContour)
+    print("area:", area)
     pts = get_points(screenContour)
 
-    # bounding rectangle
-    temp, box =  draw_rect(img, screenContour)
-    cv2.imshow("bounding rect", temp)
+    temp, box = draw_rect(img, screenContour)
+    if debug=='on':
+        cv2.imshow("adaptive thresh", adapt_thresh)
+        cv2.imshow("bounding rect", temp)
     return pts
+
+def crop_screen(img, pts):
+    return perspective.four_point_transform(img, pts)
 
 def binarize_img(img):
     # make it gray in order to prepare it for threshold command
@@ -297,6 +345,9 @@ def process_digits_img(img):
     # print("poinrt",screen_pts)
 
     # transform image so it is easier to parse
+    if len(screen_pts) == 0:
+        return
+
     warped = perspective.four_point_transform(img, screen_pts)
     processed_screen = binarize_img(warped)
 
@@ -379,6 +430,31 @@ def digit_match(img, templates):
     cv2.imshow('res.png',img_gray)
 
 # return binarized images
+def binarize_entire_dir(img_dir):
+    test_images = []
+    if os.path.exists(img_dir):
+        os.chdir(img_dir)
+        for file in glob.glob("*.jpg"):
+            img = cv2.imread(file)
+            test_images.append(img)
+            # test_images.append(img_dir+'/'+str(file))
+
+        ratio = 0.2
+        bin_images = []
+        # test_images = test_images[:2]
+        for img in test_images:
+            # img = cv2.imread(test_images[j])
+            img_scaled = cv2.resize(img,None,fx=ratio,fy=ratio,interpolation=cv2.INTER_LINEAR)
+            # crop the screen
+            screen_pts = find_screen(img_scaled)
+            # transform image so it is easier to parse
+            warped = perspective.four_point_transform(img_scaled, screen_pts)
+            processed_screen = binarize_img(warped)
+            bin_images.append(processed_screen)
+
+    return bin_images
+
+
 def binarize_img_dir(img_dir):
     test_images = []
     if os.path.exists(img_dir):
