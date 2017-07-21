@@ -26,7 +26,7 @@ new_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pro
 os.chdir(img_dir)
 test_imgs = []
 for file in glob.glob("*.jpg"):
-	if "screen10" in file:
+	if "screen14" in file:
 		print(file)
 		test_imgs.append(cv2.imread(file))
  
@@ -76,29 +76,29 @@ for i, img in enumerate(test_imgs):
 	cv2.imwrite("compresed"+str(i)+".jpg", compressed_mat)
 
 	# sliding window
-	h_comp, w_comp = compressed_mat.shape[:2]
-	digit_w = .15*w_comp
-	digit_h = h_comp
-	padding = 1
-	next_digit_x = 0
-	print("small:",h_comp,w_comp)
-	print("digit width:", digit_w)
-	for x in range(w_comp):
-		if x+digit_w < w_comp:
-			# print("y:", digit_h,"x:",x)
-			crop = compressed_mat[1:int(digit_h),x:int(x+digit_w)]
-			nonzero = np.count_nonzero(crop)
-			total_pixls = crop.size
-			# only save crop if num of white pixels is greater than 10%
-			# print("corops"+str(x)+str(i)+":", float(nonzero/total_pixls))
-			if float(nonzero/total_pixls) >= .10:
-				# first digit
-				next_digit_x = x+digit_w+padding
-				leftmost_x = x
-				cv2.imwrite("corops"+str(x)+str(i)+".jpg", crop)
-				break
-			else:
-				continue
+	# h_comp, w_comp = compressed_mat.shape[:2]
+	# digit_w = .15*w_comp
+	# digit_h = h_comp
+	# padding = 1
+	# next_digit_x = 0
+	# print("small:",h_comp,w_comp)
+	# print("digit width:", digit_w)
+	# for x in range(w_comp):
+	# 	if x+digit_w < w_comp:
+	# 		# print("y:", digit_h,"x:",x)
+	# 		crop = compressed_mat[1:int(digit_h),x:int(x+digit_w)]
+	# 		nonzero = np.count_nonzero(crop)
+	# 		total_pixls = crop.size
+	# 		# only save crop if num of white pixels is greater than 10%
+	# 		# print("corops"+str(x)+str(i)+":", float(nonzero/total_pixls))
+	# 		if float(nonzero/total_pixls) >= .10:
+	# 			# first digit
+	# 			next_digit_x = x+digit_w+padding
+	# 			leftmost_x = x
+	# 			cv2.imwrite("corops"+str(x)+str(i)+".jpg", crop)
+	# 			break
+	# 		else:
+	# 			continue
 
 	# given first digit slide over to get the next digits
 	# while next_digit_x+digit_w < w_comp:
@@ -113,8 +113,9 @@ for i, img in enumerate(test_imgs):
 	# 		cv2.imwrite("corops"+str(next_digit_x)+str(i)+".jpg", crop)
 	# 	next_digit_x = next_digit_x+digit_w
 
-	print("left", leftmost_x)
-	crop = compressed_mat[0:,int(leftmost_x):]
+	# print("left", leftmost_x)
+	# crop = compressed_mat[0:,int(leftmost_x):]
+	crop = compressed_mat.copy()
 	cv2.imshow("asd",crop)
 	h, w = crop.shape[:2]
 	print(h,w)
@@ -250,7 +251,33 @@ for i, img in enumerate(test_imgs):
 		cv2.imwrite("skel combine.jpg", skel)
 
 	# get contours
-	
+	ratio = 3
+	img_scaled = cv2.resize(skel,None,fx=ratio,fy=ratio,interpolation=cv2.INTER_LINEAR)
+	cv2.imshow("scaled", img_scaled)
+	img_scaled = np.array(img_scaled, dtype=np.uint8)
+	cv2.imshow("title wt", img_scaled)
+	cpy = img_scaled.copy()
+	# img2, cnts, hier = cv2.findContours(img_scaled,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+	# cnts = sorted(cnts, key = cv2.contourArea, reverse = True)[:10]
+	# cv2.drawContours(img_scaled, cnts, -1, (0,255,0), 3)
+	# cv2.imshow("cont", img_scaled)
+
+	coords = dipdigits.find_digits(cpy)
+	# coords are in x, y, w, h
+	print(coords)
+	# digits = img_scaled[coords[0][0]:coords[0][0]+coords[0][2], coords[0][1]:coords[0][1]+coords[0][3]]
+	# cv2.imshow("digit", digits)
+	# dipdigits.identify_digits(skel,coords)
+	for i,c in enumerate(coords):
+		# extract the digit from the screen picture
+		x = c[0]
+		y = c[1]
+		w = c[2]
+		h = c[3]
+		roi = img_scaled[y:y + h, x:x + w]
+		title = "cropped"+str(i)
+		cv2.imshow(title, roi)
+		cv2.imwrite("digit"+str(i)+".jpg", roi)
 
 	
 cv2.waitKey(0)
