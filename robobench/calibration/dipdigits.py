@@ -8,9 +8,6 @@ from skimage.filters import threshold_otsu, threshold_local
 from matplotlib import pyplot as plt
 import glob, os
 from bradley_thresh import faster_bradley_threshold
-
-import pytesseract
-pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files (x86)/Tesseract-OCR/tesseract'
 from PIL import Image
 
 DIGITS_LOOKUP = {
@@ -62,6 +59,9 @@ def find_screen(img, debug='off'):
     if debug=='on':
         cv2.imshow("gray", img2)
 
+    # turn to hsv
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
     # img processing
     blur = cv2.GaussianBlur(img2,(5,5),0)
 
@@ -78,7 +78,7 @@ def find_screen(img, debug='off'):
     img3, contours, hierarchy = cv2.findContours(otsu_thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     img3, contours1, hierarchy = cv2.findContours(adapt_thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     img3, contours2, hierarchy = cv2.findContours(opening,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-    contours = contours1
+    contours = contours + contours1
     """
     # bradley thresh
     blur2 = cv2.GaussianBlur(img2,(5,3),0)
@@ -112,7 +112,7 @@ def find_screen(img, debug='off'):
     for contour in contours:
         # approximate the contour
         peri = cv2.arcLength(contour, True)
-        approx = cv2.approxPolyDP(contour, 0.02 * peri, True)
+        approx = cv2.approxPolyDP(contour, 0.01 * peri, True)
      
         # if our approximated contour has four points, then we can assume that we have found our screen
         area = cv2.contourArea(approx)
@@ -201,7 +201,8 @@ def find_digits(img):
     cnts = sorted(cnts, key = cv2.contourArea, reverse = True)[:10]
     # get digitCoords
     # res = img.copy
-    res = cv2.cvtColor(img,cv2.COLOR_GRAY2RGB)
+    res = cv2.cvtColor(img.copy(),cv2.COLOR_GRAY2RGB)
+    cv2.imshow("color",res)
     digitCoords = []
     for c in cnts:
         # ll vs rect?
@@ -212,16 +213,17 @@ def find_digits(img):
         # print("coords",rect_coords)
 
         # if the contour is sufficiently large, it must be a digit
-        if (w >= 15 or w >= 0 and w <=10) and (h >= 40 and h <= 50):
+        # if (w >= 15 or w >= 0 and w <=10) and (h >= 40 and h <= 50):
+        if (w>=5 and h >=50):
             #""" optional - drawing the bounding box is for visual clarity
             # compute the bounding box of the contour
 
             # the digit 1
             if (w <= 10):
                 rect_coords = (x-12,y-3,w+12,h+2)
-                cv2.rectangle(res,(x-12,y-3),(x+w,y+h-1),(0,255,0),2)
+                cv2.rectangle(res,(x-12,y-3),(x+w,y+h-1),(0,255,0),1)
             else:
-                cv2.rectangle(res,(x,y),(x+w,y+h),(0,255,0),2)
+                cv2.rectangle(res,(x,y),(x+w,y+h),(0,255,0),1)
             
             # print("coords that passed",(x, y, w, h))
             #"""
@@ -249,6 +251,7 @@ def identify_digits(img, digitCoords):
         # compute the width and height of each of the 7 segments we are going to examine
         (roiH, roiW) = roi.shape
         (dW, dH) = (int(roiW * 0.25), int(roiH * 0.15))
+        print("dw, dh:",dW,dH)
         dHC = int(roiH * 0.05)
 
         # define the set of 7 segments

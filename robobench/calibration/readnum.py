@@ -4,8 +4,10 @@ import dipdigits
 from skimage import exposure
 from imutils import contours
 import extract_digits
-import os
+import glob, os
 import label_image
+
+from datetime import datetime
 
 # 2 because 0 = webcam, 1 = backfacing cam, 2 = usb cam
 cap = cv2.VideoCapture(2)
@@ -28,9 +30,10 @@ while(True):
     # turn img gray
     img_gray = cv2.cvtColor(frame.copy(), cv2.COLOR_BGR2GRAY)
     img_gray = exposure.rescale_intensity(img_gray, out_range = (0, 255))
+    cv2.imshow("gray",img_gray)
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
     cl1 = clahe.apply(img_gray)
-    cv2.imshow("gray",cl1)
+    cv2.imshow("gray optimzed",cl1)
 
     # adaptive threshold
     blur = cv2.GaussianBlur(cl1,(5,5),0)
@@ -54,7 +57,7 @@ while(True):
         # if our approximated contour has four points, then we can assume that we have found our screen
         area = cv2.contourArea(approx)
         
-        if len(approx) == 4 and area >= .25 * window_area:
+        if len(approx) == 4 and area >= .25 * window_area and area <= .50 * window_area:
         	# print("len:", len(approx), "loop area:", area, "window:", window_area)
         	screenContour = approx
         	area = cv2.contourArea(screenContour)
@@ -70,7 +73,6 @@ while(True):
 
     	cv2.imshow("detected screen", box)
     	
-
     	# binarize screen
     	screen_gray = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
     	screen_gray = exposure.rescale_intensity(screen_gray, out_range = (0, 255))
@@ -107,7 +109,7 @@ while(True):
     		roi = otsu_thresh[0+10:h-10,x-slant:x+width-slant]
     		nonzero = np.count_nonzero(roi)
     		# is a digit
-    		if float(nonzero/digit_size) >= .10:
+    		if float(nonzero/digit_size) >= .05:
     			cv2.rectangle(screen, (x-slant, 0+10), (x+width-slant, h-10), (255,0,0), 2)
     			# digit = roi
     			digit_coords.append([(x-slant,0+10),(x+width-slant,h-10)])
@@ -122,11 +124,15 @@ while(True):
     			x2 = coords[1][0]
     			y2 = coords[1][1]
 
-    			digit = screen[y1:y2,x1:x2]
-    			cv2.imwrite("digit.jpg",digit)
-    			# digit = label_image.identify("digit.jpg")
-    			# reading.append(digit)
-    			cv2.putText(screen, "8", (x1, y1+100), cv2.FONT_HERSHEY_SIMPLEX, 4, (0, 0, 255), 5)
+    			digit = otsu_thresh[y1:y2,x1:x2]
+    			# file = "DIGIT"+str(datetime.now())[-6:]+".jpg"
+    			# cv2.imwrite(file,digit)
+    			# img = cv2.imread(file)
+    			# print(file)
+    			cv2.imwrite("digit.jpg", digit)
+    			digit = label_image.identify("digit.jpg")
+    			reading.append(digit)
+    			cv2.putText(screen, digit, (x1, y1+100), cv2.FONT_HERSHEY_SIMPLEX, 4, (0, 0, 255), 5)
     			try:
     				os.remove("digit.jpg")
     			except:
