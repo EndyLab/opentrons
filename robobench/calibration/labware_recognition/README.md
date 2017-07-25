@@ -1,32 +1,47 @@
 # Labware Recognition Pipeline
 Steps to use TensorFlow's Object Recognition Pipeline
+**Still need to run through steps and debug**
+
+![alt text](https://github.com/EndyLab/opentrons/blob/master/robobench/calibration/labware_recognition/deckrecognition.png)
 
 ## Installations
 
-Use environment.yml to set up virtual env
-
 Install TensorFlow https://www.tensorflow.org/install/
 
-Clone TensorFlow models repo to desired folder https://github.com/tensorflow/models
+Clone TensorFlow models repo to this folder (labware_recognition) https://github.com/tensorflow/models
 
 Install Object Detection API https://github.com/tensorflow/models/blob/master/object_detection/g3doc/installation.md
 
 ## Building Data Set
 
-Take a look at TensorFlow's documentation: https://github.com/tensorflow/models/tree/master/object_detection
-Before beginning, I would recommend trying the supplied first tutorial.
+TensorFlow's [documentation](https://github.com/tensorflow/models/tree/master/object_detection) is thorough and provides most of the information necessary to get started. The aim of this document is to speed up the process by providing a guide through the entire process (in particular, collecting and formatting data).
+Before beginning, I would recommend completing the first object detection tutorial.
 
-These instructions are largely based on https://stackoverflow.com/questions/44973184/train-tensorflow-object-detection-on-own-dataset/44973203#44973203
+These instructions are largely based on [this](https://stackoverflow.com/questions/44973184/train-tensorflow-object-detection-on-own-dataset/44973203#44973203) Stack Overflow post.
 
 ### Create PASCAL VOC Dataset
 
-Create folder structure
+TF provides a [script](https://github.com/tensorflow/models/blob/master/object_detection/g3doc/preparing_inputs.md) to convert a PASCAL VOC dataset to the desired TFRecords format. This section gives a possible approach to creating a PASCAL VOC dataset.
 
-Add images using *script name*
+Within models/object_detection, create the following directory structure:
+```
++VOCdevkit
+  +VOC2012
+    +Annotations
+    +ImageSets
+      +Main
+    +JPEGImages
+```
 
-Annotate images using labelImg
+All training and validation images should be placed in JPEGImages.
+[LabImageCapture.py](https://github.com/EndyLab/opentrons/blob/master/robobench/calibration/labware_recognition/tools/LabImageCapture.py) Can be use to collect the images and place them in the appropriate folder. The script requires opencv and imutils.
+**Note:** opencv3 version 3.0.0 should be used for OSX, the most recent version crashes with video capture. To install, see https://anaconda.org/jlaura/opencv3
 
-Create imageSets using *script name*
+Annotate images using [labelImg](https://github.com/tzutalin/labelImg)
+
+When completed, make sure to move annotations to Annotations.
+
+Create imageSets using [CreateImageSets.py](https://github.com/EndyLab/opentrons/blob/master/robobench/calibration/labware_recognition/tools/CreateImageSets.py).
 
 Change label map file
 
