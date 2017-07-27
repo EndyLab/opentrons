@@ -10,24 +10,30 @@ POS = 	{
 
 class BetterPipette:
 	instances = {}
+	nameToVar = {}
+
 	def __init__(self, name, axis, max_volume, pos=POS):
 		self.name = name
 		self.axis = axis
 		self.max_volume = max_volume
 		self.pos = pos
 
+		self.var = self
+		BetterPipette.nameToVar[self.name] = self
+
 		self.update()
 
-	def __del__(self):
+	def delete(self):
 		BetterPipette.instances.pop(self.name, None)
-		del self
+		BetterPipette.nameToVar.pop(self.name, None)
+		del(self)
 
 	def toDict(self):
 		data = 	{
 					self.name: {
-						'axis': self.axis,
+						'axis'		: self.axis,
 						'max_volume': self.max_volume,
-						'positions': self.pos
+						'positions'	: self.pos
 					}
 				}
 		return data
@@ -79,13 +85,20 @@ def demo():
 	test.changeVolume(200)
 
 	# deleting an instance
-	# del(test1)
+	BetterPipette.nameToVar['pip1'].delete()
+	print("name",test.name)
 
 	pipData = BetterPipette.instances
-
+	pipList = BetterPipette.nameToVar
+	print(pipData)
+	print(pipList)
 	# write to .json file
 	with open('data.json', 'w+') as f:
 	    json.dump(pipData, f,sort_keys=True, indent=4)
+
+def removePipette(pipette):
+	pipette.delete()
+	del pipette
 
 def opentrons_connect():
     try:
@@ -108,14 +121,16 @@ if __name__ == '__main__':
 	# making pipette instances
 	test = BetterPipette('pip1','a',100)
 	test1 = BetterPipette('pip2','b',200)
+	# print(BetterPipette.nameToVar)
 
 	# changing position
 	test1.setPos('drop_tip',20)
 	test.setPos('top', 10)
 	test.changeVolume(200)
+	# removePipette(test1)
 
-	with open('data.json') as json_data:
-		pipData = json.load(json_data)
+	# with open('data.json') as json_data:
+	# 	pipData = json.load(json_data)
 
 	"""
 	robot._driver.move_plunger(mode='relative', a=1)
@@ -125,31 +140,36 @@ if __name__ == '__main__':
 	cmd = ''
 	while cmd != 'q':
 		cmd = input('input (q to quit): ')
+
 		if cmd == 'q':
 			break
+
+		# save calibration pos
 		elif cmd == 'save':
 			temp = input('which pos to save calibration: ')
 			plungerPos = robot._driver.get_plunger_positions()
 			print(plungerPos)
 			test1.setPos(temp,plungerPos['current']['b'])
+
+		# remove a pipette
 		elif cmd == 'rm':
-			temp = input('name of pipette to remove: ')
-			remove_pipette(pipData, temp)
+			temp = input('name of pipette to delete: ')
+			removePipette(BetterPipette.nameToVar[temp])
+
+		# move to calibrated positions
 		elif cmd == 'move':
 			temp = input('which position: ')
 			pos = BetterPipette.instances['pip2']['positions'][temp]
 			robot._driver.move_plunger(mode='absolute',b=pos)
+
+		# move to specific coord
 		elif cmd.replace('.','',1).isdigit():
 			robot._driver.move_plunger(mode='absolute',b=float(cmd))
+
 		else:
 			print('not a valid input')
 
-
 	robot.disconnect()
-	pipData = BetterPipette.instances
-	dictionaryToJson = json.dumps(pipData, sort_keys=True, indent=4)
-	print(dictionaryToJson)
-
 	# write to .json file
 	with open('data.json', 'w+') as f:
-	    json.dump(pipData, f,sort_keys=True, indent=4)
+	    json.dump(BetterPipette.instances, f,sort_keys=True, indent=4)
