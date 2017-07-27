@@ -118,6 +118,7 @@ if __name__ == '__main__':
 	# demo()
 	opentrons_connect()
 
+	"""
 	# making pipette instances
 	test = BetterPipette('pip1','a',100)
 	test1 = BetterPipette('pip2','b',200)
@@ -128,10 +129,18 @@ if __name__ == '__main__':
 	test.setPos('top', 10)
 	test.changeVolume(200)
 	# removePipette(test1)
+	"""
 
-	# with open('data.json') as json_data:
-	# 	pipData = json.load(json_data)
+	with open('data.json') as json_data:
+		pipData = json.load(json_data)
 
+	# use json to instantiate pipettes
+	pipettes = []
+	for name in pipData.keys():
+		data = pipData[name]
+		pipettes.append(BetterPipette(name, data['axis'], data['max_volume'], data['positions']))		
+
+	print(BetterPipette.nameToVar)
 	"""
 	robot._driver.move_plunger(mode='relative', a=1)
 	strs = robot._driver.get_plunger_positions()
@@ -149,7 +158,7 @@ if __name__ == '__main__':
 			temp = input('which pos to save calibration: ')
 			plungerPos = robot._driver.get_plunger_positions()
 			print(plungerPos)
-			test1.setPos(temp,plungerPos['current']['b'])
+			BetterPipette.nameToVar['pip2'].setPos(temp,plungerPos['current']['b'])
 
 		# remove a pipette
 		elif cmd == 'rm':
