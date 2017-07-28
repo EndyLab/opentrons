@@ -1,7 +1,7 @@
 import json
 from opentrons import robot
 from snapshot import read_scale
-
+print('rip')
 POS = 	{
 			"blow_out": 0,
 			"bottom": 0,
