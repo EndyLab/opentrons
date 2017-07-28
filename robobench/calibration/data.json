@@ -1,0 +1,22 @@
+{
+    "pip1": {
+        "axis": "a",
+        "max_volume": 200,
+        "positions": {
+            "blow_out": 0,
+            "bottom": 0,
+            "drop_tip": 0,
+            "top": 0
+        }
+    },
+    "pip2": {
+        "axis": "b",
+        "max_volume": 200,
+        "positions": {
+            "blow_out": 32.0,
+            "bottom": 30.0,
+            "drop_tip": 34.0,
+            "top": 14.0
+        }
+    }
+}

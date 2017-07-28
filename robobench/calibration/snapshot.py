@@ -3,6 +3,7 @@ import numpy as np
 from skimage import exposure
 from imutils import contours
 from imutils import perspective
+import imutils
 import extract_digits
 import glob, os
 from PIL import Image
@@ -99,12 +100,17 @@ def getScreen(img):
 
     return screenContour
 
-cap = cv2.VideoCapture(2)
-ratio = 0.5
-while(True):
-    # Capture frame-by-frame
+def read_scale(debug='off'):
+    cap = cv2.VideoCapture(2)
+    ratio = 0.5
+    # take snapshot
     ret, frame = cap.read()
-    cv2.imshow('frame',frame)
+
+    # rotate
+    # frame = imutils.rotate(frame, 180)
+    if debug == 'on':
+        cv2.imshow('frame',frame)
+
 
     # img processing
     # img = cv2.imread("screen.png")
@@ -118,8 +124,9 @@ while(True):
     blur = cv2.GaussianBlur(img_gray,(5,5),0)
     ret, otsu_thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
     adapt_thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY_INV,11,2)
-    cv2.imshow("adaptive threshold", adapt_thresh)
-    cv2.imshow("otsu threshold", otsu_thresh)
+    if debug == 'on':
+        cv2.imshow("adaptive threshold", adapt_thresh)
+        cv2.imshow("otsu threshold", otsu_thresh)
 
     # get screen
     screenContour = getScreen(otsu_thresh)
@@ -132,7 +139,8 @@ while(True):
         rect_pts = draw_rect(box, screenContour)
         screen = perspective.four_point_transform(img, rect_pts)
 
-        cv2.imshow("detected screen", box)
+        if debug == 'on':
+            cv2.imshow("detected screen", box)
         
         # binarize screen
         screen_gray = toGray(screen)
@@ -141,64 +149,59 @@ while(True):
         blur = cv2.GaussianBlur(screen_gray,(5,1),0)
         ret, otsu_thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
         adapt_thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY_INV,11,2)
-        cv2.imshow("screen adaptive", adapt_thresh)
-        cv2.imshow("screen otsu", otsu_thresh)
+        if debug == 'on':
+            cv2.imshow("screen adaptive", adapt_thresh)
+            cv2.imshow("screen otsu", otsu_thresh)
         # compressed = extract_digits.compress(adapt_thresh,3)
         # cv2.imshow("compressed", compressed)
         kernel = np.ones((5,5),np.uint8)
         dilated = cv2.dilate(adapt_thresh,kernel,iterations=1)
-        cv2.imshow("dilated", dilated)
+        if debug == 'on':
+            cv2.imshow("dilated", dilated)
 
         # bradley threshold
         pil_im = Image.fromarray(blur)
         bradley_thresh = faster_bradley_threshold(pil_im, 95, 10)
         open_cv_image = np.array(bradley_thresh)
         bradley_thresh = cv2.bitwise_not(open_cv_image)
-        cv2.imshow("bradley", bradley_thresh)
-
-        # finding contours of bradley threshold
-        # img3, contours, hierarchy = cv2.findContours(bradley_thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-        # contours = sorted(contours, key = cv2.contourArea, reverse = True)[:10]
-        # cv2.drawContours(screen,contours,-1,(0,255,0),1)
-        # cv2.imshow("contours", screen)
+        if debug == 'on':
+            cv2.imshow("bradley", bradley_thresh)
 
         # digits appear in roughly the same place so...
         h,w = screen.shape[:2]
-        width = 21   
-        spacing = 5
-        slant = 15
+        # width = 21   
+        # spacing = 5
+        # slant = 15
+        # y_offset = 10
+        width = 26  
+        spacing = 4
         y_offset = 10
-        digit_size = width*(h-10-10)
-        digit_coords = []
+        digit_start = 66
+        digit_size = width*(h-2*y_offset)
         cropped_digits = []
-        for x in range(0,w,width+spacing):
-            roi = bradley_thresh[0+y_offset:h-y_offset+5,x-slant:x+width-slant]
+        for x in range(digit_start,w,width+spacing):
+            roi = bradley_thresh[0+y_offset:h-y_offset, x:x+width]
             nonzero = np.count_nonzero(roi)
             # is a digit
             if float(nonzero/digit_size) >= .15:
-                cv2.rectangle(screen, (x-slant, 0+5), (x+width-slant, h-5), (255,0,0), 2)
-                digit_coords.append([(x-slant,0+10),(x+width-slant,h-10)])
+                cv2.rectangle(screen, (x, 0+y_offset), (x+width, h-y_offset), (255,0,0), 2)
                 cropped_digits.append(roi)
-                cv2.imshow("digit"+str(x), roi)
-        cv2.imshow("screen",screen)
+                if debug == 'on':
+                    cv2.imshow("digit"+str(x), roi)
+        if debug == 'on':
+            cv2.imshow("screen",screen)
 
-        # identify image on command
-        if cv2.waitKey(1) & 0xFF == ord('i'):
-            identified = knn(cropped_digits,7)
-            print(identified)
+        # identify image
+        identified = knn(cropped_digits,7)
+        # print(identified)
+        cap.release()
+        cv2.destroyAllWindows()
+        return identified
 
     except TypeError:
-        pass
+        print('failed')
+        return -1
 
-    # quit on 'q'
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-cap.release()
-cv2.destroyAllWindows()
-
-
-# # Display the resulting img
-# cv2.imshow('img',img)
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
+    cap.release()
+    # cv2.waitKey(0)
+    cv2.destroyAllWindows()
