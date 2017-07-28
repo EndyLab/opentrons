@@ -17,7 +17,7 @@ def get_coords():
     # print("robot coords are: x= ",pos.x, " y= ", pos.y, " z= ", pos.z, sep='')
     return [curr_x, curr_y, curr_z]
 
-class BetterPipette:
+class PiBetter:
 	instances = {}
 	nameToVar = {}
 
@@ -28,13 +28,13 @@ class BetterPipette:
 		self.pos = pos
 
 		self.var = self
-		BetterPipette.nameToVar[self.name] = self
+		PiBetter.nameToVar[self.name] = self
 
 		self.update()
 
 	def delete(self):
-		BetterPipette.instances.pop(self.name, None)
-		BetterPipette.nameToVar.pop(self.name, None)
+		PiBetter.instances.pop(self.name, None)
+		PiBetter.nameToVar.pop(self.name, None)
 		del(self)
 
 	def to_dict(self):
@@ -49,7 +49,7 @@ class BetterPipette:
 
 	def update(self):
 		self.dict = self.to_dict()
-		BetterPipette.instances.update(self.dict)
+		PiBetter.instances.update(self.dict)
 
 	def get_max_volume(self):
 		return self.max_volume
@@ -139,11 +139,11 @@ class BetterPipette:
 	        robot.add_warning('Plunger calibrated incorrectly')
 	    return travel * percent
 
-# BetterPipette class demo
+# PiBetter class demo
 def demo():
 	# making pipette instances
-	test = BetterPipette('pip1','a',100)
-	test1 = BetterPipette('pip2','b',200)
+	test = PiBetter('pip1','a',100)
+	test1 = PiBetter('pip2','b',200)
 
 	# changing position
 	test1.set_pos('drop_tip',20)
@@ -153,11 +153,11 @@ def demo():
 	test.change_max_volume(200)
 
 	# deleting an instance
-	BetterPipette.nameToVar['pip1'].delete()
+	PiBetter.nameToVar['pip1'].delete()
 	print("name",test.name)
 
-	pipData = BetterPipette.instances
-	pipList = BetterPipette.nameToVar
+	pipData = PiBetter.instances
+	pipList = PiBetter.nameToVar
 	print(pipData)
 	print(pipList)
 	# write to .json file
@@ -219,9 +219,9 @@ if __name__ == '__main__':
 	pipettes = []
 	for name in pipData.keys():
 		data = pipData[name]
-		pipettes.append(BetterPipette(name, data['axis'], data['max_volume'], data['positions']))		
+		pipettes.append(PiBetter(name, data['axis'], data['max_volume'], data['positions']))		
 
-	# print(BetterPipette.nameToVar)
+	# print(PiBetter.nameToVar)
 	"""
 	robot._driver.move_plunger(mode='relative', a=1)
 	strs = robot._driver.get_plunger_positions()
@@ -234,7 +234,7 @@ if __name__ == '__main__':
 
 	# robot._driver.home('b','a')
 
-	p = BetterPipette.nameToVar['pip2']
+	p = PiBetter.nameToVar['pip2']
 	test_vol = p.get_max_volume()
 	calibrate(p, test_vol)
 	calibrate(p, 100)
@@ -260,12 +260,12 @@ if __name__ == '__main__':
 		# remove a pipette
 		elif cmd == 'rm':
 			temp = input('name of pipette to delete: ')
-			removePipette(BetterPipette.nameToVar[temp])
+			removePipette(PiBetter.nameToVar[temp])
 
 		# move to calibrated positions
 		elif cmd == 'move':
 			temp = input('which position: ')
-			pos = BetterPipette.instances['pip2']['positions'][temp]
+			pos = PiBetter.instances['pip2']['positions'][temp]
 			robot._driver.move_plunger(mode='absolute',b=pos)
 
 		# move to specific coord
@@ -278,6 +278,6 @@ if __name__ == '__main__':
 
 	# write to .json file
 	with open('data.json', 'w+') as f:
-	    json.dump(BetterPipette.instances, f,sort_keys=True, indent=4)
+	    json.dump(PiBetter.instances, f,sort_keys=True, indent=4)
 
 	robot.disconnect()
