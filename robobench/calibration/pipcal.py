@@ -182,7 +182,7 @@ def opentrons_connect():
     # robot.home('xyzab')
     # pipette = instruments.Pipette(axis='a')
 
-def toDecimal(scale_reading):
+def to_vol_measurement(scale_reading):
 	# this particular scale has a decimal after the 3rd digit from the right
 	decimal_pos = 3
 	factor = 10**decimal_pos
@@ -190,25 +190,27 @@ def toDecimal(scale_reading):
 	for digit in scale_reading:
 		val = val*10 + digit
 
-	# return with units of micro
+	# vol in liters
 	return val
+
+def calibrate(pipette, vol):
+	scale_coords = [150, 220.1, 5]
+	water_coords = [250, 220.1, -30]
+	pipette.aspirate(vol, [water_coords[0], water_coords[1], water_coords[2]-10])
+
+	# move to scale
+	pipette.dispense(scale_coords)
+	scale_reading = read_scale()
+	while scale_reading == -1:
+		scale_reading = read_scale()
+
+	scale_val = to_vol_measurement(scale_reading)
+	print(scale_reading)
+	print(scale_val)
 
 if __name__ == '__main__':
 	# demo()
 	opentrons_connect()
-
-	"""
-	# making pipette instances
-	test = BetterPipette('pip1','a',100)
-	test1 = BetterPipette('pip2','b',200)
-	# print(BetterPipette.nameToVar)
-
-	# changing position
-	test1.set_pos('drop_tip',20)
-	test.set_pos('top', 10)
-	test.change_max_volume(200)
-	# removePipette(test1)
-	"""
 
 	with open('data.json') as json_data:
 		pipData = json.load(json_data)
@@ -232,33 +234,10 @@ if __name__ == '__main__':
 
 	# robot._driver.home('b','a')
 
-	scale_coords = [150, 220.1, 5]
-	water_coords = [250, 220.1, -30]
-
-
 	p = BetterPipette.nameToVar['pip2']
 	test_vol = p.get_max_volume()
-	p.aspirate(test_vol, [water_coords[0], water_coords[1], water_coords[2]-10])
-
-	# move to scale
-	p.dispense(scale_coords)
-	scale_reading = read_scale()
-	while scale_reading == -1:
-		scale_reading = read_scale()
-
-	# # robot.move_head(x=x-95, y=y+5, z=z)
-
-	scale_val = toDecimal(scale_reading)
-	print(scale_val)
-	# if scale_val != p.get_max_volume():
-	# 	p.change_max_volume(scale_val)
-
-	# res = p.get_plunge_distance(100)
-	# print("plunge distance", res)
-
-	p.aspirate(100, [water_coords[0], water_coords[1], water_coords[2]-10])
-	p.dispense(scale_coords)
-
+	calibrate(p, test_vol)
+	calibrate(p, 100)
 
 	# shell for debugging
 	"""
