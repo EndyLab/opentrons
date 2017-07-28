@@ -13,7 +13,7 @@
         "axis": "b",
         "max_volume": 200,
         "positions": {
-            "blow_out": 32.0,
+            "blow_out": 33.0,
             "bottom": 30.0,
             "drop_tip": 34.0,
             "top": 14.0

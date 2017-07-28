@@ -26,7 +26,7 @@ def opentrons_connect():
         robot.connect('Virtual Smoothie')
         robot.home(now=True)
 
-    # robot.home('xyzab')
+    robot.home('zab')
     pipette = instruments.Pipette(axis='a')
 
 def get_coords():

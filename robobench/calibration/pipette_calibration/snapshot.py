@@ -4,7 +4,7 @@ from skimage import exposure
 from imutils import contours
 from imutils import perspective
 import imutils
-import extract_digits
+# import extract_digits
 import glob, os
 from PIL import Image
 from bradley_thresh import faster_bradley_threshold
