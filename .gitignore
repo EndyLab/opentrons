@@ -1,6 +1,7 @@
 .ipynb_checkpoints
 .DS_Store
 robobench/videos
+robobench/calibration/labware_recognition/models/
 
 .json
 digit_test.py
