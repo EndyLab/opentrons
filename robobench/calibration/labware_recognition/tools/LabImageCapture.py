@@ -6,9 +6,13 @@ from os import listdir
 from os.path import isfile, join
 import sys
 
+# Classes to train for
 labware = ['96wellplate', 'tiprack', 'trough', 'scale', 'trash']
+# Names of robots with grids
 boxes = ['enzo', 'hiro']
+# Names of robobenches
 benches = ['yt']
+# Grid positions
 positions = ['A1', 'A2', 'A3',
 			 'B1', 'B2', 'B3',
 			 'C1', 'C2', 'C3',
@@ -16,7 +20,8 @@ positions = ['A1', 'A2', 'A3',
 			 'E1', 'E2', 'E3']
 # Files saved as labware_robot_pos_dataset-num.jpg
 img_dir = '../models/object_detection/VOCdevkit/VOC2012/JPEGImages'
-crop_points = [(144, 10), (591, 368)]
+# Stores top left and bottom right to crop for
+crop_points = []
 
 def getLabwareType():
 	labware_type = input("Labware type: ")
@@ -44,6 +49,11 @@ def getDatasetName():
 	return d
 
 def getROI(event, x, y, flags, param):
+	"""
+	Mouse event handler
+	Expects ROI drawn as rect from top left to bottom right
+	Stores corner points in crop_points
+	"""
     global crop_points
 
     if event == cv2.EVENT_LBUTTONDOWN:
@@ -54,6 +64,9 @@ def getROI(event, x, y, flags, param):
     print(crop_points)
 
 def getIndex(prefix):
+	"""
+	Returns next available index for given image prefix (item_robot_pos_dataset) in img_dir
+	"""
 	filesInDir = [f.split('-')[1][:-4] for f in listdir(img_dir) if isfile(join(img_dir, f)) and f.startswith(prefix)]
 	print(filesInDir)
 	if len(filesInDir) == 0:
@@ -65,6 +78,9 @@ def getIndex(prefix):
 		return int(filesInDir[0]) + 1
 
 def setCrop(img):
+	"""
+	Opens window with passed in img and allows ROI to be drawn. Closes when key pressed
+	"""
     cv2.namedWindow('Set crop')
     cv2.imshow('Set crop', img)
     cv2.setMouseCallback('Set crop', getROI)
@@ -73,6 +89,12 @@ def setCrop(img):
     cv2.destroyWindow('Set crop')
 
 def benchImageCapture(camera, labware_type, robot_name, dataset):
+	"""
+	Captures images with given parameters until 'n' is pressed
+	Press 'c' to capture image
+	Press 'n' to enter new settings
+	Press 'q' to quit program
+	"""
 	prefix = labware_type + "_" + robot_name + "_deck_" + dataset
 	while True:
 		(grabbed, frame) = camera.read()
@@ -100,6 +122,12 @@ def cropFrame(frame):
 	return roi
 
 def boxImageCapture(camera, labware_type, robot_name, dataset):
+	"""
+	Captures one image for each deck position with given parameters
+	Press 'c' to capture image
+	Press 'n' to enter new settings
+	Press 'q' to quit program
+	"""
 	global positions
 	for pos in positions:
 		print(pos)
@@ -125,6 +153,9 @@ def boxImageCapture(camera, labware_type, robot_name, dataset):
 
 
 def collectImages():
+	"""
+	Continually gets parameters (object type, robot name, dataset) then captures images
+	"""
 	camera = cv2.VideoCapture(0)
 	time.sleep(.25)
 	while True:
