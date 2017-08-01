@@ -42,8 +42,8 @@ water = containers.load('point', 'C2', 'water')
 scale = containers.load('point', 'B2', 'scale')
 p200 = instruments.Pipette(axis='b', max_volume=200)
 
-p200.calibrate_plunger(top=14, bottom=30, blow_out=33, drop_tip=34)
-p200.update_calibrations()
+# p200.calibrate_plunger(top=14, bottom=30, blow_out=33, drop_tip=34)
+# p200.update_calibrations()
 
 # pick up tip
 # p200.pick_up_tip(tiprack[0])
@@ -70,6 +70,8 @@ for val in readings:
 ave = float(total/len(readings))
 print("average out of 3:", ave)
 p200.max_volume = ave
+print(p200.max_volume)
+p200.update_calibrations()
 
 robot.disconnect()
 
