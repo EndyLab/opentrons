@@ -169,44 +169,67 @@ while(True):
 
         # digits appear in roughly the same place so...
         h,w = screen.shape[:2]
-        # width = 26  
-        # spacing = 4
-        # slant = 0
-        # y_offset = 10
-        # digit_size = width*(h-10-10)
-        # digit_coords = []
-        # cropped_digits = []
+        def nothing(x):
+            pass
+        # slidebars and window for calibration
+        cv2.namedWindow('digits')
+        cv2.createTrackbar('width', 'digits', 0, 100, nothing)
+        cv2.createTrackbar('spacing', 'digits', 0, 50, nothing)
+        cv2.createTrackbar('y_offset_top', 'digits', 0, 50, nothing)
+        cv2.createTrackbar('y_offset_bottom', 'digits', 0, 50, nothing)
+        cv2.createTrackbar('digit_start', 'digits', 0, 100, nothing)
        
+        # width = 33  
+        # spacing = 4
+        # y_offset_top = 11
+        # y_offset_bottom = 9
+        # digit_start = 45
+        # digit_size = width*(h-y_offset_top-y_offset_bottom)
+
+        loop = 1
         width = 33  
         spacing = 4
         y_offset_top = 11
         y_offset_bottom = 9
-        digit_start = 45
-        digit_size = width*(h-y_offset_top-y_offset_bottom)
+        digit_start = 0
+        while True:
+            # get params
+            # cv2.setTrackbarPos('width', 'digits', width)
+            # cv2.setTrackbarPos('spacing', 'digits', spacing)
+            # cv2.setTrackbarPos('y_offset_top', 'digits', y_offset_top)
+            # cv2.setTrackbarPos('y_offset_bottom', 'digits', y_offset_bottom)
+            # cv2.setTrackbarPos('digit_start', 'digits', digit_start)
 
-        params = {
-            'digit_width': width,
-            'digit_spacing': spacing,
-            'y_offset_top': y_offset_top,
-            'y_offset_bottom': y_offset_bottom,
-            'digit_start': digit_start
-        }
+            digit_size = width*(h-y_offset_top-y_offset_bottom)
+            # show images
+            cropped_digits = []
+            temp = screen.copy()
+            for x in range(digit_start,w,width+spacing):
+                roi = bradley_thresh[0+y_offset_top:h-y_offset_bottom, x:x+width]
+                nonzero = np.count_nonzero(roi)
+                # is a digit
+                if float(nonzero/digit_size) >= .15:
+                    
+                    cv2.rectangle(temp, (x, 0+y_offset_top), (x+width, h-y_offset_bottom), (255,0,0), 2)
+                    # cropped_digits.append(roi)
+                    # cv2.imshow("digit"+str(x), roi)
 
-        # write this stuff to a json file
-        with open('segvision.json', 'w+') as f:
-            json.dump(params, f,sort_keys=True, indent=4)
+            cv2.imshow('digits',temp)
 
-        cropped_digits = []
-        for x in range(digit_start,w,width+spacing):
-            roi = bradley_thresh[0+y_offset_top:h-y_offset_bottom, x:x+width]
-            nonzero = np.count_nonzero(roi)
-            # is a digit
-            if float(nonzero/digit_size) >= .15:
-                cv2.rectangle(screen, (x, 0+y_offset_top), (x+width, h-y_offset_bottom), (255,0,0), 2)
-                cropped_digits.append(roi)
-                cv2.imshow("digit"+str(x), roi)
-        cv2.imshow("screen",screen)
+            if cv2.getTrackbarPos('width', 'digits') > 0:
+                width = cv2.getTrackbarPos('width', 'digits') 
+            if cv2.getTrackbarPos('spacing', 'digits') > 0:
+                spacing = cv2.getTrackbarPos('spacing', 'digits')
+            if cv2.getTrackbarPos('y_offset_top', 'digits') > 0:
+                y_offset_top = cv2.getTrackbarPos('y_offset_top', 'digits')
+            if cv2.getTrackbarPos('y_offset_bottom', 'digits') > 0:
+                y_offset_bottom = cv2.getTrackbarPos('y_offset_bottom', 'digits')
+            if cv2.getTrackbarPos('digit_start', 'digits') > 0:
+                digit_start = cv2.getTrackbarPos('digit_start', 'digits')
 
+            k = cv2.waitKey(1) & 0xFF
+            if k == 27:   # hit escape to quit
+                break
 
         # identify image on command
         if cv2.waitKey(1) & 0xFF == ord('i'):
