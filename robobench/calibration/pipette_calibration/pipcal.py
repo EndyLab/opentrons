@@ -1,7 +1,7 @@
 import json
 from opentrons import robot
 from snapshot import read_scale
-print('rip')
+
 POS = 	{
 			"blow_out": 0,
 			"bottom": 0,
@@ -207,6 +207,7 @@ def calibrate(pipette, vol):
 	scale_val = to_vol_measurement(scale_reading)
 	print(scale_reading)
 	print(scale_val)
+	return scale_val
 
 if __name__ == '__main__':
 	# demo()
@@ -233,11 +234,13 @@ if __name__ == '__main__':
 	# [95.004, 405.0, 95.0]
 
 	# robot._driver.home('b','a')
-
+	print(get_coords())
 	p = PiBetter.nameToVar['pip2']
 	test_vol = p.get_max_volume()
-	calibrate(p, test_vol)
-	calibrate(p, 100)
+	actual_val = calibrate(p, test_vol)
+	if actual_val != test_vol:
+		p.change_max_volume(actual_val)
+	# calibrate(p, 100)
 
 	# shell for debugging
 	"""

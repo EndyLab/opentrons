@@ -4,7 +4,7 @@ from skimage import exposure
 from imutils import contours
 from imutils import perspective
 import imutils
-# import extract_digits
+import extract_digits
 import glob, os
 from PIL import Image
 from bradley_thresh import faster_bradley_threshold
@@ -101,17 +101,15 @@ def getScreen(img):
 
     return screenContour
 
-def read_scale(debug='off'):
-    cap = cv2.VideoCapture(2)
-    ratio = 0.5
-    # take snapshot
+cap = cv2.VideoCapture(2)
+ratio = 0.5
+while(True):
+    # Capture frame-by-frame
     ret, frame = cap.read()
 
     # rotate
     # frame = imutils.rotate(frame, 180)
-    if debug == 'on':
-        cv2.imshow('frame',frame)
-
+    cv2.imshow('frame',frame)
 
     # img processing
     # img = cv2.imread("screen.png")
@@ -125,9 +123,8 @@ def read_scale(debug='off'):
     blur = cv2.GaussianBlur(img_gray,(5,5),0)
     ret, otsu_thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
     adapt_thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY_INV,11,2)
-    if debug == 'on':
-        cv2.imshow("adaptive threshold", adapt_thresh)
-        cv2.imshow("otsu threshold", otsu_thresh)
+    cv2.imshow("adaptive threshold", adapt_thresh)
+    cv2.imshow("otsu threshold", otsu_thresh)
 
     # get screen
     screenContour = getScreen(otsu_thresh)
@@ -140,8 +137,7 @@ def read_scale(debug='off'):
         rect_pts = draw_rect(box, screenContour)
         screen = perspective.four_point_transform(img, rect_pts)
 
-        if debug == 'on':
-            cv2.imshow("detected screen", box)
+        cv2.imshow("detected screen", box)
         
         # binarize screen
         screen_gray = toGray(screen)
@@ -150,40 +146,56 @@ def read_scale(debug='off'):
         blur = cv2.GaussianBlur(screen_gray,(5,1),0)
         ret, otsu_thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
         adapt_thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY_INV,11,2)
-        if debug == 'on':
-            cv2.imshow("screen adaptive", adapt_thresh)
-            cv2.imshow("screen otsu", otsu_thresh)
+        cv2.imshow("screen adaptive", adapt_thresh)
+        cv2.imshow("screen otsu", otsu_thresh)
         # compressed = extract_digits.compress(adapt_thresh,3)
         # cv2.imshow("compressed", compressed)
         kernel = np.ones((5,5),np.uint8)
         dilated = cv2.dilate(adapt_thresh,kernel,iterations=1)
-        if debug == 'on':
-            cv2.imshow("dilated", dilated)
+        cv2.imshow("dilated", dilated)
 
         # bradley threshold
         pil_im = Image.fromarray(blur)
         bradley_thresh = faster_bradley_threshold(pil_im, 95, 10)
         open_cv_image = np.array(bradley_thresh)
         bradley_thresh = cv2.bitwise_not(open_cv_image)
-        if debug == 'on':
-            cv2.imshow("bradley", bradley_thresh)
+        cv2.imshow("bradley", bradley_thresh)
+
+        # finding contours of bradley threshold
+        # img3, contours, hierarchy = cv2.findContours(bradley_thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+        # contours = sorted(contours, key = cv2.contourArea, reverse = True)[:10]
+        # cv2.drawContours(screen,contours,-1,(0,255,0),1)
+        # cv2.imshow("contours", screen)
 
         # digits appear in roughly the same place so...
         h,w = screen.shape[:2]
-        # width = 21   
-        # spacing = 5
-        # slant = 15
+        # width = 26  
+        # spacing = 4
+        # slant = 0
         # y_offset = 10
-
-        with open('segvision.json') as json_data:
-            params = json.load(json_data)
-
-        width = params['digit_width']
-        spacing = params['digit_spacing']
-        y_offset_top = params['y_offset_top']
-        y_offset_bottom = params['y_offset_bottom']
-        digit_start = params['digit_start']
+        # digit_size = width*(h-10-10)
+        # digit_coords = []
+        # cropped_digits = []
+       
+        width = 33  
+        spacing = 4
+        y_offset_top = 11
+        y_offset_bottom = 9
+        digit_start = 45
         digit_size = width*(h-y_offset_top-y_offset_bottom)
+
+        params = {
+            'digit_width': width,
+            'digit_spacing': spacing,
+            'y_offset_top': y_offset_top,
+            'y_offset_bottom': y_offset_bottom,
+            'digit_start': digit_start
+        }
+
+        # write this stuff to a json file
+        with open('segvision.json', 'w+') as f:
+            json.dump(params, f,sort_keys=True, indent=4)
+
         cropped_digits = []
         for x in range(digit_start,w,width+spacing):
             roi = bradley_thresh[0+y_offset_top:h-y_offset_bottom, x:x+width]
@@ -192,24 +204,27 @@ def read_scale(debug='off'):
             if float(nonzero/digit_size) >= .15:
                 cv2.rectangle(screen, (x, 0+y_offset_top), (x+width, h-y_offset_bottom), (255,0,0), 2)
                 cropped_digits.append(roi)
-                # cv2.imwrite("digit"+str(x)+".jpg", roi)
-                if debug == 'on':
-                    cv2.imshow("digit"+str(x), roi)
-        if debug == 'on':
-            cv2.imshow("screen",screen)
+                cv2.imshow("digit"+str(x), roi)
+        cv2.imshow("screen",screen)
 
-        # identify image
-        identified = knn(cropped_digits,7)
-        # print(identified)
-        cap.release()
-        cv2.destroyAllWindows()
-        return identified
+
+        # identify image on command
+        if cv2.waitKey(1) & 0xFF == ord('i'):
+            identified = knn(cropped_digits,7)
+            print(identified)
+
+        # save images
+        if cv2.waitKey(1) & 0xFF == ord('s'):
+            for i, digit in enumerate(cropped_digits):
+                cv2.imwrite("digit"+str(i)+".jpg", roi)
+
 
     except TypeError:
-        print('failed')
-        return -1
+        pass
 
-    cap.release()
-    # cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # quit on 'q'
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 
+cap.release()
+cv2.destroyAllWindows()
