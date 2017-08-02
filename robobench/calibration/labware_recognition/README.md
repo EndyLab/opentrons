@@ -11,10 +11,11 @@ Install TensorFlow https://www.tensorflow.org/install/
 Clone TensorFlow models repo to this folder (labware_recognition) https://github.com/tensorflow/models
 
 Install Object Detection API https://github.com/tensorflow/models/blob/master/object_detection/g3doc/installation.md
+(Do not forget the protobuf and path steps)
 
 ## Building Data Set
 
-TensorFlow's [documentation](https://github.com/tensorflow/models/tree/master/object_detection) is thorough and provides most of the information necessary to get started. The aim of this document is to speed up the process by providing a guide through the entire process (in particular, collecting and formatting data).
+TensorFlow's [documentation](https://github.com/tensorflow/models/tree/master/object_detection) is thorough and provides most of the information necessary to get started. The aim of this document is to describe the necessary steps and provide a possible approach to using the API.
 Before beginning, I would recommend completing the first object detection tutorial.
 
 These instructions are largely based on [this](https://stackoverflow.com/questions/44973184/train-tensorflow-object-detection-on-own-dataset/44973203#44973203) Stack Overflow post.
@@ -34,7 +35,7 @@ Within models/object_detection, create the following directory structure:
 ```
 
 All training and validation images should be placed in JPEGImages.
-[LabImageCapture.py](https://github.com/EndyLab/opentrons/blob/master/robobench/calibration/labware_recognition/tools/LabImageCapture.py) Can be use to collect the images and place them in the appropriate folder. The script requires opencv and imutils.
+[LabImageCapture.py](https://github.com/EndyLab/opentrons/blob/master/robobench/calibration/labware_recognition/tools/LabImageCapture.py) can be use to collect the images and place them in the appropriate folder. The script requires opencv and imutils.
 **Note:** opencv3 version 3.0.0 should be used for OSX, the most recent version crashes with video capture. To install, see https://anaconda.org/jlaura/opencv3
 
 Annotate images using [labelImg](https://github.com/tzutalin/labelImg)
