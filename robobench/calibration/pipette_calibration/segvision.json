@@ -1,7 +1,7 @@
 {
-    "digit_spacing": 4,
-    "digit_start": 45,
-    "digit_width": 33,
-    "y_offset_bottom": 9,
-    "y_offset_top": 11
+    "digit_spacing": 1,
+    "digit_start": 43,
+    "digit_width": 24,
+    "y_offset_bottom": 13,
+    "y_offset_top": 5
 }

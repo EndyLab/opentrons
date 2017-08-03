@@ -201,7 +201,7 @@ def read_scale(debug='off'):
                 # save digits
                 name = "digit"+str(datetime.now())[20:]+".jpg"
                 print('saving', name)
-                cv2.imwrite(name, roi)
+                # cv2.imwrite(name, roi)
                 if debug == 'on':
                     cv2.imshow("digit"+str(x), roi)
         if debug == 'on':
