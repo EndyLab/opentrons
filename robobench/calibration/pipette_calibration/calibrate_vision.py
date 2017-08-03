@@ -108,7 +108,7 @@ while(True):
     ret, frame = cap.read()
 
     # rotate
-    # frame = imutils.rotate(frame, 180)
+    frame = imutils.rotate(frame, 180)
     cv2.imshow('frame',frame)
     cv2.moveWindow('frame',0,0)
 
@@ -128,7 +128,7 @@ while(True):
     cv2.imshow("otsu threshold", otsu_thresh)
 
     # get screen
-    screenContour = getScreen(otsu_thresh)
+    screenContour = getScreen(adapt_thresh)
     pts = get_points(screenContour)
 
     # get digits

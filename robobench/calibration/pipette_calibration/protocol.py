@@ -38,34 +38,38 @@ opentrons_connect()
 # calibrate stuff on the deck
 
 tiprack = containers.load('tiprack-200ul', 'A1')
-water = containers.load('point', 'C2', 'water')
-scale = containers.load('point', 'B2', 'scale')
+water = containers.load('point', 'A1', 'water')
+scale = containers.load('point', 'A1', 'scale')
+scale_screen = containers.load('point', 'A1', 'screen')
 p200 = instruments.Pipette(axis='b', max_volume=200)
 
 # p200.calibrate_plunger(top=14, bottom=30, blow_out=33, drop_tip=34)
 # p200.update_calibrations()
 
 # pick up tip
-# p200.pick_up_tip(tiprack[0])
+p200.pick_up_tip(tiprack[0])
+# p200.pick_up_tip(scale_screen)
 last_reading = 0
 readings = []
-for j in range(3):
-	p200.aspirate(200, water.wells(0))   
-	p200.dispense(200, scale.wells(0))
-	time.sleep(2)
-	scale_reading = read_scale(debug='on')
-	while scale_reading == -1:
+for i in range(150,200,50):
+	for j in range(3):
+		p200.aspirate(i, water.wells(0))   
+		p200.blow_out(scale.wells(0))
+		time.sleep(2)
+		p200.move_to(scale_screen)
 		scale_reading = read_scale(debug='on')
+		while scale_reading == -1:
+			scale_reading = read_scale(debug='on')
 
-	amount = to_vol_measurement(scale_reading)
-	tared = amount-last_reading
-	print(amount, tared)
-	readings.append(tared)
-	last_reading = amount
+		amount = to_vol_measurement(scale_reading)
+		tared = amount-last_reading
+		print(amount, tared)
+		readings.append(tared)
+		last_reading = amount
 
-total = 0
-for val in readings:
-	total += val
+	total = 0
+	for val in readings:
+		total += val
 
 ave = float(total/len(readings))
 print("average out of 3:", ave)
