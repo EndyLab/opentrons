@@ -411,6 +411,9 @@ pipette_txt = Label(right_frame, textvariable=pipette_str)
 pipette_txt.grid(columnspan=2, sticky=W)
 pipette_txt.config(justify=LEFT)
 
+# home button
+home_button = Button(right_frame, text = "Home", command = lambda: robot.home('xyzab')).grid(columnspan=2)
+
 ################
 # BOTTOM FRAME #
 ################

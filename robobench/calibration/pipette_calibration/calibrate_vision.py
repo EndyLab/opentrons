@@ -108,8 +108,9 @@ while(True):
     ret, frame = cap.read()
 
     # rotate
-    # frame = imutils.rotate(frame, 180)
+    frame = imutils.rotate(frame, 180)
     cv2.imshow('frame',frame)
+    cv2.moveWindow('frame',0,0)
 
     # img processing
     # img = cv2.imread("screen.png")
@@ -127,7 +128,7 @@ while(True):
     cv2.imshow("otsu threshold", otsu_thresh)
 
     # get screen
-    screenContour = getScreen(otsu_thresh)
+    screenContour = getScreen(adapt_thresh)
     pts = get_points(screenContour)
 
     # get digits
@@ -173,73 +174,93 @@ while(True):
             pass
         # slidebars and window for calibration
         cv2.namedWindow('digits')
+        cv2.moveWindow('digits',650,0)
         cv2.createTrackbar('width', 'digits', 0, 100, nothing)
         cv2.createTrackbar('spacing', 'digits', 0, 50, nothing)
         cv2.createTrackbar('y_offset_top', 'digits', 0, 50, nothing)
         cv2.createTrackbar('y_offset_bottom', 'digits', 0, 50, nothing)
         cv2.createTrackbar('digit_start', 'digits', 0, 100, nothing)
-       
-        # width = 33  
-        # spacing = 4
-        # y_offset_top = 11
-        # y_offset_bottom = 9
-        # digit_start = 45
-        # digit_size = width*(h-y_offset_top-y_offset_bottom)
 
-        loop = 1
-        width = 33  
-        spacing = 4
-        y_offset_top = 11
-        y_offset_bottom = 9
-        digit_start = 0
-        while True:
-            # get params
-            # cv2.setTrackbarPos('width', 'digits', width)
-            # cv2.setTrackbarPos('spacing', 'digits', spacing)
-            # cv2.setTrackbarPos('y_offset_top', 'digits', y_offset_top)
-            # cv2.setTrackbarPos('y_offset_bottom', 'digits', y_offset_bottom)
-            # cv2.setTrackbarPos('digit_start', 'digits', digit_start)
+        with open('segvision.json') as json_data:
+            params = json.load(json_data)
 
-            digit_size = width*(h-y_offset_top-y_offset_bottom)
-            # show images
-            cropped_digits = []
-            temp = screen.copy()
-            for x in range(digit_start,w,width+spacing):
-                roi = bradley_thresh[0+y_offset_top:h-y_offset_bottom, x:x+width]
-                nonzero = np.count_nonzero(roi)
-                # is a digit
-                if float(nonzero/digit_size) >= .15:
-                    
-                    cv2.rectangle(temp, (x, 0+y_offset_top), (x+width, h-y_offset_bottom), (255,0,0), 2)
-                    # cropped_digits.append(roi)
-                    # cv2.imshow("digit"+str(x), roi)
+        width = params['digit_width']
+        spacing = params['digit_spacing']
+        y_offset_top = params['y_offset_top']
+        y_offset_bottom = params['y_offset_bottom']
+        digit_start = params['digit_start']
 
-            cv2.imshow('digits',temp)
+        # e: edit params
+        crop = False
+        if cv2.waitKey(1) & 0xFF == ord('e'):
+            while True:
+                # get params
+                # cv2.setTrackbarPos('width', 'digits', width)
+                # cv2.setTrackbarPos('spacing', 'digits', spacing)
+                # cv2.setTrackbarPos('y_offset_top', 'digits', y_offset_top)
+                # cv2.setTrackbarPos('y_offset_bottom', 'digits', y_offset_bottom)
+                # cv2.setTrackbarPos('digit_start', 'digits', digit_start)
 
-            if cv2.getTrackbarPos('width', 'digits') > 0:
-                width = cv2.getTrackbarPos('width', 'digits') 
-            if cv2.getTrackbarPos('spacing', 'digits') > 0:
-                spacing = cv2.getTrackbarPos('spacing', 'digits')
-            if cv2.getTrackbarPos('y_offset_top', 'digits') > 0:
-                y_offset_top = cv2.getTrackbarPos('y_offset_top', 'digits')
-            if cv2.getTrackbarPos('y_offset_bottom', 'digits') > 0:
-                y_offset_bottom = cv2.getTrackbarPos('y_offset_bottom', 'digits')
-            if cv2.getTrackbarPos('digit_start', 'digits') > 0:
-                digit_start = cv2.getTrackbarPos('digit_start', 'digits')
+                # c: crop digits
+                if cv2.waitKey(1) & 0xFF == ord('c'):
+                    crop = True
 
-            k = cv2.waitKey(1) & 0xFF
-            if k == 27:   # hit escape to quit
-                break
+                digit_size = width*(h-y_offset_top-y_offset_bottom)
+                # show images
+                cropped_digits = []
+                temp = screen.copy()
+                for x in range(digit_start,w,width+spacing):
+                    roi = bradley_thresh[0+y_offset_top:h-y_offset_bottom, x:x+width]
+                    nonzero = np.count_nonzero(roi)
+                    # is a digit
+                    if float(nonzero/digit_size) >= .15:
+                        
+                        cv2.rectangle(temp, (x, 0+y_offset_top), (x+width, h-y_offset_bottom), (255,0,0), 2)
+                        if crop == True:
+                            cropped_digits.append(roi)
+                            cv2.imshow("digit"+str(x), roi)
 
-        # identify image on command
-        if cv2.waitKey(1) & 0xFF == ord('i'):
-            identified = knn(cropped_digits,7)
-            print(identified)
+                cv2.imshow('digits',temp)
 
-        # save images
-        if cv2.waitKey(1) & 0xFF == ord('s'):
-            for i, digit in enumerate(cropped_digits):
-                cv2.imwrite("digit"+str(i)+".jpg", roi)
+                if cv2.getTrackbarPos('width', 'digits') > 0:
+                    width = cv2.getTrackbarPos('width', 'digits') 
+                if cv2.getTrackbarPos('spacing', 'digits') > 0:
+                    spacing = cv2.getTrackbarPos('spacing', 'digits')
+                if cv2.getTrackbarPos('y_offset_top', 'digits') > 0:
+                    y_offset_top = cv2.getTrackbarPos('y_offset_top', 'digits')
+                if cv2.getTrackbarPos('y_offset_bottom', 'digits') > 0:
+                    y_offset_bottom = cv2.getTrackbarPos('y_offset_bottom', 'digits')
+                if cv2.getTrackbarPos('digit_start', 'digits') > 0:
+                    digit_start = cv2.getTrackbarPos('digit_start', 'digits')
+
+                # w: write params to json
+                if cv2.waitKey(1) & 0xFF == ord('w'):
+                    data =  {
+                                'digit_spacing': spacing,
+                                'digit_start': digit_start,
+                                'digit_width': width,
+                                'y_offset_bottom': y_offset_bottom,
+                                'y_offset_top': y_offset_top
+                            }
+                    print(data)
+                    with open('segvision.json', 'w+') as f:
+                        json.dump(data, f,sort_keys=True, indent=4)
+
+                # i: identify image on command
+                if cv2.waitKey(1) & 0xFF == ord('i'):
+                    identified = knn(cropped_digits,7)
+                    print(identified)
+
+                # s: save images
+                if cv2.waitKey(1) & 0xFF == ord('s'):
+                    for i, digit in enumerate(cropped_digits):
+                        cv2.imwrite("digit"+str(i)+".jpg", roi)
+
+                # esc: quit
+                if cv2.waitKey(1) & 0xFF == 27: 
+                    break
+
+                crop = False
 
 
     except TypeError:

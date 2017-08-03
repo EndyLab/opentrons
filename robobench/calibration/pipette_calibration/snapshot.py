@@ -4,12 +4,13 @@ from skimage import exposure
 from imutils import contours
 from imutils import perspective
 import imutils
-# import extract_digits
 import glob, os
 from PIL import Image
 from bradley_thresh import faster_bradley_threshold
 from classify import knn
 import json
+
+from datetime import datetime
 
 def get_points(contourPoints):
     x = []
@@ -40,10 +41,12 @@ def draw_rect(img, contour):
 def toGray(img):
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img_gray = exposure.rescale_intensity(img_gray, out_range = (0, 255))
-    cv2.imshow("gray",img_gray)
+    
+    # cv2.imshow("gray",img_gray)
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
     cl1 = clahe.apply(img_gray)
-    cv2.imshow("gray optimzed",cl1)
+
+    # cv2.imshow("gray optimzed",cl1)
     return cl1
 
 def find_top_left_point(rect_coords):
@@ -66,7 +69,7 @@ def find_top_left_point(rect_coords):
     return ordered[0]
 
 def getScreen(img):
-    cv2.imshow("passed img", img)
+    # cv2.imshow("passed img", img)
     bin_img = img.copy()
     img3, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     contours = sorted(contours, key = cv2.contourArea, reverse = True)[:10]
@@ -92,7 +95,9 @@ def getScreen(img):
             # print(tl)
             color = cv2.cvtColor(img.copy(),cv2.COLOR_GRAY2RGB)
             cv2.circle(color,(tl[0],tl[1]), 1, (0,0,255), -1)
-            cv2.imshow("circle", color)
+
+            # cv2.imshow("circle", color)
+
             # print("color:", bin_img[tl[1]+1][tl[0]+1])
             if bin_img[tl[1]+1][tl[0]+1] != 255:
                 screenContour = approx
@@ -108,7 +113,7 @@ def read_scale(debug='off'):
     ret, frame = cap.read()
 
     # rotate
-    # frame = imutils.rotate(frame, 180)
+    frame = imutils.rotate(frame, 180)
     if debug == 'on':
         cv2.imshow('frame',frame)
 
@@ -130,7 +135,7 @@ def read_scale(debug='off'):
         cv2.imshow("otsu threshold", otsu_thresh)
 
     # get screen
-    screenContour = getScreen(otsu_thresh)
+    screenContour = getScreen(adapt_thresh)
     pts = get_points(screenContour)
 
     # get digits
@@ -192,7 +197,11 @@ def read_scale(debug='off'):
             if float(nonzero/digit_size) >= .15:
                 cv2.rectangle(screen, (x, 0+y_offset_top), (x+width, h-y_offset_bottom), (255,0,0), 2)
                 cropped_digits.append(roi)
-                # cv2.imwrite("digit"+str(x)+".jpg", roi)
+
+                # save digits
+                name = "digit"+str(datetime.now())[20:]+".jpg"
+                print('saving', name)
+                cv2.imwrite(name, roi)
                 if debug == 'on':
                     cv2.imshow("digit"+str(x), roi)
         if debug == 'on':
@@ -200,12 +209,17 @@ def read_scale(debug='off'):
 
         # identify image
         identified = knn(cropped_digits,7)
-        # print(identified)
+        print(identified)
+
         cap.release()
+        cv2.waitKey(0)
         cv2.destroyAllWindows()
         return identified
 
     except TypeError:
+        cap.release()
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
         print('failed')
         return -1
 
