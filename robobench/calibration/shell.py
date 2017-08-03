@@ -26,7 +26,7 @@ def opentrons_connect():
         robot.connect('Virtual Smoothie')
         robot.home(now=True)
 
-    robot.home('zab')
+    robot.home(now=True)
     pipette = instruments.Pipette(axis='a')
 
 def get_coords():
@@ -179,6 +179,9 @@ def key_to_cmd(event):
         if event.keysym == key:
             key_dict_pipette[key][0](key_dict_pipette[key][1])
             break
+
+    if event.keysym == 'h':
+        robot.home()
 
     # robot.home()
 
