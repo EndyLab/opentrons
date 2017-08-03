@@ -21,19 +21,33 @@ class SlotCalibrator:
 			'B2': [(79, 91), (123, 155)], 'A1': [(35, 156), (79, 221)], 'E2': [(214, 90), (258, 157)]}
 	# Next step is achieving fine precision automatically
 	# Hardcoding for now, could probably be good enough by looking at dx/dy
-	pos_dict = {'A1':{'tiprack':(33, 35.5, -33), '96-flat':(34, 35.5, -45)},
-				'B1':{'tiprack':(125, 35.5, -33), '96-flat':(126, 35.5, -45)},
-				'C1':{'tiprack':(216.5, 35.5, -33), '96-flat':(217.5, 35.5, -45)},
-				'D1':{'tiprack':(308.5, 35.5, -33), '96-flat':(309.5, 35.5, -45)},
-				'A2':{'tiprack':(33, 171.5, -33), '96-flat':(34, 171.5, -45)},
-				'B2':{'tiprack':(125, 171.5, -33), '96-flat':(126, 171.5, -45)},
-				'C2':{'tiprack':(216.5, 171.5, -33), '96-flat':(217.5, 171.5, -45)},
-				'D2':{'tiprack':(308.5, 171.5, -33), '96-flat':(309.5, 171.5, -45)},
-				'A3':{'tiprack':(33, 304.5, -33), '96-flat':(34, 304.5, -45)},
-				'B3':{'tiprack':(125, 304.5, -33), '96-flat':(126, 304.5, -45)},
-				'C3':{'tiprack':(216.5, 304.5, -33), '96-flat':(217.5, 304.5, -45)},
-				'D3':{'tiprack':(308.5, 304.5, -33), '96-flat':(309.5, 304.5, -45)},
-				}
+	# add points
+	# pos_dict = {'A1':{'tiprack-200ul':(33, 35.5, -33), '96-flat':(34, 35.5, -45)},
+	# 			'B1':{'tiprack-200ul':(125, 35.5, -33), '96-flat':(126, 35.5, -45)},
+	# 			'C1':{'tiprack-200ul':(216.5, 35.5, -33), '96-flat':(217.5, 35.5, -45)},
+	# 			'D1':{'tiprack-200ul':(308.5, 35.5, -33), '96-flat':(309.5, 35.5, -45)},
+	# 			'A2':{'tiprack-200ul':(33, 171.5, -33), '96-flat':(34, 171.5, -45)},
+	# 			'B2':{'tiprack-200ul':(125, 171.5, -33), '96-flat':(126, 171.5, -45)},
+	# 			'C2':{'tiprack-200ul':(216.5, 171.5, -33), '96-flat':(217.5, 171.5, -45)},
+	# 			'D2':{'tiprack-200ul':(308.5, 171.5, -33), '96-flat':(309.5, 171.5, -45)},
+	# 			'A3':{'tiprack-200ul':(33, 304.5, -33), '96-flat':(34, 304.5, -45)},
+	# 			'B3':{'tiprack-200ul':(125, 304.5, -33), '96-flat':(126, 304.5, -45)},
+	# 			'C3':{'tiprack-200ul':(216.5, 304.5, -33), '96-flat':(217.5, 304.5, -45)},
+	# 			'D3':{'tiprack-200ul':(308.5, 304.5, -33), '96-flat':(309.5, 304.5, -45)},
+	pos_dict = {'A1':{'tiprack-200ul':(33, 35.5, -33)},
+			'B1':{'tiprack-200ul':(125, 35.5, -33)},
+			'C1':{'tiprack-200ul':(216.5, 35.5, -33)},
+			'D1':{'tiprack-200ul':(308.5, 35.5, -33)},
+			'A2':{'tiprack-200ul':(33, 171.5, -33)},
+			'B2':{'tiprack-200ul':(125, 171.5, -33)},
+			'C2':{'tiprack-200ul':(216.5, 171.5, -33)},
+			'D2':{'tiprack-200ul':(308.5, 171.5, -33)},
+			'A3':{'tiprack-200ul':(33, 304.5, -33)},
+			'B3':{'tiprack-200ul':(125, 304.5, -33)},
+			'C3':{'tiprack-200ul':(216.5, 304.5, -33)},
+			'D3':{'tiprack-200ul':(308.5, 304.5, -33)},
+			}
+	point_types = ['scale', 'trough', 'trash']
 
 	def initialize(self):
 		camera = cv2.VideoCapture(0)
@@ -42,7 +56,16 @@ class SlotCalibrator:
 		frame = imutils.resize(frame, width=500)
 		self.setCrop(frame)
 		frame = self.cropFrame(frame)
+		self.generatePosDict()
 		# self.setSlots(frame)
+
+	def generatePosDict(self):
+		for slot, item_pos_map in self.pos_dict.items():
+			base_x, base_y, base_z = item_pos_map['tiprack-200ul']
+			item_pos_map['96-flat'] = (base_x + 1, base_y, -45)
+			item_pos_map['scale'] = (base_x + 35, base_y + 71.5, -23)
+			item_pos_map['trough'] = (base_x + 32, base_y + 50.5, -36)
+			item_pos_map['trash'] = (base_x + 32, base_y + 50.5, 9)
 
 	def calibrate(self, instrument, items):
 		"""
@@ -67,11 +90,15 @@ class SlotCalibrator:
 				print('Calibrated to slot')
 				container_dict[name] = container
 			except KeyError:
-				return {'error':'Item missing'}
+				return {'error':'Item missing: {}'.format(item)}
 		return container_dict
 
 	def calibrateToSlot(self, item_type, name, slot, instrument):
-		curr_container = containers.load(item_type, slot, name)
+		if item_type in self.point_types:
+			ot_type = 'point'
+		else:
+			ot_type = item_type
+		curr_container = containers.load(ot_type, slot, name)
 		print(curr_container)
 		rel_pos = curr_container[0].from_center(x=0, y=0, z=-1, reference=curr_container)
 		print(rel_pos)
