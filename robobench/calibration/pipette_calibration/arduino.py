@@ -35,7 +35,6 @@ def extract_val_str(line):
 	return replaced
 
 params = ''
-# cmdargs = str(sys.argv)[1:]
 try:
     opts, args = getopt.getopt(sys.argv[1:], 'p:h', ['params=', 'help'])
 except getopt.GetoptError:
@@ -66,14 +65,11 @@ if params != 'file':
 	plunger_distance = []
 	arduino_reading = []
 	averages = []
-	dist = np.linspace(0,35+1,num=100)
+	BOTTOM = 35
+	dist = np.linspace(0,BOTTOM+1,num=100)
+	print('Starting plunger calibration')
+	print('...collecting force readings')
 	for j in dist:
-		if j == 35//4:
-			print('25%% done')
-		if j == 35//2:
-			print('50%% done')
-		if j == 35//4*3:
-			print('75%% done')
 		# move pipette plunger
 		robot._driver.move_plunger(mode='absolute',b=j)
 
