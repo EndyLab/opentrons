@@ -12,7 +12,7 @@ def list_to_str(vals):
 
 img = cv2.imread("screen.png")
 img_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/screen" 
-
+screen_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/crops"
 # load screens
 os.chdir(img_dir)
 
@@ -27,10 +27,21 @@ screen_success = 0
 for file in glob.glob("*.jpg"):
 	print('opening ' + file)
 	screen = cv2.imread(file)
-	snapshot.color_filter(screen)
+	# cv2.imshow('screen', screen)
+	# cv2.waitKey(0)
+	# cv2.destroyAllWindows()
+	
+	# res = snapshot.color_filter(screen)
 	# res = isolate_screen(screen)
+
+	extracted_screen = snapshot.extract_screen(screen, file)
+	
+	# os.chdir(screen_dir)
+	# if extracted_screen != -1:
+		# cv2.imshow('cropped', extracted_screen)
+
 	# if res != [-1, -1, -1, -1]:
-	# 	screen_success = screen_success + 1
+		# screen_success = screen_success + 1
 
 
 
@@ -48,6 +59,6 @@ for file in glob.glob("*.jpg"):
 
 
 print("num imgs:", str(num_imgs))
-# print("screen detected", str((screen_success)/num_imgs*100), '%')
+print("screen detected", str((screen_success)/num_imgs*100), '%')
 
 

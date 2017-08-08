@@ -68,24 +68,49 @@ def find_top_left_point(rect_coords):
 
     return ordered[0]
 
+def extract_screen(img, file):
+    # filters hsv to get screen
+    hsv_threshed = color_filter(img)
+    # cv2.imshow('filtered', hsv_threshed)
+
+    # gets contour points of screen
+    pts = getScreen(hsv_threshed)
+    print(pts)
+    # extracts screen from origional image
+    if len(pts) != 0:
+        screen = perspective.four_point_transform(img, pts)
+        # cv2.imshow('screen', screen)
+
+        cv2.imwrite(r'C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/crops/'+file, screen)
+    else:
+        print('empty list') 
+        return
+        
+    cv2.waitKey(0)
+    cv2.destroyAllWindows() 
+
+
+
 def color_filter(img):
-    BLUE_MIN = np.array([10, 50, 180],np.uint8)
+    BLUE_MIN = np.array([10, 50, 170],np.uint8)
     BLUE_MAX = np.array([140, 255, 255],np.uint8)
 
     hsv_img = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-    hsv_threshed = cv2.inRange(hsv_img, BLUE_MIN, BLUE_MAX)
-    cv2.imshow('filtered', hsv_threshed)
+    return cv2.inRange(hsv_img, BLUE_MIN, BLUE_MAX)
+    # cv2.imshow('filtered', hsv_threshed)
 
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()  
+    # return getScreen(hsv_threshed)
+
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()  
 
 def getScreen(img):
     # cv2.imshow("passed img", img)
     img3, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     contours = sorted(contours, key = cv2.contourArea, reverse = True)[:10]
     color = cv2.cvtColor(img.copy(),cv2.COLOR_GRAY2RGB)
-    cv2.drawContours(color,contours,-1,(0,255,0),3)
-    cv2.imshow("passed img", color)
+    # cv2.drawContours(color,contours,-1,(0,255,0),3)
+    # cv2.imshow("passed img", color)
 
     windowH, windowW = img.shape
     window_area = windowW*windowH
@@ -93,18 +118,18 @@ def getScreen(img):
     for contour in contours:
         # approximate the contour
         peri = cv2.arcLength(contour, True)
-        approx = cv2.approxPolyDP(contour, 0.01 * peri, True)
+        approx = cv2.approxPolyDP(contour, 0.02 * peri, True)
 
         # print(approx)
        
-     
         # if our approximated contour has four points, then we can assume that we have found our screen
         area = cv2.contourArea(approx)
+        # print(len(approx))
         # if len(approx) == 4 and area >= .10 * window_area and area <= .50 * window_area:
-        if len(approx) == 4 and area <= .3*window_area and area >= .01*window_area:
+        if len(approx) == 4:
             color = cv2.cvtColor(img.copy(),cv2.COLOR_GRAY2RGB)
             cv2.drawContours(color,approx,-1,(0,0,255),3)
-            cv2.imshow("screen", color)
+            # cv2.imshow("screen", color)
             screenContour = approx
             break
             """
@@ -120,9 +145,15 @@ def getScreen(img):
                 screenContour = approx
                 break
             """
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()   
-    return screenContour
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()  
+    pts = get_points(screenContour)
+    # print(pts)
+    try:
+        len(pts)
+        return pts
+    except TypeError:
+        return [] 
 
 def isolate_screen(img):
     b,g,r = cv2.split(img)
@@ -146,7 +177,7 @@ def isolate_screen(img):
         len(pts)
         return pts
     except TypeError:
-        return [-1, -1, -1, -1]
+        return [-1]
     
 
 
