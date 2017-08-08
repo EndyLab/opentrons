@@ -70,17 +70,13 @@ def find_top_left_point(rect_coords):
 
 def getScreen(img):
     # cv2.imshow("passed img", img)
-    bin_img = img.copy()
     img3, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     contours = sorted(contours, key = cv2.contourArea, reverse = True)[:10]
     # cv2.drawContours(img,contours,-1,(0,255,0),3)
     windowH, windowW = img.shape
     window_area = windowW*windowH
     screenContour = None
-    found = 0
     for contour in contours:
-        if found == 1:
-            break
         # approximate the contour
         peri = cv2.arcLength(contour, True)
         approx = cv2.approxPolyDP(contour, 0.01 * peri, True)
@@ -90,7 +86,11 @@ def getScreen(img):
      
         # if our approximated contour has four points, then we can assume that we have found our screen
         area = cv2.contourArea(approx)
-        if len(approx) == 4 and area >= .10 * window_area and area <= .50 * window_area:
+        # if len(approx) == 4 and area >= .10 * window_area and area <= .50 * window_area:
+        if len(approx) == 4:
+            screenContour = approx
+            break
+            """
             tl = find_top_left_point(approx)
             # print(tl)
             color = cv2.cvtColor(img.copy(),cv2.COLOR_GRAY2RGB)
@@ -101,30 +101,54 @@ def getScreen(img):
             # print("color:", bin_img[tl[1]+1][tl[0]+1])
             if bin_img[tl[1]+1][tl[0]+1] != 255:
                 screenContour = approx
-                found = 1
                 break
+            """
 
     return screenContour
 
-def read_scale(debug='off'):
-    cap = cv2.VideoCapture(2)
-    ratio = 0.5
-    # take snapshot
-    ret, frame = cap.read()
+def isolate_screen(img):
+    b,g,r = cv2.split(img)
+    # b = exposure.rescale_intensity(b, out_range = (0, 255))
+    
+    # cv2.imshow("gray",img_gray)
+    # clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+    # cl1 = clahe.apply(b)
 
-    # rotate
-    frame = imutils.rotate(frame, 180)
-    if debug == 'on':
-        cv2.imshow('frame',frame)
+    # cv2.imshow('blue channel', b)
+    blur = cv2.GaussianBlur(b,(5,5),0)
+    ret, otsu_thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    adapt_thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
+    # cv2.imshow("adaptive threshold", adapt_thresh)
+    # cv2.imshow("otsu threshold", otsu_thresh)
+
+    screenContour = getScreen(otsu_thresh)
+    pts = get_points(screenContour)
+    # print(pts)
+    try:
+        len(pts)
+        return pts
+    except TypeError:
+        return [-1, -1, -1, -1]
+    
 
 
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+
+
+def scale_to_digit(img, debug='off'):
     # img processing
-    # img = cv2.imread("screen.png")
-    img = frame
+    ratio = 1
     img = cv2.resize(img,None,fx=ratio,fy=ratio,interpolation=cv2.INTER_LINEAR)
+
+    if debug=='on':
+        print('resizing img')
 
     # turn img gray
     img_gray = toGray(img)
+
+    if debug=='on':
+        print('turning img gray')
 
     # adaptive threshold
     blur = cv2.GaussianBlur(img_gray,(5,5),0)
@@ -134,13 +158,21 @@ def read_scale(debug='off'):
         cv2.imshow("adaptive threshold", adapt_thresh)
         cv2.imshow("otsu threshold", otsu_thresh)
 
+    if debug=='on':
+        print('calculating img threshold')
+
     # get screen
     screenContour = getScreen(adapt_thresh)
     pts = get_points(screenContour)
 
+    if debug=='on':
+        print('trying to find screen')
+
     # get digits
     try:
         len(pts)
+        if debug=='on':
+            print('found screen')
         box = img.copy()
         rect_pts = draw_rect(box, screenContour)
         screen = perspective.four_point_transform(img, rect_pts)
@@ -180,7 +212,7 @@ def read_scale(debug='off'):
         # slant = 15
         # y_offset = 10
 
-        with open('segvision.json') as json_data:
+        with open('C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/segvision.json') as json_data:
             params = json.load(json_data)
 
         width = params['digit_width']
@@ -200,7 +232,7 @@ def read_scale(debug='off'):
 
                 # save digits
                 name = "digit"+str(datetime.now())[20:]+".jpg"
-                print('saving', name)
+                # print('saving', name)
                 # cv2.imwrite(name, roi)
                 if debug == 'on':
                     cv2.imshow("digit"+str(x), roi)
@@ -209,21 +241,39 @@ def read_scale(debug='off'):
 
         # identify image
         identified = knn(cropped_digits,7)
-        print(identified)
+        # print(identified)
 
-        cap.release()
+        # cap.release()
         cv2.waitKey(0)
         cv2.destroyAllWindows()
         return identified
 
     except TypeError:
-        cap.release()
+        # cap.release()
         cv2.waitKey(0)
         cv2.destroyAllWindows()
-        print('failed')
+        # print('failed')
         return -1
 
-    cap.release()
+    # cap.release()
     # cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # cv2.destroyAllWindows()
 
+def read_scale(debug='off'):
+    cap = cv2.VideoCapture(2)
+    ratio = 0.5
+    # take snapshot
+    ret, frame = cap.read()
+
+    # rotate
+    # frame = imutils.rotate(frame, 180)
+    if debug == 'on':
+        cv2.imshow('frame',frame)
+
+
+    # img processing
+    # img = cv2.imread("screen.png")
+    img = frame
+    cap.release()
+    cv2.destroyAllWindows()
+    return scale_to_digit(img)
