@@ -68,11 +68,25 @@ def find_top_left_point(rect_coords):
 
     return ordered[0]
 
+def color_filter(img):
+    BLUE_MIN = np.array([10, 50, 180],np.uint8)
+    BLUE_MAX = np.array([140, 255, 255],np.uint8)
+
+    hsv_img = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
+    hsv_threshed = cv2.inRange(hsv_img, BLUE_MIN, BLUE_MAX)
+    cv2.imshow('filtered', hsv_threshed)
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()  
+
 def getScreen(img):
     # cv2.imshow("passed img", img)
     img3, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     contours = sorted(contours, key = cv2.contourArea, reverse = True)[:10]
-    # cv2.drawContours(img,contours,-1,(0,255,0),3)
+    color = cv2.cvtColor(img.copy(),cv2.COLOR_GRAY2RGB)
+    cv2.drawContours(color,contours,-1,(0,255,0),3)
+    cv2.imshow("passed img", color)
+
     windowH, windowW = img.shape
     window_area = windowW*windowH
     screenContour = None
@@ -87,7 +101,10 @@ def getScreen(img):
         # if our approximated contour has four points, then we can assume that we have found our screen
         area = cv2.contourArea(approx)
         # if len(approx) == 4 and area >= .10 * window_area and area <= .50 * window_area:
-        if len(approx) == 4:
+        if len(approx) == 4 and area <= .3*window_area and area >= .01*window_area:
+            color = cv2.cvtColor(img.copy(),cv2.COLOR_GRAY2RGB)
+            cv2.drawContours(color,approx,-1,(0,0,255),3)
+            cv2.imshow("screen", color)
             screenContour = approx
             break
             """
@@ -103,7 +120,8 @@ def getScreen(img):
                 screenContour = approx
                 break
             """
-
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()   
     return screenContour
 
 def isolate_screen(img):
@@ -114,12 +132,12 @@ def isolate_screen(img):
     # clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
     # cl1 = clahe.apply(b)
 
-    # cv2.imshow('blue channel', b)
+    cv2.imshow('blue channel', b)
     blur = cv2.GaussianBlur(b,(5,5),0)
-    ret, otsu_thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-    adapt_thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
-    # cv2.imshow("adaptive threshold", adapt_thresh)
-    # cv2.imshow("otsu threshold", otsu_thresh)
+    ret, otsu_thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+    adapt_thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY_INV,11,2)
+    cv2.imshow("adaptive threshold", adapt_thresh)
+    cv2.imshow("otsu threshold", otsu_thresh)
 
     screenContour = getScreen(otsu_thresh)
     pts = get_points(screenContour)
@@ -132,8 +150,8 @@ def isolate_screen(img):
     
 
 
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
 def scale_to_digit(img, debug='off'):

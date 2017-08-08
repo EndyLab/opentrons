@@ -1,4 +1,5 @@
 from snapshot import scale_to_digit, isolate_screen
+import snapshot
 import glob, os
 import json
 import cv2 
@@ -26,9 +27,10 @@ screen_success = 0
 for file in glob.glob("*.jpg"):
 	print('opening ' + file)
 	screen = cv2.imread(file)
-	res = isolate_screen(screen)
-	if res != [-1, -1, -1, -1]:
-		screen_success = screen_success + 1
+	snapshot.color_filter(screen)
+	# res = isolate_screen(screen)
+	# if res != [-1, -1, -1, -1]:
+	# 	screen_success = screen_success + 1
 
 
 
@@ -46,6 +48,6 @@ for file in glob.glob("*.jpg"):
 
 
 print("num imgs:", str(num_imgs))
-print("screen detected", str((screen_success)/num_imgs*100), '%')
+# print("screen detected", str((screen_success)/num_imgs*100), '%')
 
 
