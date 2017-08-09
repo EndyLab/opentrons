@@ -22,43 +22,30 @@ with open('key.json') as json_data:
 
 # iterate through images
 num_imgs = 0
-screen_failed = 0
-screen_success = 0
+failed = 0
+success = 0
 for file in glob.glob("*.jpg"):
 	print('opening ' + file)
 	screen = cv2.imread(file)
-	# cv2.imshow('screen', screen)
-	# cv2.waitKey(0)
-	# cv2.destroyAllWindows()
-	
-	# res = snapshot.color_filter(screen)
-	# res = isolate_screen(screen)
 
-	extracted_screen = snapshot.extract_screen(screen, file)
-	
-	# os.chdir(screen_dir)
-	# if extracted_screen != -1:
-		# cv2.imshow('cropped', extracted_screen)
-
-	# if res != [-1, -1, -1, -1]:
-		# screen_success = screen_success + 1
-
-
-
-	# res = scale_to_digit(screen, debug='off')
-
-	# if res == -1:
-	# 	screen_failed = screen_failed+1
-	# else:
-	# 	num = list_to_str(res)
-	# 	print('result: ', num, 'actual: ', key[file])
-	# 	if num == key[file]:
-	# 		print('YAY')
+	# test screen extraction
+	res = extracted_screen = snapshot.extract_screen(screen, file)
+	if res == 0:
+		success = success + 1
 
 	num_imgs = num_imgs+1
 
+os.chdir(screen_dir)
 
+# now analyze the screen crops
+for file in glob.glob("*.jpg"):
+	print('opening ' + file)
+	screen = cv2.imread(file)
+
+	# find aspect ratios
+	
+# results 
 print("num imgs:", str(num_imgs))
-print("screen detected", str((screen_success)/num_imgs*100), '%')
+print("screen detected", str(success/num_imgs*100), '%')
 
 

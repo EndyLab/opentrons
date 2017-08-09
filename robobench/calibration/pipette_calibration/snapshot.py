@@ -68,6 +68,8 @@ def find_top_left_point(rect_coords):
 
     return ordered[0]
 
+
+
 def extract_screen(img, file):
     # filters hsv to get screen
     hsv_threshed = color_filter(img)
@@ -75,16 +77,14 @@ def extract_screen(img, file):
 
     # gets contour points of screen
     pts = getScreen(hsv_threshed)
-    print(pts)
+    # print(pts)
     # extracts screen from origional image
     if len(pts) != 0:
         screen = perspective.four_point_transform(img, pts)
-        # cv2.imshow('screen', screen)
-
         cv2.imwrite(r'C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/crops/'+file, screen)
+        return 0
     else:
-        print('empty list') 
-        return
+        return -1
         
     cv2.waitKey(0)
     cv2.destroyAllWindows() 
