@@ -59,6 +59,33 @@ def get_screen_info(dir):
 
     return total_w//count, total_h//count
 
+def reduce_glare(img):
+    # Converting image to LAB Color model
+    lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+    # cv2.imshow("lab",lab)
+
+    # Splitting the LAB image to different channels 
+    l, a, b = cv2.split(lab)
+    # cv2.imshow('l_channel', l)
+    # cv2.imshow('a_channel', a)
+    # cv2.imshow('b_channel', b)
+
+    # Applying CLAHE to L-channel
+    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
+    cl = clahe.apply(l)
+    # cv2.imshow('CLAHE output', cl)
+
+    # Merge the CLAHE enhanced L-channel with the a and b channel 
+    limg = cv2.merge((cl,a,b))
+    # cv2.imshow('limg', limg)
+
+    # Converting image from LAB Color model to RGB model
+    final = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
+    cv2.imshow('final', final)
+
+    cv2.waitKey(0)
+    return final
+
 # rezies all of the screens into the same aspect ratio
 def normalize_screens(dir, aspect_ratio):
     os.chdir(dir)
@@ -76,13 +103,19 @@ def normalize_screens(dir, aspect_ratio):
         s.fill(255)
         v.fill(255)
         cv2.imshow('hsv', hsv_img[:,:,0])
-        cv2.imshow('h', h)
-        cv2.imshow('s', s)
-        cv2.imshow('v', v)
+
+        reduced_glare = reduce_glare(resized)
+
+        hsv_img2 = cv2.cvtColor(reduced_glare,cv2.COLOR_BGR2HSV)
+        h, s, v = cv2.split(hsv_img2)
+        s.fill(255)
+        v.fill(255)
+        cv2.imshow('glare less', hsv_img2[:,:,0])
+
         thresh, binarized = cv2.threshold(hsv_img[:,:,0], 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
         cv2.imshow('OTSU', binarized)
 
-        pil_im = Image.fromarray(hsv_img[:,:,0])
+        pil_im = Image.fromarray(reduced_glare)
         bradley_thresh = faster_bradley_threshold(pil_im, 95, 10)
         open_cv_image = np.array(bradley_thresh)
         bradley_thresh = cv2.bitwise_not(open_cv_image)
