@@ -71,25 +71,42 @@ def normalize_screens(dir, aspect_ratio):
 
         resized = cv2.resize(img, (resize_w, resize_h), interpolation = cv2.INTER_AREA)
         # cv2.imshow("resized", resized)
+        hsv_img = cv2.cvtColor(resized,cv2.COLOR_BGR2HSV)
+        h, s, v = cv2.split(hsv_img)
+        s.fill(255)
+        v.fill(255)
+        cv2.imshow('hsv', hsv_img[:,:,0])
+        cv2.imshow('h', h)
+        cv2.imshow('s', s)
+        cv2.imshow('v', v)
+        thresh, binarized = cv2.threshold(hsv_img[:,:,0], 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+        cv2.imshow('OTSU', binarized)
 
-        # to grayscale
-        gray = cv2.cvtColor(resized,cv2.COLOR_BGR2GRAY)
-        equ = cv2.equalizeHist(gray.copy())
-
-        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
-        gray = clahe.apply(gray)
-        
-        cv2.imshow('gray', gray)
-        cv2.imshow('his', equ)
-
-        # binarize img
-        # bradley threshold
-        pil_im = Image.fromarray(gray)
+        pil_im = Image.fromarray(hsv_img[:,:,0])
         bradley_thresh = faster_bradley_threshold(pil_im, 95, 10)
         open_cv_image = np.array(bradley_thresh)
         bradley_thresh = cv2.bitwise_not(open_cv_image)
 
         cv2.imshow('bradleuy', bradley_thresh)
+
+        # # to grayscale
+        # gray = cv2.cvtColor(resized,cv2.COLOR_BGR2GRAY)
+        # equ = cv2.equalizeHist(gray.copy())
+
+        # clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+        # gray = clahe.apply(gray)
+        
+        # cv2.imshow('gray', gray)
+        # cv2.imshow('his', equ)
+
+        # # binarize img
+        # # bradley threshold
+        # pil_im = Image.fromarray(gray)
+        # bradley_thresh = faster_bradley_threshold(pil_im, 95, 10)
+        # open_cv_image = np.array(bradley_thresh)
+        # bradley_thresh = cv2.bitwise_not(open_cv_image)
+
+        # cv2.imshow('bradleuy', bradley_thresh)
         cv2.waitKey(0)
 
         # write to new folder
