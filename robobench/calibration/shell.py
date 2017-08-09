@@ -22,7 +22,7 @@ from pipette_calibration.get_images import livestream
 
 def camera():
     # turn on video capture
-    livestream(2, 0, '../pipette_calibration/screen')
+    livestream(2, 0, 'C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/screen')
 
 def gui():
     def opentrons_connect():
