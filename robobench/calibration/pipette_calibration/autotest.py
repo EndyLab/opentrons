@@ -64,12 +64,15 @@ def normalize_screens(dir, aspect_ratio):
 		resize_h = int(resize_w * float(1/aspect_ratio))
 
 		resized = cv2.resize(img, (resize_w, resize_h), interpolation = cv2.INTER_AREA)
-		cv2.imshow("resized", resized)
-		cv2.waitKey(0)
+		# cv2.imshow("resized", resized)
+		# cv2.waitKey(0)
+
+		# write to new folder
+		cv2.imwrite(r"C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/norms/"+file, resized)
 
 img_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/screen" 
 screen_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/crops"
-
+normed_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/norms"
 # load img digit key from json file
 os.chdir(img_dir)
 with open('key.json') as json_data:
@@ -82,15 +85,7 @@ print(aspect)
 
 normalize_screens(screen_dir, aspect)
 
-# os.chdir(screen_dir)
 
-# # now analyze the screen crops
-# for file in glob.glob("*.jpg"):
-# 	print('opening ' + file)
-# 	screen = cv2.imread(file)
-
-# 	# find aspect ratios
-# 	width, height = cv.GetSize(screen)
 
 
 
