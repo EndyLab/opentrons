@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 from PIL import Image
 from bradley_thresh import faster_bradley_threshold
+import matplotlib.pyplot as plt
 
 def list_to_str(vals):
     res = ''
@@ -28,7 +29,7 @@ def check_screen_extraction(dir):
         screen = cv2.imread(file)
 
         # test screen extraction
-        res = extracted_screen = snapshot.extract_screen(screen, file)
+        res = snapshot.extract_screen(screen, file)
         if res == 0:
             success = success + 1
 
@@ -106,7 +107,7 @@ def normalize_screens(dir, aspect_ratio):
 
         # bradley thresholding for binarization
         pil_im = Image.fromarray(reduced_glare)
-        bradley_thresh = faster_bradley_threshold(pil_im, 95, 10)
+        bradley_thresh = faster_bradley_threshold(pil_im, 92, 20)
         open_cv_image = np.array(bradley_thresh)
         bradley_thresh = cv2.bitwise_not(open_cv_image)
 
@@ -116,23 +117,65 @@ def normalize_screens(dir, aspect_ratio):
         # write to new folder
         cv2.imwrite(r"C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/norms/"+file, bradley_thresh)
 
+# sliding window
+BLACK = 255
+WHITE = 0
+def extract_digits(img):
+    y_offset_top = 2
+    y_offset_bottom = 3
+    window_w = 13
+    h, w = img.shape[:2]
+
+    vals = []
+    crop_start = []
+
+    for x in range(w):
+        if x + window_w > w:
+            break
+        roi = img[0+y_offset_top:h-y_offset_bottom, x:x+window_w]
+
+        roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+        roi_h, roi_w = roi.shape[:2]
+        num_white = cv2.countNonZero(roi)
+        num_pixels = roi_h*roi_w
+        percent_white = float(num_white/num_pixels)
+        print(percent_white)
+
+        crop_start.append(x)
+        vals.append(percent_white)
+
+        cv2.imshow('crop', roi)
+        cv2.waitKey(0)
+
+    # plot graph of % white vs crop pos
+    plt.plot(crop_start, vals, 'ro')
+    plt.show()
+
+
+
+
 if __name__ == '__main__':
     img_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/screen" 
     screen_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/crops"
     normed_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/norms"
-    # load img digit key from json file
-    os.chdir(img_dir)
-    with open('key.json') as json_data:
-        key = json.load(json_data)
+    
+    # # load img digit key from json file
+    # os.chdir(img_dir)
+    # with open('key.json') as json_data:
+    #     key = json.load(json_data)
 
-    # check_screen_extraction(img_dir)
-    w, h = get_screen_info(screen_dir)
-    aspect = float(w/h)
-    # print(aspect)
+    # # check_screen_extraction(img_dir)
+    # w, h = get_screen_info(screen_dir)
+    # aspect = float(w/h)
+    # # print(aspect)
 
-    normalize_screens(screen_dir, aspect)
+    # normalize_screens(screen_dir, aspect)
+    os.chdir(normed_dir)
+    img = cv2.imread('screen2017-08-04_249038.jpg')
+    cv2.imshow('orig', img)
+    extract_digits(img)
+    cv2.waitKey(0)
 
-    # go through all the normed screens and binarize them
 
 
 
