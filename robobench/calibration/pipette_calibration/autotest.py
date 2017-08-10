@@ -7,6 +7,10 @@ import numpy as np
 from PIL import Image
 from bradley_thresh import faster_bradley_threshold
 import matplotlib.pyplot as plt
+from scipy.interpolate import UnivariateSpline
+
+
+from scipy import signal
 
 def list_to_str(vals):
     res = ''
@@ -144,14 +148,32 @@ def extract_digits(img):
         crop_start.append(x)
         vals.append(percent_white)
 
-        cv2.imshow('crop', roi)
-        cv2.waitKey(0)
+        # cv2.imshow('crop', roi)
+        # cv2.waitKey(0)
 
     # plot graph of % white vs crop pos
-    plt.plot(crop_start, vals, 'ro')
+    # plt.plot(crop_start, vals, 'ro')
+    # plt.show()
+    find_peaks(crop_start, vals)
+
+
+def find_peaks(x, y):
+    # curve fitting
+    spl = UnivariateSpline(x,y,s=0,k=4)
+    plt.plot(x,y,'ro',label = 'data')
+    xs = np.linspace(x[0], x[-1], 1000)
+    spl.set_smoothing_factor(0.001)
+    plt.plot(xs,spl(xs), 'g', lw=3)
+
+    # 1st derivative
+    spl_d = spl.derivative(n=1)
+    deriv = spl_d(xs)
+    plt.plot(xs,deriv, 'y', lw=3)
     plt.show()
 
-
+    # find peak indices
+    peak_indices = signal.find_peaks_cwt(y, np.arange(1,10))
+    print(peak_indices)
 
 
 if __name__ == '__main__':
@@ -163,7 +185,7 @@ if __name__ == '__main__':
     # os.chdir(img_dir)
     # with open('key.json') as json_data:
     #     key = json.load(json_data)
-
+  
     # # check_screen_extraction(img_dir)
     # w, h = get_screen_info(screen_dir)
     # aspect = float(w/h)
@@ -171,10 +193,12 @@ if __name__ == '__main__':
 
     # normalize_screens(screen_dir, aspect)
     os.chdir(normed_dir)
-    img = cv2.imread('screen2017-08-04_249038.jpg')
-    cv2.imshow('orig', img)
-    extract_digits(img)
-    cv2.waitKey(0)
+    for file in glob.glob('*.jpg'):
+        img = cv2.imread(file)
+        # img = cv2.imread('screen2017-08-04_249038.jpg')
+        cv2.imshow('orig', img)
+        extract_digits(img)
+        cv2.waitKey(0)
 
 
 
