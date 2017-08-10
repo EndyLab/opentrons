@@ -1,7 +1,9 @@
 <annotation verified="no">
+	<!-- Used to find images, with our file structure and described adjustment from README to the tfrs script not important -->
 	<folder>training</folder>
 	<filename>96wellplate_enzo_A3_t-0.jpg</filename>
-	<path>/Users/michaelbereket/Desktop/EndyLab/endy_dev/opentrons/robobench/calibration/labware_recognition/models/object_detection/TopViewPipeline/VOCdevkit_top/VOC2012/JPEGImages96wellplate_enzo_A3_t-0.jpg</path>
+	<!-- Path needs to be the absolute path to the image file -->
+	<path>/Users/.../labware_recognition/models/object_detection/VOCdevkit/VOC2012/JPEGImages/96wellplate_enzo_A3_t-0.jpg</path>
 	<source>
 		<database>Unknown</database>
 	</source>
