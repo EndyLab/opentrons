@@ -154,7 +154,8 @@ def extract_digits(img):
     # plot graph of % white vs crop pos
     # plt.plot(crop_start, vals, 'ro')
     # plt.show()
-    find_peaks(crop_start, vals)
+    digit_start = find_peaks(crop_start, vals)
+    cv2.imshow('digit_start', img[0+y_offset_top:h-y_offset_bottom, digit_start:digit_start+window_w])
 
 
 def find_peaks(x, y):
@@ -169,11 +170,14 @@ def find_peaks(x, y):
     spl_d = spl.derivative(n=1)
     deriv = spl_d(xs)
     plt.plot(xs,deriv, 'y', lw=3)
-    plt.show()
+    # plt.show()
 
     # find peak indices
     peak_indices = signal.find_peaks_cwt(y, np.arange(1,10))
     print(peak_indices)
+
+    # the 2nd index is the first peak aka first digit
+    return peak_indices[1]
 
 
 if __name__ == '__main__':
