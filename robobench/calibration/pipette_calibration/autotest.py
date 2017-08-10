@@ -143,7 +143,7 @@ def extract_digits(img):
         num_white = cv2.countNonZero(roi)
         num_pixels = roi_h*roi_w
         percent_white = float(num_white/num_pixels)
-        print(percent_white)
+        # print(percent_white)
 
         crop_start.append(x)
         vals.append(percent_white)
@@ -154,8 +154,30 @@ def extract_digits(img):
     # plot graph of % white vs crop pos
     # plt.plot(crop_start, vals, 'ro')
     # plt.show()
+    digits = []
     digit_start = find_peaks(crop_start, vals)
-    cv2.imshow('digit_start', img[0+y_offset_top:h-y_offset_bottom, digit_start:digit_start+window_w])
+    # cv2.imshow('digit_start', img[0+y_offset_top:h-y_offset_bottom, digit_start:digit_start+window_w])
+    # digits.append(img[0+y_offset_top:h-y_offset_bottom, digit_start:digit_start+window_w])
+
+    # extarct the digits given starting index
+    x = digit_start
+    while x <= w:
+        if x + window_w > w:
+            break
+        roi = img[0+y_offset_top:h-y_offset_bottom, x:x+window_w]
+        roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+        roi_h, roi_w = roi.shape[:2]
+        num_white = cv2.countNonZero(roi)
+        num_pixels = roi_h*roi_w
+        percent_white = float(num_white/num_pixels)
+
+        if percent_white >= .35:
+            digits.append(roi)
+            cv2.imshow('digits', roi)
+            cv2.waitKey(0)
+        x = x + window_w + 1
+
+    return digits
 
 
 def find_peaks(x, y):
@@ -174,7 +196,7 @@ def find_peaks(x, y):
 
     # find peak indices
     peak_indices = signal.find_peaks_cwt(y, np.arange(1,10))
-    print(peak_indices)
+    # print(peak_indices)
 
     # the 2nd index is the first peak aka first digit
     return peak_indices[1]
