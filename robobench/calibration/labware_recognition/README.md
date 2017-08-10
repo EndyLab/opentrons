@@ -4,6 +4,12 @@ Steps to use TensorFlow's Object Recognition Pipeline
 
 ![alt text](https://github.com/EndyLab/opentrons/blob/master/robobench/calibration/labware_recognition/deckrecognition.png)
 
+**Resources**:
+[TensorFlow Object Detection Documentation](https://github.com/tensorflow/models/tree/master/object_detection)
+[Useful StackOverflow post](https://stackoverflow.com/questions/44973184/train-tensorflow-object-detection-on-own-dataset/) documenting steps
+
+This document is an add on to these resources to help you train for labware detection more easily.
+
 ## Installations
 
 Install TensorFlow https://www.tensorflow.org/install/
@@ -15,12 +21,43 @@ Install Object Detection API https://github.com/tensorflow/models/blob/master/ob
 
 ## Building Data Set
 
-TensorFlow's [documentation](https://github.com/tensorflow/models/tree/master/object_detection) is thorough and provides most of the information necessary to get started. The aim of this document is to describe the necessary steps and provide a possible approach to using the API.
-Before beginning, I would recommend completing the first object detection tutorial.
+Before beginning, I would recommend completing the first object detection tutorial and looking through the SO post and the second object detection tutorial.
 
-These instructions are largely based on [this](https://stackoverflow.com/questions/44973184/train-tensorflow-object-detection-on-own-dataset/44973203#44973203) Stack Overflow post.
+Within models/object_detection, create the following directory structure:
+```
++VOCdevkit
+  +VOC2012
+    +Annotations
+    +ImageSets
+      +Main
+    +JPEGImages
+```
+
+All training and validation images should be placed in JPEGImages.
+
+To capture labware images, can use [LabImageCapture.py](https://github.com/EndyLab/opentrons/blob/master/robobench/calibration/labware_recognition/tools/LabImageCapture.py)
+**Note:** opencv3 version 3.0.0 should be used for OSX, the most recent version crashes with video capture. To install, see https://anaconda.org/jlaura/opencv3
+
 
 ### Create PASCAL VOC Dataset
+
+Follow instructions from the StackOverflow [post](https://stackoverflow.com/questions/44973184/train-tensorflow-object-detection-on-own-dataset/44973203#44973203)
+
+Images can be annotated with PASCALVOC format using [labelImg](https://github.com/tzutalin/labelImg)
+
+Once all annotations and images are finalized, LINK can be used to generate image scripts if LabImageCapture.py was used to capture the images.
+
+#### Changing test/validation category
+ADD LINK TO SAMPLE XML FILE WITH EXPLANATIONS
+NEED TO LOOK INTO HOW MERGED DATASET WORKS
+
+You may have some images you intended to use for training that you want to change to validation or vice versa. It is important to alter all the relevant elements of the xml file to be aligned (ADD LINK OF EXAMPLE SCRIPT).
+
+#### Creating TFRS Records
+
+DESCRIBE CHANGE TO TO FOLDER VARIABLE
+
+
 
 TF provides a [script](https://github.com/tensorflow/models/blob/master/object_detection/g3doc/preparing_inputs.md) to convert a PASCAL VOC dataset to the desired TFRecords format. This section gives a possible approach to creating a PASCAL VOC dataset.
 
