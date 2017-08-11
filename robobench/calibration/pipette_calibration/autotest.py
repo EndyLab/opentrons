@@ -8,7 +8,7 @@ from PIL import Image
 from bradley_thresh import faster_bradley_threshold
 import matplotlib.pyplot as plt
 from scipy.interpolate import UnivariateSpline
-
+from classify import knn
 
 from scipy import signal
 
@@ -122,18 +122,19 @@ def normalize_screens(dir, aspect_ratio):
         cv2.imwrite(r"C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/norms/"+file, bradley_thresh)
 
 # optimize sliding window
-WINDOW_MIN = 10
-def optimize_sliding_window(img):
+# once you find the first digit, offset to find the next
+
+WINDOW_MIN = 15
+def find_first_digit(img):
     y_offset_top = 2
     y_offset_bottom = 2
     h, w = img.shape[:2]
 
-    master_crops = []
-    master_vals = []
+    master_crops = [] # x value of crop
+    master_vals = [] # percent of white pixels
     master_widths = []
-    opt_param = [] # param which we are optimizing
 
-    for width in range(WINDOW_MIN, w//5, 1):
+    for width in range(WINDOW_MIN, WINDOW_MIN+1, 1):
         # print('width:', width)
         crops = []
         vals = []
@@ -152,6 +153,8 @@ def optimize_sliding_window(img):
             # print(percent_white)
 
             crops.append(x)
+
+
             vals.append(percent_white)
 
         master_crops.append(crops)
@@ -160,15 +163,22 @@ def optimize_sliding_window(img):
 
     # find peaks for each window size
     for crop, val, width in zip(master_crops, master_vals, master_widths):
-        peaks = find_peaks(crop, val)
-        print(peaks)
+        peak = find_peaks(crop, val)
+        print('x coords:', peak)
 
-        for peak in peaks:
-            # crop at the peaks
-            roi = img[0+y_offset_top:h-y_offset_bottom, peak:peak+width]
-            cv2.imshow('crop', roi)
-            cv2.waitKey(0)
-        
+        opt_vals = []
+        # for peak in peaks:
+        # crop at the peaks
+        roi = img[0+y_offset_top:h-y_offset_bottom, peak:peak+width]
+        temps = [cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)]
+        digit = knn(temps)
+        print(digit)
+        opt_vals.append(val[peak])
+        print(val[peak])
+        cv2.imshow('crop', roi)
+        cv2.waitKey(0)
+        print(opt_vals, width)
+
 # sliding window
 BLACK = 255
 WHITE = 0
@@ -246,7 +256,7 @@ def condense_list(x):
         if val != 0:
             res.append(val)
 
-    return res
+    return np.asarray(res)
 
 # find the first digit
 def find_peaks(x, y):
@@ -269,7 +279,7 @@ def find_peaks(x, y):
 
     # the 2nd index is the first peak aka first digit
     # return peak_indices[1:]
-    return condense_list(peak_indices[1:])
+    return condense_list(peak_indices[1:])[0]
 
 
 if __name__ == '__main__':
@@ -294,7 +304,7 @@ if __name__ == '__main__':
         # img = cv2.imread('screen2017-08-04_249038.jpg')
         cv2.imshow('orig', img)
         # extract_digits(img)
-        optimize_sliding_window(img)
+        find_first_digit(img)
         cv2.waitKey(0)
 
 
