@@ -125,7 +125,8 @@ def normalize_screens(dir, aspect_ratio):
 # once you find the first digit, offset to find the next
 
 WINDOW_MIN = 15
-def find_first_digit(img):
+# use cliding window and graph to find 
+def find_digit_start(img):
     y_offset_top = 2
     y_offset_bottom = 2
     h, w = img.shape[:2]
@@ -171,13 +172,15 @@ def find_first_digit(img):
         # crop at the peaks
         roi = img[0+y_offset_top:h-y_offset_bottom, peak:peak+width]
         temps = [cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)]
-        digit = knn(temps)
-        print(digit)
+        # digit = knn(temps)
+        # print(digit)
         opt_vals.append(val[peak])
         print(val[peak])
-        cv2.imshow('crop', roi)
-        cv2.waitKey(0)
+        # cv2.imshow('crop', roi)
+        # cv2.waitKey(0)
         print(opt_vals, width)
+    print('digit start x coords:', peak)
+    return peak
 
 # sliding window
 BLACK = 255
@@ -185,40 +188,16 @@ WHITE = 0
 def extract_digits(img):
     y_offset_top = 2
     y_offset_bottom = 3
-    window_w = 13
+    window_w = WINDOW_MIN
     h, w = img.shape[:2]
 
     vals = []
     crop_start = []
-    # for width in range()
-    for x in range(w):
-        if x + window_w > w:
-            break
-        roi = img[0+y_offset_top:h-y_offset_bottom, x:x+window_w]
+    # find the coords of the first digit
+    digit_start = find_digit_start(img)
 
-        roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-        roi_h, roi_w = roi.shape[:2]
-        num_white = cv2.countNonZero(roi)
-        num_pixels = roi_h*roi_w
-        percent_white = float(num_white/num_pixels)
-        # print(percent_white)
-
-        crop_start.append(x)
-        vals.append(percent_white)
-
-        # cv2.imshow('crop', roi)
-        # cv2.waitKey(0)
-
-    # plot graph of % white vs crop pos
-    # plt.plot(crop_start, vals, 'ro')
-    # plt.show()
-    digits = []
-    digit_start = find_peaks(crop_start, vals)
-    # cv2.imshow('digit_start', img[0+y_offset_top:h-y_offset_bottom, digit_start:digit_start+window_w])
-    # digits.append(img[0+y_offset_top:h-y_offset_bottom, digit_start:digit_start+window_w])
-
-    # extract the digits given starting index
     x = digit_start
+    digits = []
     while x <= w:
         if x + window_w > w:
             break
@@ -233,7 +212,7 @@ def extract_digits(img):
             digits.append(roi)
             # cv2.imshow('digits', roi)
             # cv2.waitKey(0)
-        x = x + window_w
+        x += window_w
 
     cv2.imshow('digits', digits[0])
     cv2.waitKey(0)
@@ -304,7 +283,7 @@ if __name__ == '__main__':
         # img = cv2.imread('screen2017-08-04_249038.jpg')
         cv2.imshow('orig', img)
         # extract_digits(img)
-        find_first_digit(img)
+        extract_digits(img)
         cv2.waitKey(0)
 
 
