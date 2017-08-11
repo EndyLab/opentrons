@@ -182,6 +182,28 @@ def find_digit_start(img):
     print('digit start x coords:', peak)
     return peak
 
+# crop digits
+def crop_digits(img, y0, y1, x0, x1):
+    # default set to fail
+    ret = -1
+    digit = img
+
+    roi = img[y0:y1, x0:x1]
+    roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+    roi_h, roi_w = roi.shape[:2]
+    num_white = cv2.countNonZero(roi)
+    num_pixels = roi_h*roi_w
+    percent_white = float(num_white/num_pixels)
+
+    if percent_white >= .35:
+        ret = 0 # 0 = pass, -1 = fail
+        digit = roi
+        cv2.imshow('digits', roi)
+        cv2.waitKey(0)
+
+    return ret, digit, percent_white
+
+
 # sliding window
 BLACK = 255
 WHITE = 0
@@ -196,25 +218,18 @@ def extract_digits(img):
     # find the coords of the first digit
     digit_start = find_digit_start(img)
 
-    x = digit_start
     digits = []
-    while x <= w:
-        if x + window_w > w:
-            break
-        roi = img[0+y_offset_top:h-y_offset_bottom, x:x+window_w]
-        roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-        roi_h, roi_w = roi.shape[:2]
-        num_white = cv2.countNonZero(roi)
-        num_pixels = roi_h*roi_w
-        percent_white = float(num_white/num_pixels)
+    # loop through enitre screen
+    for x in range(digit_start, w, window_w):
+        # digit candidates
+        y0 = 0+y_offset_top
+        y1 = h-y_offset_bottom
+        x0 = x
+        x1 = x+window_w
+        crop_digits(img, y0, y1, x0, x1)
+        
 
-        if percent_white >= .35:
-            digits.append(roi)
-            # cv2.imshow('digits', roi)
-            # cv2.waitKey(0)
-        x += window_w
-
-    cv2.imshow('digits', digits[0])
+    # cv2.imshow('digits', digits[0])
     cv2.waitKey(0)
     return digits
 
