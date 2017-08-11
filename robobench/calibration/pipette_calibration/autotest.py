@@ -121,6 +121,53 @@ def normalize_screens(dir, aspect_ratio):
         # write to new folder
         cv2.imwrite(r"C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/norms/"+file, bradley_thresh)
 
+# optimize sliding window
+WINDOW_MIN = 10
+def optimize_sliding_window(img):
+    y_offset_top = 2
+    y_offset_bottom = 2
+    h, w = img.shape[:2]
+
+    master_crops = []
+    master_vals = []
+    master_widths = []
+    for width in range(WINDOW_MIN, w//5, 1):
+        # print('width:', width)
+        crops = []
+        vals = []
+        for x in range(w):
+            if x + width > w:
+                break
+            roi = img[0+y_offset_top:h-y_offset_bottom, x:x+width]
+            # cv2.imshow('crop', roi)
+            # cv2.waitKey(0)
+
+            roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+            roi_h, roi_w = roi.shape[:2]
+            num_white = cv2.countNonZero(roi)
+            num_pixels = roi_h*roi_w
+            percent_white = float(num_white/num_pixels)
+            # print(percent_white)
+
+            crops.append(x)
+            vals.append(percent_white)
+
+        master_crops.append(crops)
+        master_vals.append(vals)
+        master_widths.append(width)
+
+    # find peaks for each window size
+    for crop, val, width in zip(master_crops, master_vals, master_widths):
+        peaks = find_peaks(crop, val)
+        print(peaks)
+
+        # for peak in peaks:
+        #     # crop at the peaks
+        #     roi = img[0+y_offset_top:h-y_offset_bottom, peak:peak+width]
+        #     cv2.imshow('crop', roi)
+        #     cv2.waitKey(0)
+        
+
 # sliding window
 BLACK = 255
 WHITE = 0
@@ -132,7 +179,7 @@ def extract_digits(img):
 
     vals = []
     crop_start = []
-
+    # for width in range()
     for x in range(w):
         if x + window_w > w:
             break
@@ -159,7 +206,7 @@ def extract_digits(img):
     # cv2.imshow('digit_start', img[0+y_offset_top:h-y_offset_bottom, digit_start:digit_start+window_w])
     # digits.append(img[0+y_offset_top:h-y_offset_bottom, digit_start:digit_start+window_w])
 
-    # extarct the digits given starting index
+    # extract the digits given starting index
     x = digit_start
     while x <= w:
         if x + window_w > w:
@@ -173,13 +220,31 @@ def extract_digits(img):
 
         if percent_white >= .35:
             digits.append(roi)
-            cv2.imshow('digits', roi)
-            cv2.waitKey(0)
-        x = x + window_w + 1
+            # cv2.imshow('digits', roi)
+            # cv2.waitKey(0)
+        x = x + window_w
 
+    cv2.imshow('digits', digits[0])
+    cv2.waitKey(0)
     return digits
 
+def condense_list(x):
+    index = 0
+    res = []
+    i = 0
+    while i < len(x)-1:
+        curr_val = x[i] 
+        next_val = x[i+1]
+        if abs(curr_val - next_val) <= 2:
+            ave = round(float((curr_val+next_val)/2))
+            x[i] = ave
+            np.delete(x,i+1)
 
+        i += 1
+
+    return x
+
+# find the first digit
 def find_peaks(x, y):
     # curve fitting
     spl = UnivariateSpline(x,y,s=0,k=4)
@@ -199,7 +264,8 @@ def find_peaks(x, y):
     # print(peak_indices)
 
     # the 2nd index is the first peak aka first digit
-    return peak_indices[1]
+    # return peak_indices[1:]
+    return condense_list(peak_indices[1:])
 
 
 if __name__ == '__main__':
@@ -222,9 +288,10 @@ if __name__ == '__main__':
     for file in glob.glob('*.jpg'):
         img = cv2.imread(file)
         # img = cv2.imread('screen2017-08-04_249038.jpg')
-        cv2.imshow('orig', img)
-        extract_digits(img)
-        cv2.waitKey(0)
+        # cv2.imshow('orig', img)
+        # extract_digits(img)
+        optimize_sliding_window(img)
+        # cv2.waitKey(0)
 
 
 
