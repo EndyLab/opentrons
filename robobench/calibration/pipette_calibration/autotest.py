@@ -131,6 +131,8 @@ def optimize_sliding_window(img):
     master_crops = []
     master_vals = []
     master_widths = []
+    opt_param = [] # param which we are optimizing
+
     for width in range(WINDOW_MIN, w//5, 1):
         # print('width:', width)
         crops = []
@@ -161,13 +163,12 @@ def optimize_sliding_window(img):
         peaks = find_peaks(crop, val)
         print(peaks)
 
-        # for peak in peaks:
-        #     # crop at the peaks
-        #     roi = img[0+y_offset_top:h-y_offset_bottom, peak:peak+width]
-        #     cv2.imshow('crop', roi)
-        #     cv2.waitKey(0)
+        for peak in peaks:
+            # crop at the peaks
+            roi = img[0+y_offset_top:h-y_offset_bottom, peak:peak+width]
+            cv2.imshow('crop', roi)
+            cv2.waitKey(0)
         
-
 # sliding window
 BLACK = 255
 WHITE = 0
@@ -237,12 +238,15 @@ def condense_list(x):
         next_val = x[i+1]
         if abs(curr_val - next_val) <= 2:
             ave = round(float((curr_val+next_val)/2))
-            x[i] = ave
-            np.delete(x,i+1)
-
+            x[i+1] = ave
+            x[i] = 0
         i += 1
 
-    return x
+    for val in x:
+        if val != 0:
+            res.append(val)
+
+    return res
 
 # find the first digit
 def find_peaks(x, y):
@@ -288,10 +292,10 @@ if __name__ == '__main__':
     for file in glob.glob('*.jpg'):
         img = cv2.imread(file)
         # img = cv2.imread('screen2017-08-04_249038.jpg')
-        # cv2.imshow('orig', img)
+        cv2.imshow('orig', img)
         # extract_digits(img)
         optimize_sliding_window(img)
-        # cv2.waitKey(0)
+        cv2.waitKey(0)
 
 
 
