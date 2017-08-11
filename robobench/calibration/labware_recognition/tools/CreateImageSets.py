@@ -1,32 +1,40 @@
-from os import listdir
-import re
+from os import listdir 
 from os.path import join
 
 annotation_dir = '../models/object_detection/VOCdevkit/VOC2012/Annotations'
-main_dir = '../object_recog_intro/models/object_detection/VOCdevkit/VOC2012/ImageSets/Main'
+main_dir = '../models/object_detection/VOCdevkit/VOC2012/ImageSets/Main'
+image_dir = '../models/object_detection/VOCdevkit/VOC2012/JPEGImages'
 
-classes = ['96wellplate', 'scale', 'tiprack', 'trough', 'arm', 'pipette', 'trash']
+classes = ['96wellplate', 'scale', 'tiprack', 'trough', 'trash']
+robots = ['hiro', 'enzo']
+slots = ['A1', 'A2', 'A3',
+		'B1', 'B2', 'B3',
+		'C1', 'C2', 'C3',
+		'D1', 'D2', 'D3',
+		'E1', 'E2', 'E3']
 
 train_class_files = [open(join(main_dir, class_type + '_train.txt'), 'w') for class_type in classes]
 val_class_files = [open(join(main_dir, class_type + '_val.txt'), 'w') for class_type in classes]
 
-annotation_files = listdir(annotation_dir)
 
-for filename in annotation_files:
-	print(filename)
-	if 'labimage' in filename:
-		print('train')
-		curr_files = train_class_files
-	else:
-		print('val')
-		curr_files = val_class_files
-	with open(join(annotation_dir, filename), 'r') as f:
-		data = f.read()
-	for i in range (len(classes)):
-		if classes[i] in data:
-			curr_files[i].write(filename[:-4] + ' 1\n')
+def createImageSet():
+	# Assumes files are formatted as in LabImageCapture.py
+	# Generates 
+	annotation_files = [f for f in listdir(annotation_dir) if not f.startswith('.')]
+	for filename in annotation_files:
+		print(filename)
+		object_type, robot, slot, purpose = filename.split('-')[0].split('_')
+		if purpose == 't':
+			print('train')
+			curr_files = train_class_files
 		else:
-			curr_files[i].write(filename[:-4] + ' -1\n')
+			print('eval')
+			curr_files = val_class_files
+		for i in range(len(classes)):
+			if classes[i] == object_type:
+				curr_files[i].write(filename[:-4] + ' 1\n')
+			else:
+				curr_files[i].write(filename[:-4] + ' -1\n')
 
-
-
+if __name__ == '__main__':
+	createImageSet()
