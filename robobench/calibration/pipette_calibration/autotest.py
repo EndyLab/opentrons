@@ -290,16 +290,17 @@ def extract_digits(img):
     
     # display these digits
     sep_digits = []
+    results = []
     for digit in digits:
         # account for variance in digit crops
         more_digits = digit_variance(digit, 2)
         sep_digits.append(more_digits)
-
         ret = knn(digit.crop, k=5)
-        print('result:', ret)
+        # print('result:', ret)
+        results.append(ret)
         date = str(datetime.now())
         name = "screen"+date[:10]+"_"+date[20:]+".jpg"
-        # cv2.imwrite(name, digit.crop)
+        # cv2.imshow('digit', digit.crop)
         # cv2.waitKey(0)
 
     # # go through all the digits and run them through knn
@@ -311,17 +312,21 @@ def extract_digits(img):
     #         img = digit.crop
     #         cv2.imshow('digit', img)
     #         cv2.waitKey(0)
-    #         ret = knn(img, k=2)
-    #         print(ret)
+    #         ret = knn(cv2.cvtColor(img,cv2.COLOR_BGR2GRAY), k=5)
+    #         # print(ret)
     #         for val in ret:
     #             results.append(val)
 
     #     # identify the digit
-    #     print('digit is:',results)
+    #     if len(results) > 0:
+    #         try:
+    #             print('digit is:',statistics.mode(results))
+    #         except statistics.StatisticsError:
+    #             print('digit is:',results[0])
     #     # cv2.imshow('digit', digit.crop)
     #     # cv2.waitKey(0)
 
-    return digits
+    return results
 
 # combines values that are close (within 2) to each other into a 1 value average
 def condense_list(x):
@@ -389,7 +394,8 @@ if __name__ == '__main__':
         # img = cv2.imread('screen2017-08-04_249038.jpg')
         # cv2.imshow('orig', img)
         # extract_digits(img)
-        extract_digits(img)
+        results = extract_digits(img)
+        print(results)
         # cv2.waitKey(0)
 
 

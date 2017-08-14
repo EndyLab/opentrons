@@ -12,17 +12,16 @@ def knn(img, k=5):
 	# train the KNN model
 	knn_model = cv2.ml.KNearest_create()
 	knn_model.train(samples,cv2.ml.ROW_SAMPLE,responses)
-	identified = []
 	dists = []
 	
 	img_scaled = cv2.resize(img, (10,25))
 	sample = img_scaled.reshape((1,250))
 	sample = np.float32(sample)
 	ret, results, neighbours, dist = knn_model.findNearest(sample, k)
-	identified.append(int(results[0][0]))
+	identified = int(results[0][0])
 	dists.append(dist)
 	# print('distance:',neighbours)
-	return neighbours[0]
+	return identified
 
 
 if __name__ == '__main__':
