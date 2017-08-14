@@ -198,16 +198,67 @@ def crop_digits(img, y0, y1, x0, x1):
     if percent_white >= .35:
         ret = 0 # 0 = pass, -1 = fail
         digit = roi
-        cv2.imshow('digits', roi)
-        cv2.waitKey(0)
+        # cv2.imshow('digits', roi)
+        # cv2.waitKey(0)
 
     return ret, digit, percent_white
 
+class Digit(object):
+    """ a Digit has an image, cropped image containing the digit, and coords o the crop
+        Attributes:
+            img = the screen with the digit
+            crop_img = the cropped image of the digit
+            coords = the coords of where the dogiot was cropped, a tuple of (x, y)
+    """ 
+    def __init__(self, screen, crop=None, coords=None):
+        self.screen = screen
+        self.crop = crop
+        self.coords = coords
+
+    def add_crop(self, img):
+        self.crop = img
+
+    def add_coords(self, coords):
+        self.coords = coords
+
+    def get_screen(self):
+        return self.screen
+
+    def get_crop(self):
+        return self.crop
+
+    # (y0, y1, x0, x1)
+    def get_coords(self):
+        return coords
+
+def digit_variance(digit, delta):
+    coords = digit.coords
+    y0 = coords[0]
+    y1 = coords[1]
+    x0 = coords[2]
+    x1 = coords[3]
+
+    h, w = digit.screen.shape[:2]
+
+    more_digits = []
+    # variance along x axis
+    for x in range (-1*delta, delta, 1):
+        if x1+x > w:
+            break
+        crop = digit.screen[y0:y1, x0+x:x1+x]
+        more_coords = (y0, y1, x0+x, x1+x)
+        more_digit = Digit(digit.screen, crop, more_coords)
+        more_digits.append(more_digit)
+        cv2.imshow('digit', crop)
+        cv2.waitKey(0)
+
+    return more_digits
 
 # sliding window
 BLACK = 255
 WHITE = 0
 def extract_digits(img):
+
     y_offset_top = 2
     y_offset_bottom = 3
     window_w = WINDOW_MIN
@@ -219,20 +270,34 @@ def extract_digits(img):
     digit_start = find_digit_start(img)
 
     digits = []
+
     # loop through enitre screen
     for x in range(digit_start, w, window_w):
+        digit = Digit(img)
         # digit candidates
         y0 = 0+y_offset_top
         y1 = h-y_offset_bottom
         x0 = x
         x1 = x+window_w
-        crop_digits(img, y0, y1, x0, x1)
-        
+        ret, digit_crop, percent_white = crop_digits(img, y0, y1, x0, x1)
+        if ret == 0:
+            # digits.append(digit_crop)
+            digit.add_crop(digit_crop)
+            digit.add_coords((y0, y1, x0, x1))
+            digits.append(digit)
 
-    # cv2.imshow('digits', digits[0])
-    cv2.waitKey(0)
+    
+    # display these digits
+    for digit in digits:
+        # account for variance in digit crops
+        more_digits = digit_variance(digit, 2)
+
+        # cv2.imshow('digit', digit.crop)
+        # cv2.waitKey(0)
+
     return digits
 
+# combines values that are close (within 2) to each other into a 1 value average
 def condense_list(x):
     index = 0
     res = []
