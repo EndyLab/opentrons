@@ -9,8 +9,10 @@ from bradley_thresh import faster_bradley_threshold
 import matplotlib.pyplot as plt
 from scipy.interpolate import UnivariateSpline
 from classify import knn
+from datetime import datetime
 
 from scipy import signal
+import statistics
 
 def list_to_str(vals):
     res = ''
@@ -165,7 +167,7 @@ def find_digit_start(img):
     # find peaks for each window size
     for crop, val, width in zip(master_crops, master_vals, master_widths):
         peak = find_peaks(crop, val)
-        print('x coords:', peak)
+        # print('x coords:', peak)
 
         opt_vals = []
         # for peak in peaks:
@@ -175,11 +177,11 @@ def find_digit_start(img):
         # digit = knn(temps)
         # print(digit)
         opt_vals.append(val[peak])
-        print(val[peak])
+        # print(val[peak])
         # cv2.imshow('crop', roi)
         # cv2.waitKey(0)
-        print(opt_vals, width)
-    print('digit start x coords:', peak)
+        # print(opt_vals, width)
+    # print('digit start x coords:', peak)
     return peak
 
 # crop digits
@@ -249,8 +251,7 @@ def digit_variance(digit, delta):
         more_coords = (y0, y1, x0+x, x1+x)
         more_digit = Digit(digit.screen, crop, more_coords)
         more_digits.append(more_digit)
-        cv2.imshow('digit', crop)
-        cv2.waitKey(0)
+        
 
     return more_digits
 
@@ -288,12 +289,37 @@ def extract_digits(img):
 
     
     # display these digits
+    sep_digits = []
     for digit in digits:
         # account for variance in digit crops
         more_digits = digit_variance(digit, 2)
+        sep_digits.append(more_digits)
 
-        # cv2.imshow('digit', digit.crop)
+        ret = knn(digit.crop, k=5)
+        print('result:', ret)
+        date = str(datetime.now())
+        name = "screen"+date[:10]+"_"+date[20:]+".jpg"
+        # cv2.imwrite(name, digit.crop)
         # cv2.waitKey(0)
+
+    # # go through all the digits and run them through knn
+    # print('digit group size', len(sep_digits))
+    # for digit_group in sep_digits:
+    #     results = []
+    #     print('size:', len(digit_group))
+    #     for digit in digit_group:
+    #         img = digit.crop
+    #         cv2.imshow('digit', img)
+    #         cv2.waitKey(0)
+    #         ret = knn(img, k=2)
+    #         print(ret)
+    #         for val in ret:
+    #             results.append(val)
+
+    #     # identify the digit
+    #     print('digit is:',results)
+    #     # cv2.imshow('digit', digit.crop)
+    #     # cv2.waitKey(0)
 
     return digits
 
@@ -361,10 +387,10 @@ if __name__ == '__main__':
     for file in glob.glob('*.jpg'):
         img = cv2.imread(file)
         # img = cv2.imread('screen2017-08-04_249038.jpg')
-        cv2.imshow('orig', img)
+        # cv2.imshow('orig', img)
         # extract_digits(img)
         extract_digits(img)
-        cv2.waitKey(0)
+        # cv2.waitKey(0)
 
 
 
