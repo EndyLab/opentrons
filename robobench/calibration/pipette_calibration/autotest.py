@@ -1,4 +1,3 @@
-from snapshot import scale_to_digit, isolate_screen
 import snapshot
 import glob, os
 import json
