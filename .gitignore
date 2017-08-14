@@ -24,3 +24,7 @@ test.jpg
 test.py
 test/
 test_imgs/
+crops/
+norms/
+screen/
+training/
