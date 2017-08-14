@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # classifies an array of imgs
-def knn(imgs, k=2):
+def knn(img, k=5):
 	# load the data we generated previously
 	training_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/training" 
 	samples = np.loadtxt(training_dir+'/general-samples.data').astype(np.float32)
@@ -13,14 +13,16 @@ def knn(imgs, k=2):
 	knn_model = cv2.ml.KNearest_create()
 	knn_model.train(samples,cv2.ml.ROW_SAMPLE,responses)
 	identified = []
-	for img in imgs:
-		img_scaled = cv2.resize(img, (10,25))
-		sample = img_scaled.reshape((1,250))
-		sample = np.float32(sample)
-		ret, results, neighbours, dist = knn_model.findNearest(sample, k)
-		identified.append(int(results[0][0]))
-
-	return identified
+	dists = []
+	
+	img_scaled = cv2.resize(img, (10,25))
+	sample = img_scaled.reshape((1,250))
+	sample = np.float32(sample)
+	ret, results, neighbours, dist = knn_model.findNearest(sample, k)
+	identified.append(int(results[0][0]))
+	dists.append(dist)
+	# print('distance:',neighbours)
+	return neighbours[0]
 
 
 if __name__ == '__main__':
