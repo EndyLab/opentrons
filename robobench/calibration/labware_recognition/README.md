@@ -2,7 +2,13 @@
 Steps to use TensorFlow's Object Recognition Pipeline
 **Still need to run through steps and debug**
 
-![alt text](https://github.com/EndyLab/opentrons/blob/master/robobench/calibration/labware_recognition/deckrecognition.png)
+![alt text](https://github.com/EndyLab/opentrons/blob/master/robobench/calibration/labware_recognition/examples/deckrecognition.png)
+
+**Resources**:
+[TensorFlow Object Detection Documentation](https://github.com/tensorflow/models/tree/master/object_detection)
+[Useful StackOverflow post](https://stackoverflow.com/questions/44973184/train-tensorflow-object-detection-on-own-dataset/) documenting steps
+
+This document is an add on to these resources to help you train for labware detection more easily.
 
 ## Installations
 
@@ -15,14 +21,7 @@ Install Object Detection API https://github.com/tensorflow/models/blob/master/ob
 
 ## Building Data Set
 
-TensorFlow's [documentation](https://github.com/tensorflow/models/tree/master/object_detection) is thorough and provides most of the information necessary to get started. The aim of this document is to describe the necessary steps and provide a possible approach to using the API.
-Before beginning, I would recommend completing the first object detection tutorial.
-
-These instructions are largely based on [this](https://stackoverflow.com/questions/44973184/train-tensorflow-object-detection-on-own-dataset/44973203#44973203) Stack Overflow post.
-
-### Create PASCAL VOC Dataset
-
-TF provides a [script](https://github.com/tensorflow/models/blob/master/object_detection/g3doc/preparing_inputs.md) to convert a PASCAL VOC dataset to the desired TFRecords format. This section gives a possible approach to creating a PASCAL VOC dataset.
+Before beginning, I would recommend completing the first object detection tutorial and looking through the SO post and the second object detection tutorial.
 
 Within models/object_detection, create the following directory structure:
 ```
@@ -35,38 +34,44 @@ Within models/object_detection, create the following directory structure:
 ```
 
 All training and validation images should be placed in JPEGImages.
-[LabImageCapture.py](https://github.com/EndyLab/opentrons/blob/master/robobench/calibration/labware_recognition/tools/LabImageCapture.py) can be use to collect the images and place them in the appropriate folder. The script requires opencv and imutils.
+
+To capture labware images, can use [LabImageCapture.py](https://github.com/EndyLab/opentrons/blob/master/robobench/calibration/labware_recognition/tools/LabImageCapture.py)
 **Note:** opencv3 version 3.0.0 should be used for OSX, the most recent version crashes with video capture. To install, see https://anaconda.org/jlaura/opencv3
 
-Annotate images using [labelImg](https://github.com/tzutalin/labelImg)
 
-When completed, make sure to move annotations to Annotations.
+### Create PASCAL VOC Dataset
 
-Create imageSets using [CreateImageSets.py](https://github.com/EndyLab/opentrons/blob/master/robobench/calibration/labware_recognition/tools/CreateImageSets.py).
+Follow instructions from the StackOverflow [post](https://stackoverflow.com/questions/44973184/train-tensorflow-object-detection-on-own-dataset/44973203#44973203)
 
-Change label map file
+Images can be annotated with PASCALVOC format using [labelImg](https://github.com/tzutalin/labelImg)
 
-### Generate TFRecords
+Once all annotations and images are finalized (see changing test/validation category), [CreateImageSets.py](https://github.com/EndyLab/opentrons/blob/master/robobench/calibration/labware_recognition/tools/CreateImageSets.py) can be used from tools to generate image scripts if filenames are formatted as in LabImageCapture.py.
 
-From https://stackoverflow.com/questions/44973184/train-tensorflow-object-detection-on-own-dataset/44973203#44973203:
 
-"If you look into their code especially this line, they explicitly grab the aeroplane_train.txt only. For curios minds, here's why. Change this file name to any of your class train text file.
 
-Make sure VOCdevkit is inside models/object_detection then you can go ahead and generate the TFRecords.
+#### Changing test/validation category
+NEED TO LOOK INTO HOW MERGED DATASET WORKS
 
-Please go through their code first should you run into any problems. It is self explanatory and well documented."
+You may have some images you intended to use for training that you want to change to validation or vice versa. It is important to alter all the relevant elements of the xml file to be aligned. 
 
-### Configure Pipeline
+[Sample XML file](https://github.com/EndyLab/opentrons/blob/master/robobench/calibration/labware_recognition/examples/96wellplate_enzo_A3_t-0.xml)
 
-Follow instructions here: https://github.com/tensorflow/models/blob/master/object_detection/g3doc/configuring_jobs.md
-Sample config files are located in https://github.com/tensorflow/models/tree/master/object_detection/samples/configs
+### Creating TFRecords
 
-### Training
+If using folder structure described here, change line 84
+`img_path = os.path.join(data['folder'], image_subdirectory, data['filename'])`
+to
+`img_path = os.path.join('VOC2012', image_subdirectory, data['filename'])`
 
-I found this tutorial https://github.com/tensorflow/models/blob/master/object_detection/g3doc/running_pets.md useful to setting up on the cloud, in addition to the
-pages on running locally https://github.com/tensorflow/models/blob/master/object_detection/g3doc/running_locally.md and running
-on the cloud https://github.com/tensorflow/models/blob/master/object_detection/g3doc/running_on_cloud.md
+Make sure protoc and PATH steps from installation have been completed.
 
-*Add lab Google cloud account*
+Then follow instructions in the StackOverflow post.
 
+### Configure Pipeline and Train
+
+Make sure preferred model has been downloaded from [model zoo](https://github.com/tensorflow/models/blob/master/object_detection/g3doc/detection_model_zoo.md). We have been using ssd_mobilenet_v1_coco. Folder should be placed in models/object_detection
+
+I would recommend running locally to debug before pushing to the cloud. TF provides good documentation, the pets tutorial is bascially what we will ultimately do except with the labware dataset.
+
+Contact Anton for access to the lab Google Cloud.
 
