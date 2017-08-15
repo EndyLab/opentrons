@@ -370,9 +370,8 @@ def find_peaks(x, y):
     # return peak_indices[1:]
     return condense_list(peak_indices[1:])[0]
 
-def to_vol_measurement(scale_reading):
+def to_vol_measurement(scale_reading, decimal_pos):
     # this particular scale has a decimal after the 3rd digit from the right
-    decimal_pos = 3
     factor = 10**decimal_pos
     val = 0
     for digit in scale_reading:
@@ -380,6 +379,9 @@ def to_vol_measurement(scale_reading):
 
     # vol in micro liters
     return val
+
+def read_scale(img):
+    return to_vol_measurement(extract_digits(img), 3)
 
 if __name__ == '__main__':
     img_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/screen" 
@@ -405,7 +407,7 @@ if __name__ == '__main__':
         # img = cv2.imread('screen2017-08-04_249038.jpg')
         # cv2.imshow('orig', img)
         # extract_digits(img)
-        results = to_vol_measurement(extract_digits(img))
+        results = read_scale(img)
         print('expected:',key[file],'got:',results)
         if key[file] == str(results):
             success += 1
