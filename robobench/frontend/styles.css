@@ -1,9 +1,13 @@
-.slot-grid {
+.slot-grid > td {
 	height: 200px;
-	width: auto;
+	width: 100px;
 
 }
 
+.slot-grid > th {
+	width: 20%;
+
+}
 .well-96 {
 	height: 30px;
 	width: 30px;
@@ -47,5 +51,10 @@
 
 .deck-labels {
 	padding: 0;
+}
+
+.table {
+	margin:0;
+	table-layout: fixed;
 }
 
