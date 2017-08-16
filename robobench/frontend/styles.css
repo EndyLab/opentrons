@@ -1,5 +1,7 @@
 .slot-grid {
 	height: 200px;
+	width: auto;
+
 }
 
 .well-96 {
@@ -25,5 +27,25 @@
 
 .circle:hover {
 	background-color: yellow;
+}
+
+#dashboard {
+	background-color: #F8F9FA;
+	border-right: 1px solid #EEEEEE;
+	padding: 10px;
+}
+
+#protocols {
+	list-style-type:none;
+	padding-left: 0;
+}
+
+/* all children of protocol will have these properties*/
+#protocols > * {
+    margin: 10px;
+}
+
+.deck-labels {
+	padding: 0;
 }
 
