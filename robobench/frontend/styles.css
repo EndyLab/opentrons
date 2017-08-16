@@ -2,6 +2,25 @@
 	height: 200px;
 }
 
-td:hover {
+.well-96 {
+	height: 30px;
+	width: 30px;
+}
+
+.well {
+	background-color: gray;
+}
+.circle {
+	background-color: white;
+	border-radius: 50%;
+	border: 1px solid grey;
+	width: 30px;
+	height: 30px; 
+	margin: 0;
+	padding: 0;
+}
+
+.circle:hover {
 	background-color: yellow;
 }
+
