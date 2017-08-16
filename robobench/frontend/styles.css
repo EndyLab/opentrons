@@ -25,6 +25,7 @@
 .well-96 .well {
 	border: 0;
 	padding: 0;
+	outline: none;
 }
 
 .circle {
