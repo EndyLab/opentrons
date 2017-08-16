@@ -1,14 +1,29 @@
+#grid table th {
+	width: 18%;
+	margin: 2%;
+	text-align: center;
+}
+
+#grid table td {
+	width: 18%;
+	margin: 2%;
+}
+
 .slot-grid {
-	height: 200px;
+}
+
+.labware {
+	/*border: 0;*/
 }
 
 .well-96 {
-	height: 30px;
-	width: 30px;
+	display: block;
+	border: 1px solid grey;
+	padding: 2px;
 }
 
-.well {
-	background-color: gray;
+.well-96 .well {
+	border: 0;
 	padding: 0;
 }
 
@@ -16,13 +31,11 @@
 	background-color: white;
 	border-radius: 50%;
 	border: 1px solid grey;
-	width: 30px;
-	height: 30px; 
-	margin: 0;
-	padding: 0;
+	width: 14px;
+	height: 14px;
+	margin: 1px;
 }
 
 .circle:hover {
-	background-color: yellow;
+	background-color: lime;
 }
-
