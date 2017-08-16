@@ -9,7 +9,9 @@
 
 .well {
 	background-color: gray;
+	padding: 0;
 }
+
 .circle {
 	background-color: white;
 	border-radius: 50%;
