@@ -1,11 +1,7 @@
-#protocol {
-
+.slot-grid {
+	height: 200px;
 }
 
-#grid {
-
-}
-
-#feedback {
-
+td:hover {
+	background-color: yellow;
 }
