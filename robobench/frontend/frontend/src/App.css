@@ -2,72 +2,28 @@ html, body {
   height: 100%;
 }
 
-
 .fill {
-  height: 100%;
-  min-height: 100%;
+  height: calc(100% - 56px);
+  min-height: calc(100% - 56px);
 }
 
-#grid-holder {
-	padding: 0px;
-	display: block;
-	width: 80%;
-	margin: auto;
-	position: relative;
-	top: 50%;
-	transform: translateY(-50%); 
-}
-/*#grid, th, td, tr {
-    border: 1px solid black;
-}
-*/
 th:first-child {
 	width: 5%;
 }
 
-/* normal cells*/
-/*th:not(:first-child), td {
-    background-color: red;
-} 
-*/
-
-.slot-grid > td {
-	height: 200px;
-	text-align:center; 
-    vertical-align:middle;
-}
-
-
 #grid {
+  height: 100%;
   width: 100%;
-  height: auto;
-  table-layout: fixed;
-  padding: 0;
 }
 
-
-/*#grid table tr {
-  height: 30%;
+#grid th {
+  text-align: center;
 }
 
-#grid table td {
-	height: 30%;
-	width: 20%;
-	margin: 2%;
-	text-align: center;
-}
-
-#grid table td {
-	height: 30%;
+#grid td {
 	width: 15%;
-	margin: 2%;
+  text-align: center;
 }
-
-.slot-grid > td {
-	height: 200px;
-	width: 100px;
-}
-*/
 
 .labware-well-96 {
 	background-color: #EEEEEE;
@@ -110,5 +66,3 @@ th:first-child {
 #protocols > * {
     margin: 15px;
 }
-
-

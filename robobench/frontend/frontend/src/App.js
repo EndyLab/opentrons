@@ -29,44 +29,94 @@ class WellPlate extends Labware {
 }
 
 class Grid extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      labware: {}
+    }
+  }
+
+  componentDidMount() {
+    this.timerID = setInterval(
+      () => this.refresh(),
+      1000
+    )
+  }
+
+  refresh() {
+    fetch('http://localhost:5000/grid')
+      .then((response) => response.json())
+      .then((json) => this.setState(json))
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timerID);
+  }
+
   render() {
+    var grid = {
+        'A1': '',
+        'A2': '',
+        'A3': '',
+        'A4': '',
+        'A5': '',
+        'B1': '',
+        'B2': '',
+        'B3': '',
+        'B4': '',
+        'B5': '',
+        'C1': '',
+        'C2': '',
+        'C3': '',
+        'C4': '',
+        'C5': '',
+    }
+
+    Object.keys(this.state.labware).forEach((key) => {
+      if (this.state.labware[key] == 'WellPlate') grid[key] = <WellPlate />;
+      else if (this.state.labware[key] == 'Trash') grid[key] = <img src="trash.svg" width="50px"/>;
+    })
+
     return (
-      <div id="grid-holder">
         <table id="grid">
-          <tr>
-            <th ></th>
-            <th>1</th>
-            <th>2</th>
-            <th>3</th>
-            <th>4</th>
-            <th>5</th>
-          </tr>
-          <tr className="slot-grid">
-            <th>C</th>
-            <td></td>
-            <td></td>
-            <td><img src="trash.svg" width="50px"/></td>
-            <td><img src="scale.svg" width="80px"/></td>
-            <td><img src="water.svg" width="50px"/></td>
-          </tr>
-          <tr className="slot-grid">
-            <th>B</th>
-            <td><WellPlate /></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr className="slot-grid">
-            <th>A</th>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
+          <thead>
+            <tr>
+              <th></th>
+              <th>1</th>
+              <th>2</th>
+              <th>3</th>
+              <th>4</th>
+              <th>5</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">C</th>
+              <td>{grid['C1']}</td>
+              <td>{grid['C2']}</td>
+              <td>{grid['C3']}</td>
+              <td>{grid['C4']}</td>
+              <td>{grid['C5']}</td>
+            </tr>
+            <tr>
+              <th scope="row">B</th>
+              <td>{grid['B1']}</td>
+              <td>{grid['B2']}</td>
+              <td>{grid['B3']}</td>
+              <td>{grid['B4']}</td>
+              <td>{grid['B5']}</td>
+            </tr>
+            <tr>
+              <th scope="row">A</th>
+              <td>{grid['A1']}</td>
+              <td>{grid['A2']}</td>
+              <td>{grid['A3']}</td>
+              <td>{grid['A4']}</td>
+              <td>{grid['A5']}</td>
+            </tr>
+          </tbody>
         </table>
-      </div>
     )
   }
 }
@@ -74,34 +124,10 @@ class Grid extends Component {
 class App extends Component {
   render() {
     return (
-      <div>
-        <nav className="navbar navbar-expand-md navbar-dark sticky-top bg-dark">
-          <a className="navbar-brand" href="#">
-            <i className="fa fa-cubes" aria-hidden="true"></i> Dashboard
-          </a>
-          <button className="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-            <span className="navbar-toggler-icon"></span>
-          </button>
-
-          <div className="collapse navbar-collapse" id="navbarsExampleDefault">
-            <ul className="navbar-nav mr-auto">
-              <li className="nav-item active">
-                <a className="nav-link" href="#">Home <span className="sr-only">(current)</span></a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="#">Settings</a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="#">Help</a>
-              </li>
-            </ul>
-
-          </div>
-        </nav>
-      
         <div className="row fill">
           {/* right window */}
           <div className="col-sm-2" id="dashboard">
+
           <ul id="protocols">
             <li><button type="button" className="btn">Dilution</button></li>
             <li>
@@ -122,11 +148,10 @@ class App extends Component {
 
 
         {/* deck grid */}
-          <div className="col-sm-10" id="grid">
+          <div className="col-sm-10 fill">
             <Grid />
           </div>
         </div>
-      </div>
     );
   }
 }
