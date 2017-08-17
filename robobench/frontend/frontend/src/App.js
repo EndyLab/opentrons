@@ -29,7 +29,55 @@ class WellPlate extends Labware {
 }
 
 class Grid extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      labware: {}
+    }
+  }
+
+  componentDidMount() {
+    this.timerID = setInterval(
+      () => this.refresh(),
+      1000
+    )
+  }
+
+  refresh() {
+    fetch('http://localhost:5000/grid')
+      .then((response) => response.json())
+      .then((json) => this.setState(json))
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timerID);
+  }
+
   render() {
+    var grid = {
+        'A1': '',
+        'A2': '',
+        'A3': '',
+        'A4': '',
+        'A5': '',
+        'B1': '',
+        'B2': '',
+        'B3': '',
+        'B4': '',
+        'B5': '',
+        'C1': '',
+        'C2': '',
+        'C3': '',
+        'C4': '',
+        'C5': '',
+    }
+
+    Object.keys(this.state.labware).forEach((key) => {
+      if (this.state.labware[key] == 'WellPlate') grid[key] = <WellPlate />;
+      else if (this.state.labware[key] == 'Trash') grid[key] = <img src="trash.svg" width="50px"/>;
+    })
+
     return (
       <table id="grid">
         <thead>
@@ -45,29 +93,27 @@ class Grid extends Component {
         <tbody>
           <tr>
             <th scope="row">C</th>
-            <td></td>
-            <td></td>
-            <td><img src="trash.svg" width="50px"/></td>
-            <td><img src="scale.svg" width="80px"/></td>
-            <td><img src="water.svg" width="50px"/></td>
-            <td></td>
-            <td></td>
+            <td>{grid['C1']}</td>
+            <td>{grid['C2']}</td>
+            <td>{grid['C3']}</td>
+            <td>{grid['C4']}</td>
+            <td>{grid['C5']}</td>
           </tr>
           <tr>
             <th scope="row">B</th>
-            <td><WellPlate /></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td>{grid['B1']}</td>
+            <td>{grid['B2']}</td>
+            <td>{grid['B3']}</td>
+            <td>{grid['B4']}</td>
+            <td>{grid['B5']}</td>
           </tr>
           <tr>
             <th scope="row">A</th>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td>{grid['A1']}</td>
+            <td>{grid['A2']}</td>
+            <td>{grid['A3']}</td>
+            <td>{grid['A4']}</td>
+            <td>{grid['A5']}</td>
           </tr>
         </tbody>
       </table>
