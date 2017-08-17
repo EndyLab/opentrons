@@ -9,15 +9,28 @@ html, body {
 }
 
 #grid-holder {
-	padding: 10px;
+	padding: 0px;
+	display: block;
+	width: 80%;
+	margin: auto;
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%); 
 }
 /*#grid, th, td, tr {
     border: 1px solid black;
-}*/
-
-.slot-grid > th {
+}
+*/
+th:first-child {
 	width: 5%;
 }
+
+/* normal cells*/
+/*th:not(:first-child), td {
+    background-color: red;
+} 
+*/
+
 .slot-grid > td {
 	height: 200px;
 }

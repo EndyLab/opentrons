@@ -34,7 +34,7 @@ class Grid extends Component {
       <div id="grid-holder">
         <table id="grid">
           <tr>
-            <th></th>
+            <th ></th>
             <th>1</th>
             <th>2</th>
             <th>3</th>
