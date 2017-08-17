@@ -110,6 +110,14 @@ class App extends Component {
             <li><button type="button" className="btn">Dilution</button></li>
             <li>
               <button type="button" className="btn">Transfer</button>
+              <li>
+                  <div class="input-group">
+                  <input type="text" class="form-control" placeholder="Volume..."></input>
+                  <span class="input-group-btn">
+                    <button class="btn btn-default" type="button">Set</button>
+                  </span>
+                  </div>
+                </li>
             </li>
             <li><button type="button" className="btn btn-success"><i className="fa fa-play" aria-hidden="true"></i> Run </button></li>
           </ul>

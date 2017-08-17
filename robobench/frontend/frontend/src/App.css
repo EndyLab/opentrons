@@ -29,7 +29,9 @@ html, body {
 	margin: 2%;
 }
 
-.slot-grid {
+.slot-grid > td {
+	height: 200px;
+	width: 100px;
 }
 
 .labware {
