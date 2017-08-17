@@ -9,7 +9,8 @@
 	.st3{fill:#A6ADB4;}
 	.st4{fill:#0043FF;}
 </style>
-<rect x="0.5" y="0.5" class="st0" width="76.1" height="100"/>
+<path class="st0" d="M7.8,0.5h61.5c4,0,7.3,3.2,7.3,7.3v85.5c0,4-3.2,7.3-7.3,7.3H7.8c-4,0-7.3-3.2-7.3-7.3V7.8
+	C0.5,3.7,3.7,0.5,7.8,0.5z"/>
 <g>
 	<path class="st1" d="M26.2,92.1"/>
 	<g>
@@ -17,5 +18,5 @@
 	</g>
 </g>
 <circle class="st3" cx="38.6" cy="32.9" r="25"/>
-<rect x="13.6" y="72.1" class="st4" width="50" height="20"/>
+<rect x="14" y="72" class="st4" width="50" height="20"/>
 </svg>
