@@ -2,29 +2,39 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+import TableDragSelect from 'react-table-drag-select';
+// import 'react-table-drag-select/style.css';
+
 class Labware extends Component {
 
 }
 
-class Well extends Component {
-  render() {
-    return (<td className='well'><div className='circle'></div></td>)
-  }
-}
-
 class WellPlate extends Labware {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      model: new TableDragSelect.Model(12, 8) // Specify rows and columns
+    };
+    this.handleModelChange = this.handleModelChange.bind(this);
+  }
+
   render() {
-    const wells = [1,2,3,4,5,6,7,8].map((id) => <Well key={id} />);
+    const wells = [1,2,3,4,5,6,7,8].map((id) => <td className='well'><div className='circle'></div></td>);
     const rows = [1,2,3,4,5,6,7,8,9,10,11,12].map((id) => <tr key={id}>{wells}</tr>);
 
     return (
       <div className="labware-well-96">
-        <table>
-          <tbody>
-          {rows}
-          </tbody>
-        </table>
-      </div>)
+        <TableDragSelect className={this.props.mode} model={this.state.model} onModelChange={this.handleModelChange}>
+            {rows}
+        </TableDragSelect>
+      </div>
+    )
+  }
+
+  handleModelChange(model) {
+    this.props.updateMode();
+    this.setState({model});
   }
 }
 
@@ -54,6 +64,15 @@ class Grid extends Component {
     clearInterval(this.timerID);
   }
 
+  updateMode(key) {
+    console.log(key)
+    if (!this.state.source) {
+      this.setState({ source: key })
+    } else if (!this.state.dest && this.state.source != key) {
+      this.setState({ dest: key })
+    }
+  }
+
   render() {
     var grid = {
         'A1': '',
@@ -74,7 +93,13 @@ class Grid extends Component {
     }
 
     Object.keys(this.state.labware).forEach((key) => {
-      if (this.state.labware[key] == 'WellPlate') grid[key] = <WellPlate />;
+      if (this.state.labware[key] == 'WellPlate') {
+        var mode = 'none'
+        if (this.state.source == key) mode = 'source'
+        else if (this.state.dest == key) mode = 'dest'
+
+        grid[key] = <WellPlate key={key} mode={mode} updateMode={() => this.updateMode(key)}/>;
+      }
       else if (this.state.labware[key] == 'Trash') grid[key] = <img src="trash.svg" width="50px"/>;
     })
 
@@ -141,7 +166,7 @@ class App extends Component {
                 </span>
                 </div>
               </li>
-      
+
             <li><button type="button" className="btn btn-success"><i className="fa fa-play" aria-hidden="true"></i> Run </button></li>
           </ul>
         </div>
