@@ -18,7 +18,7 @@ class WellPlate extends Labware {
     const rows = [1,2,3,4,5,6,7,8,9,10,11,12].map((id) => <tr key={id}>{wells}</tr>);
 
     return (
-      <div className="labware well-96">
+      <div className="labware-well-96">
         <table>
           <tbody>
           {rows}

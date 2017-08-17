@@ -25,13 +25,10 @@ th:first-child {
   text-align: center;
 }
 
-.labware {
-	/*border: 0;*/
-}
-
-.well-96 {
+.labware-well-96 {
+	background-color: #EEEEEE;
 	display: inline-block;
-	border: 1px solid grey;
+	border: 1px solid #C4C4C4;
 	padding: 2px;
 }
 
@@ -43,7 +40,8 @@ th:first-child {
 .circle {
 	background-color: white;
 	border-radius: 50%;
-	border: 1px solid grey;
+	border: 1px solid #C4C4C4;
+/*	border: 1px solid grey;*/
 	width: 14px;
 	height: 14px;
 	margin: 1px;
