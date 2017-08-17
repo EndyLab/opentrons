@@ -5,7 +5,8 @@
   "dependencies": {
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
-    "react-scripts": "1.0.11"
+    "react-scripts": "1.0.11",
+    "react-table-drag-select": "^0.2.4"
   },
   "scripts": {
     "start": "react-scripts start",

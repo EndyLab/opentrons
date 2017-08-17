@@ -32,9 +32,27 @@ th:first-child {
 	padding: 2px;
 }
 
-.well-96 .well {
+.labware-well-96 .well {
+  height: 18px;
 	border: 0;
 	padding: 0;
+  font-size: 0;
+}
+
+.labware-well-96 .dest .cell-being-selected {
+  background-color: #fee5d9;
+}
+
+.labware-well-96 .dest .cell-selected {
+  background-color: #fee5d9;
+}
+
+.labware-well-96 .source .cell-being-selected {
+  background-color: #edf8e9;
+}
+
+.labware-well-96 .source .cell-selected {
+  background-color: #edf8e9;
 }
 
 .circle {
