@@ -78,16 +78,48 @@ class Grid extends Component {
 class App extends Component {
   render() {
     return (
-      <div className="row fill">
-        <div className="col-sm-2" id="protocol">
-          <button type="button" className="btn">Dilution</button>
-          <button type="button" className="btn">Transfer</button>
+      <div>
+        <nav className="navbar navbar-expand-md navbar-dark sticky-top bg-dark">
+          <a className="navbar-brand" href="#">
+            <i className="fa fa-cubes" aria-hidden="true"></i> Dashboard
+          </a>
+          <button className="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+            <span className="navbar-toggler-icon"></span>
+          </button>
+
+          <div className="collapse navbar-collapse" id="navbarsExampleDefault">
+            <ul className="navbar-nav mr-auto">
+              <li className="nav-item active">
+                <a className="nav-link" href="#">Home <span className="sr-only">(current)</span></a>
+              </li>
+              <li className="nav-item">
+                <a className="nav-link" href="#">Settings</a>
+              </li>
+              <li className="nav-item">
+                <a className="nav-link" href="#">Help</a>
+              </li>
+            </ul>
+
+          </div>
+        </nav>
+      
+        <div className="row fill">
+          {/* right window */}
+          <div className="col-sm-2" id="dashboard">
+          <ul id="protocols">
+            <li><button type="button" className="btn">Dilution</button></li>
+            <li>
+              <button type="button" className="btn">Transfer</button>
+            </li>
+            <li><button type="button" className="btn btn-success"><i className="fa fa-play" aria-hidden="true"></i> Run </button></li>
+          </ul>
         </div>
-        <div className="col-sm-8" id="grid">
-        <Grid />
-        </div>
-        <div className="col-sm-2" id="feedback">
-          <button type="button" className="btn btn-success">Run</button>
+
+
+        {/* deck grid */}
+          <div className="col-sm-10" id="grid">
+            <Grid />
+          </div>
         </div>
       </div>
     );
