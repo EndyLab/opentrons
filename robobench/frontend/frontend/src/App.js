@@ -31,8 +31,8 @@ class WellPlate extends Labware {
 class Grid extends Component {
   render() {
     return (
-      <table id="grid">
-        <thead>
+      <div id="grid-holder">
+        <table id="grid">
           <tr>
             <th></th>
             <th>1</th>
@@ -41,36 +41,32 @@ class Grid extends Component {
             <th>4</th>
             <th>5</th>
           </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">C</th>
+          <tr className="slot-grid">
+            <th>C</th>
             <td></td>
             <td></td>
             <td><img src="trash.svg" width="50px"/></td>
             <td><img src="scale.svg" width="80px"/></td>
             <td><img src="water.svg" width="50px"/></td>
-            <td></td>
-            <td></td>
           </tr>
-          <tr>
-            <th scope="row">B</th>
+          <tr className="slot-grid">
+            <th>B</th>
             <td><WellPlate /></td>
             <td></td>
             <td></td>
             <td></td>
             <td></td>
           </tr>
-          <tr>
-            <th scope="row">A</th>
+          <tr className="slot-grid">
+            <th>A</th>
             <td></td>
             <td></td>
             <td></td>
             <td></td>
             <td></td>
           </tr>
-        </tbody>
-      </table>
+        </table>
+      </div>
     )
   }
 }
