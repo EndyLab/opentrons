@@ -95,8 +95,8 @@ if __name__ == '__main__':
 		'A2': 'B2',
 		'A3': 'B3'
 	}
-	source = ( '96-flat', 'A1' )
-	dest = ( '96-flat', 'A2' )
+	source = ( '96-flat', 'D1' )
+	dest = ( '96-flat', 'C2' )
 	transfer(p200, source, dest, wells, 100)
 
 
