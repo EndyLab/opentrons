@@ -108,7 +108,7 @@ class App extends Component {
               <button type="button" className="btn">Transfer</button>
               <li>
                   <div className="input-group">
-                  <input type="text" className="form-control" placeholder="Volume...">
+                  <input type="text" className="form-control" placeholder="Volume..." />
                   <span className="input-group-btn">
                     <button className="btn btn-default" type="button">Set</button>
                   </span>
