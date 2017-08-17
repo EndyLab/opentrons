@@ -72,7 +72,7 @@ th:first-child {
 #dashboard {
 	background-color: #F8F9FA;
 	border-right: 1px solid #EEEEEE;
-	height: fill;
+	height: 100%;
 }
 
 #protocols {
@@ -83,4 +83,8 @@ th:first-child {
 /* all children of protocol will have these properties*/
 #protocols > * {
     margin: 15px;
+}
+
+.row {
+	height: 100%;
 }

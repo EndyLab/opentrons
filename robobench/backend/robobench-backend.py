@@ -5,7 +5,9 @@ def get_labware():
     return {
         'A1': 'WellPlate',
         'C2': 'WellPlate',
-        'B1': 'WellPlate'
+        'B3': 'Trash',
+        'B2': 'WellPlate',
+        'E3': 'Trash'
     }
 
 @app.route('/')

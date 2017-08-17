@@ -79,18 +79,18 @@ class Grid extends Component {
         'A1': '',
         'A2': '',
         'A3': '',
-        'A4': '',
-        'A5': '',
         'B1': '',
         'B2': '',
         'B3': '',
-        'B4': '',
-        'B5': '',
         'C1': '',
         'C2': '',
         'C3': '',
-        'C4': '',
-        'C5': '',
+        'D1': '',
+        'D2': '',
+        'D3': '',
+        'E1': '',
+        'E2': '',
+        'E3': '',
     }
 
     Object.keys(this.state.labware).forEach((key) => {
@@ -109,37 +109,37 @@ class Grid extends Component {
           <thead>
             <tr>
               <th></th>
-              <th>1</th>
-              <th>2</th>
-              <th>3</th>
-              <th>4</th>
-              <th>5</th>
+              <th>A</th>
+              <th>B</th>
+              <th>C</th>
+              <th>D</th>
+              <th>E</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <th scope="row">C</th>
-              <td>{grid['C1']}</td>
-              <td>{grid['C2']}</td>
-              <td>{grid['C3']}</td>
-              <td>{grid['C4']}</td>
-              <td>{grid['C5']}</td>
-            </tr>
-            <tr>
-              <th scope="row">B</th>
-              <td>{grid['B1']}</td>
-              <td>{grid['B2']}</td>
-              <td>{grid['B3']}</td>
-              <td>{grid['B4']}</td>
-              <td>{grid['B5']}</td>
-            </tr>
-            <tr>
-              <th scope="row">A</th>
+              <th scope="row">1</th>
               <td>{grid['A1']}</td>
+              <td>{grid['B1']}</td>
+              <td>{grid['C1']}</td>
+              <td>{grid['D1']}</td>
+              <td>{grid['E1']}</td>
+            </tr>
+            <tr>
+              <th scope="row">2</th>
               <td>{grid['A2']}</td>
+              <td>{grid['B2']}</td>
+              <td>{grid['C2']}</td>
+              <td>{grid['D2']}</td>
+              <td>{grid['E2']}</td>
+            </tr>
+            <tr>
+              <th scope="row">3</th>
               <td>{grid['A3']}</td>
-              <td>{grid['A4']}</td>
-              <td>{grid['A5']}</td>
+              <td>{grid['B3']}</td>
+              <td>{grid['C3']}</td>
+              <td>{grid['D3']}</td>
+              <td>{grid['E3']}</td>
             </tr>
           </tbody>
         </table>
