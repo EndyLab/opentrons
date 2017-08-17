@@ -16,6 +16,7 @@ class WellPlate extends Labware {
     this.state = {
       model: new TableDragSelect.Model(12, 8) // Specify rows and columns
     };
+
     this.handleModelChange = this.handleModelChange.bind(this);
   }
 
@@ -25,7 +26,7 @@ class WellPlate extends Labware {
 
     return (
       <div className="labware-well-96">
-        <TableDragSelect className={this.props.mode} model={this.state.model} onModelChange={this.handleModelChange}>
+        <TableDragSelect className={this.props.mode} model={this.props.model} onModelChange={this.props.updateModel}>
             {rows}
         </TableDragSelect>
       </div>
@@ -64,7 +65,7 @@ class Grid extends Component {
     clearInterval(this.timerID);
   }
 
-  updateMode(key) {
+  updateModel(key) {
     console.log(key)
     if (!this.state.source) {
       this.setState({ source: key })
@@ -98,7 +99,7 @@ class Grid extends Component {
         if (this.state.source == key) mode = 'source'
         else if (this.state.dest == key) mode = 'dest'
 
-        grid[key] = <WellPlate key={key} mode={mode} updateMode={() => this.updateMode(key)}/>;
+        grid[key] = <WellPlate key={key} mode={mode} model=model updateMode={() => this.updateModel(key)}/>;
       }
       else if (this.state.labware[key] == 'Trash') grid[key] = <img src="trash.svg" width="50px"/>;
     })
