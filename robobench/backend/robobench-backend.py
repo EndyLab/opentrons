@@ -9,6 +9,7 @@ def get_labware():
     return {
         'A1': 'WellPlate',
         'B1': 'WellPlate',
+        'C3': 'Trash',
     }
 
 @app.route('/')
@@ -57,37 +58,6 @@ test_data =  {
 
 @app.route('/run', methods=['POST'])
 def run():
-    # # the dictionary
-    # # data = request.get_json()
-    # data = test_data
-
-    # # not the same amount of wells selected
-    # if len(data['source']['wells']) != len(data['dest']['wells']):
-    #     response = jsonify({
-    #         'status': 'bad well(s) input'
-    #     })
-    #     return response
-
-    # print(data)
-
-    # """
-    #     Usage of transfer.py
-    #     ----------------
-    #     pipette: the pipette that transfers liquid
-    #     source: tuple of source container type and slot Ex: () well, A1 )
-    #     dest: destination plate
-    #     wells: dictionary of wells to transfer stuff to asusming 1:1 well transfer ratio here
-    #     vol: volume to transfer (1 volume for now MVP)
-    #     96-flate the pipette gets its tips from
-    #     water: where the water is 
-    # """
-    # web_transfer(data['source'], data['dest'], data['volume'])
-
-    # response = jsonify({
-    #     'status': 'ok'
-    # })
-    # response.headers.add('Access-Control-Allow-Origin', '*')
-
     # return response
     data = request.get_json()
     
@@ -110,3 +80,6 @@ def run():
     response.headers.add('Access-Control-Allow-Origin', '*')
 
     return response
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
