@@ -3,10 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 
 import TableDragSelect from 'react-table-drag-select';
-// import update from 'immutability-helper';
 // import 'react-table-drag-select/style.css';
-
-const SERVER = "http://localhost:5000"
 
 class Labware extends Component {
 
@@ -19,17 +16,16 @@ class WellPlate extends Labware {
     this.state = {
       model: new TableDragSelect.Model(12, 8) // Specify rows and columns
     };
-
     this.handleModelChange = this.handleModelChange.bind(this);
   }
 
   render() {
-    const wells = ["A","B","C","D","E","F","G","H"].map((id) => <td key={id} className='well'><div className='circle'></div></td>);
+    const wells = [1,2,3,4,5,6,7,8].map((id) => <td className='well'><div className='circle'></div></td>);
     const rows = [1,2,3,4,5,6,7,8,9,10,11,12].map((id) => <tr key={id}>{wells}</tr>);
 
     return (
       <div className="labware-well-96">
-        <TableDragSelect className={this.props.mode} model={this.props.model} onModelChange={this.props.updateModel}>
+        <TableDragSelect className={this.props.mode} model={this.state.model} onModelChange={this.handleModelChange}>
             {rows}
         </TableDragSelect>
       </div>
@@ -37,7 +33,8 @@ class WellPlate extends Labware {
   }
 
   handleModelChange(model) {
-    this.props.updateModel(model);
+    this.props.updateMode();
+    this.setState({model});
   }
 }
 
@@ -46,8 +43,7 @@ class Grid extends Component {
     super(props);
 
     this.state = {
-      labware: {},
-      models: {}
+      labware: {}
     }
   }
 
@@ -59,7 +55,7 @@ class Grid extends Component {
   }
 
   refresh() {
-    fetch(SERVER + '/grid')
+    fetch('http://localhost:5000/grid')
       .then((response) => response.json())
       .then((json) => this.setState(json))
   }
@@ -68,16 +64,12 @@ class Grid extends Component {
     clearInterval(this.timerID);
   }
 
-  updateModel(key, model) {
-    console.log(model)
-
-    this.state.models[key] = model
-    this.setState({ models: this.state.models })
-
+  updateMode(key) {
+    console.log(key)
     if (!this.state.source) {
-      this.setState({ source: key });
+      this.setState({ source: key })
     } else if (!this.state.dest && this.state.source != key) {
-      this.setState({ dest: key });
+      this.setState({ dest: key })
     }
   }
 
@@ -106,11 +98,7 @@ class Grid extends Component {
         if (this.state.source == key) mode = 'source'
         else if (this.state.dest == key) mode = 'dest'
 
-        var model;
-        if (key in this.state.models) model = this.state.models[key];
-        else model = new TableDragSelect.Model(12, 8);
-
-        grid[key] = <WellPlate key={key} mode={mode} model={model} updateModel={(model) => this.updateModel(key, model)}/>;
+        grid[key] = <WellPlate key={key} mode={mode} updateMode={() => this.updateMode(key)}/>;
       }
       else if (this.state.labware[key] == 'Trash') grid[key] = <img src="trash.svg" width="50px"/>;
     })
@@ -159,55 +147,7 @@ class Grid extends Component {
 }
 
 class App extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {}
-
-    this.runRobot = this.runRobot.bind(this);
-  }
-
-  runRobot() {
-    var source = this.grid.state.models[this.grid.state.source]._cellsSelected;
-    var dest = this.grid.state.models[this.grid.state.dest]._cellsSelected;
-
-    var sourceWells = [];
-    var destWells = [];
-
-    ["A","B","C","D","E","F","G","H"].forEach((col, c) => {
-      [1,2,3,4,5,6,7,8,9,10,11,12].forEach((row, r) => {
-        if (source[r][c]) sourceWells.push(col + row);
-        if (dest[r][c]) destWells.push(col + row);
-      })
-    })
-
-    fetch(SERVER + '/run', {
-      method: 'post',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        protocol: 'transfer',
-        source: {
-          labware: 'WellPlate',
-          slot: this.grid.state.source,
-          wells: sourceWells
-        },
-        dest: {
-          labware: 'WellPlate',
-          slot: this.grid.state.dest,
-          wells: destWells
-        }
-      })
-    })
-  }
-
-  componentDidMount() {
-    console.log('ok')
-  }
-
   render() {
-    console.log(this.state)
     return (
         <div className="row fill">
           {/* right window */}
@@ -219,7 +159,7 @@ class App extends Component {
               <button type="button" className="btn">Transfer</button>
             </li>
             <li>
-              <form action = "http://localhost:5000/volume" method = "POST">
+              <form action = "localhost/volume" method = "POST">
                 <div className="input-group">
                   <input type="text" name="volume" className="form-control" placeholder="Volume..." />
                   <input type="submit" value="set" />
@@ -227,14 +167,14 @@ class App extends Component {
               </form>
             </li>
 
-              <li><button type="button" className="btn btn-success" onClick={this.runRobot}><i className="fa fa-play" aria-hidden="true"></i>Run</button></li>
+            <li><button type="button" className="btn btn-success"><i className="fa fa-play" aria-hidden="true"></i> Run </button></li>
           </ul>
         </div>
 
 
         {/* deck grid */}
           <div className="col-sm-10 fill">
-            <Grid ref={(grid) => { this.grid = grid }} />
+            <Grid />
           </div>
         </div>
     );

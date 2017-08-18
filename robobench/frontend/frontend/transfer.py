@@ -74,6 +74,14 @@ def transfer(pipette, source_dict, dest_dict, wells, vol):
 		# dispense to dest
 		pipette.dispense(dest.wells(value))
 
+# connects to robot automatrically and homes it and instantiates pipette
+def web_transfer():
+	opentrons_connect()
+	robot.home('xyzab')
+	p200 = instruments.Pipette(axis='b', max_volume=200)
+	p200.calibrate_plunger(top=5, bottom=15, blow_out=15, drop_tip=15)
+	p200.update_calibrations()
+
 
 if __name__ == '__main__':
 	opentrons_connect()
