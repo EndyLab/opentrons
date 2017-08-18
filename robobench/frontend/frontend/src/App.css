@@ -40,19 +40,19 @@ th:first-child {
 }
 
 .labware-well-96 .dest .cell-being-selected {
-  background-color: #fee5d9;
+  background-color: #fdae6b;
 }
 
 .labware-well-96 .dest .cell-selected {
-  background-color: #fee5d9;
+  background-color: #fdae6b;
 }
 
 .labware-well-96 .source .cell-being-selected {
-  background-color: #edf8e9;
+  background-color: #a1d99b;
 }
 
 .labware-well-96 .source .cell-selected {
-  background-color: #edf8e9;
+  background-color: #a1d99b;
 }
 
 .circle {

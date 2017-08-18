@@ -31,7 +31,8 @@ def grid():
 def run():
     data = request.get_json()
 
-    print(request.data)
+    from pprint import pprint; pprint(data)
+
     response = jsonify({
         'status': 'ok'
     })
