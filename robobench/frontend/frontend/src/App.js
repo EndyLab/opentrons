@@ -3,7 +3,10 @@ import logo from './logo.svg';
 import './App.css';
 
 import TableDragSelect from 'react-table-drag-select';
+// import update from 'immutability-helper';
 // import 'react-table-drag-select/style.css';
+
+const SERVER = "http://localhost:5000"
 
 class Labware extends Component {
 
@@ -21,7 +24,7 @@ class WellPlate extends Labware {
   }
 
   render() {
-    const wells = [1,2,3,4,5,6,7,8].map((id) => <td className='well'><div className='circle'></div></td>);
+    const wells = ["A","B","C","D","E","F","G","H"].map((id) => <td key={id} className='well'><div className='circle'></div></td>);
     const rows = [1,2,3,4,5,6,7,8,9,10,11,12].map((id) => <tr key={id}>{wells}</tr>);
 
     return (
@@ -34,8 +37,7 @@ class WellPlate extends Labware {
   }
 
   handleModelChange(model) {
-    this.props.updateMode();
-    this.setState({model});
+    this.props.updateModel(model);
   }
 }
 
@@ -44,7 +46,8 @@ class Grid extends Component {
     super(props);
 
     this.state = {
-      labware: {}
+      labware: {},
+      models: {}
     }
   }
 
@@ -56,7 +59,7 @@ class Grid extends Component {
   }
 
   refresh() {
-    fetch('http://localhost:5000/grid')
+    fetch(SERVER + '/grid')
       .then((response) => response.json())
       .then((json) => this.setState(json))
   }
@@ -65,12 +68,16 @@ class Grid extends Component {
     clearInterval(this.timerID);
   }
 
-  updateModel(key) {
-    console.log(key)
+  updateModel(key, model) {
+    console.log(model)
+
+    this.state.models[key] = model
+    this.setState({ models: this.state.models })
+
     if (!this.state.source) {
-      this.setState({ source: key })
+      this.setState({ source: key });
     } else if (!this.state.dest && this.state.source != key) {
-      this.setState({ dest: key })
+      this.setState({ dest: key });
     }
   }
 
@@ -99,7 +106,11 @@ class Grid extends Component {
         if (this.state.source == key) mode = 'source'
         else if (this.state.dest == key) mode = 'dest'
 
-        grid[key] = <WellPlate key={key} mode={mode} model=model updateMode={() => this.updateModel(key)}/>;
+        var model;
+        if (key in this.state.models) model = this.state.models[key];
+        else model = new TableDragSelect.Model(12, 8);
+
+        grid[key] = <WellPlate key={key} mode={mode} model={model} updateModel={(model) => this.updateModel(key, model)}/>;
       }
       else if (this.state.labware[key] == 'Trash') grid[key] = <img src="trash.svg" width="50px"/>;
     })
@@ -148,7 +159,55 @@ class Grid extends Component {
 }
 
 class App extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {}
+
+    this.runRobot = this.runRobot.bind(this);
+  }
+
+  runRobot() {
+    var source = this.grid.state.models[this.grid.state.source]._cellsSelected;
+    var dest = this.grid.state.models[this.grid.state.dest]._cellsSelected;
+
+    var sourceWells = [];
+    var destWells = [];
+
+    ["A","B","C","D","E","F","G","H"].forEach((col, c) => {
+      [1,2,3,4,5,6,7,8,9,10,11,12].forEach((row, r) => {
+        if (source[r][c]) sourceWells.push(col + row);
+        if (dest[r][c]) destWells.push(col + row);
+      })
+    })
+
+    fetch(SERVER + '/run', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        protocol: 'transfer',
+        source: {
+          labware: 'WellPlate',
+          slot: this.grid.state.source,
+          wells: sourceWells
+        },
+        dest: {
+          labware: 'WellPlate',
+          slot: this.grid.state.dest,
+          wells: destWells
+        }
+      })
+    })
+  }
+
+  componentDidMount() {
+    console.log('ok')
+  }
+
   render() {
+    console.log(this.state)
     return (
         <div className="row fill">
           {/* right window */}
@@ -168,14 +227,14 @@ class App extends Component {
                 </div>
               </li>
 
-            <li><button type="button" className="btn btn-success"><i className="fa fa-play" aria-hidden="true"></i> Run </button></li>
+              <li><button type="button" className="btn btn-success" onClick={this.runRobot}><i className="fa fa-play" aria-hidden="true"></i>Run</button></li>
           </ul>
         </div>
 
 
         {/* deck grid */}
           <div className="col-sm-10 fill">
-            <Grid />
+            <Grid ref={(grid) => { this.grid = grid }} />
           </div>
         </div>
     );
