@@ -22,19 +22,20 @@ def get_coords():
     return pos
 
 def calibrateToSlot(item_type, name, slot, instrument):
+	# data for eppendorf pipette
 	pos_dict =	{	
-		'A1':{'96-flat':(33, 35.5, -33)},
-		'B1':{'96-flat':(125, 35.5, -33)},
-		'C1':{'96-flat':(216.5, 35.5, -33)},
-		'D1':{'96-flat':(308.5, 35.5, -33)},
-		'A2':{'96-flat':(33, 171.5, -33)},
-		'B2':{'96-flat':(125, 171.5, -33)},
-		'C2':{'96-flat':(216.5, 171.5, -33)},
-		'D2':{'96-flat':(308.5, 171.5, -33)},
-		'A3':{'96-flat':(33, 304.5, -33)},
-		'B3':{'96-flat':(125, 304.5, -33)},
-		'C3':{'96-flat':(216.5, 304.5, -33)},
-		'D3':{'96-flat':(308.5, 304.5, -33)},
+		'A1':{'96-flat':(23, 36, -50)},
+		'B1':{'96-flat':(116, 36, -50)},
+		'C1':{'96-flat':(208, 36, -50)},
+		'D1':{'96-flat':(299, 36, -50)},
+		'A2':{'96-flat':(23, 172, -50)},
+		'B2':{'96-flat':(116, 172, -50)},
+		'C2':{'96-flat':(208, 172, -50)},
+		'D2':{'96-flat':(299, 172, -50)},
+		'A3':{'96-flat':(23, 305, -50)},
+		'B3':{'96-flat':(116, 305, -50)},
+		'C3':{'96-flat':(208, 305, -50)},
+		'D3':{'96-flat':(299, 305, -50)},
 	}
 
 	point_types = ['scale', 'trough', 'trash']
@@ -81,13 +82,13 @@ if __name__ == '__main__':
 
 	tiprack = containers.load('tiprack-200ul', 'A1')
 	water = containers.load('point', 'A1', 'water')
-	# plate_source = containers.load('96-flat', 'D1', 'plate')
-	# plate_dest = containers.load('96-flat', 'D2', 'plate')
+	plate_source = containers.load('96-flat', 'D1', 'plate')
+	plate_dest = containers.load('96-flat', 'D2', 'plate')
 	p200 = instruments.Pipette(axis='b', max_volume=200)
 
 	# given a slot, instantiate and calibrate a 96-well
 
-	p200.calibrate_plunger(top=12, bottom=27, blow_out=33, drop_tip=34)
+	p200.calibrate_plunger(top=12, bottom=27, blow_out=27, drop_tip=27)
 	p200.update_calibrations()
 
 	wells = {
@@ -96,7 +97,7 @@ if __name__ == '__main__':
 		'A3': 'B3'
 	}
 	source = ( '96-flat', 'D1' )
-	dest = ( '96-flat', 'C2' )
+	dest = ( '96-flat', 'B1' )
 	transfer(p200, source, dest, wells, 100)
 
 
