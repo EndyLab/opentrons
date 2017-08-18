@@ -129,12 +129,12 @@ class Grid extends Component {
           </thead>
           <tbody>
             <tr>
-              <th scope="row">1</th>
-              <td>{grid['A1']}</td>
-              <td>{grid['B1']}</td>
-              <td>{grid['C1']}</td>
-              <td>{grid['D1']}</td>
-              <td>{grid['E1']}</td>
+              <th scope="row">3</th>
+              <td>{grid['A3']}</td>
+              <td>{grid['B3']}</td>
+              <td>{grid['C3']}</td>
+              <td>{grid['D3']}</td>
+              <td>{grid['E3']}</td>
             </tr>
             <tr>
               <th scope="row">2</th>
@@ -145,12 +145,12 @@ class Grid extends Component {
               <td>{grid['E2']}</td>
             </tr>
             <tr>
-              <th scope="row">3</th>
-              <td>{grid['A3']}</td>
-              <td>{grid['B3']}</td>
-              <td>{grid['C3']}</td>
-              <td>{grid['D3']}</td>
-              <td>{grid['E3']}</td>
+              <th scope="row">1</th>
+              <td>{grid['A1']}</td>
+              <td>{grid['B1']}</td>
+              <td>{grid['C1']}</td>
+              <td>{grid['D1']}</td>
+              <td>{grid['E1']}</td>
             </tr>
           </tbody>
         </table>
