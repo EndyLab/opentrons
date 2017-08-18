@@ -12,6 +12,21 @@ class Labware extends Component {
 
 }
 
+class TipRack extends Labware {
+  render() {
+    const wells = ["A","B","C","D","E","F","G","H"].map((id) => <td key={id} className='tip'><div className='circle'></div></td>);
+    const rows = [12,11,10,9,8,7,6,5,4,3,2,1].map((id) => <tr key={id}>{wells}</tr>);
+
+    return (
+      <div className="labware-tiprack-96">
+        <table>
+            {rows}
+        </table>
+      </div>
+    )
+  }
+}
+
 class WellPlate extends Labware {
   constructor(props) {
     super(props);
@@ -113,6 +128,8 @@ class Grid extends Component {
         grid[key] = <WellPlate key={key} mode={mode} model={model} updateModel={(model) => this.updateModel(key, model)}/>;
       }
       else if (this.state.labware[key] == 'Trash') grid[key] = <img src="trash.svg" width="50px"/>;
+      else if (this.state.labware[key] == 'Scale') grid[key] = <img src="scale.svg" width="80px"/>
+      else if (this.state.labware[key] == 'TipRack') grid[key] = <TipRack />;
     })
 
     return (
@@ -168,6 +185,7 @@ class App extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.selectProtocol = this.selectProtocol.bind(this);
     this.runRobot = this.runRobot.bind(this);
+    this.resetGrid = this.resetGrid.bind(this);
   }
 
   runRobot() {
@@ -205,6 +223,8 @@ class App extends Component {
         }
       })
     })
+      .then((response) => { return response.json() })
+      .then((json) => { console.log(json); if (json.status == "ok") this.setState({ running: true })})
   }
 
   componentDidMount() {
@@ -218,11 +238,21 @@ class App extends Component {
   }
 
   selectProtocol(event) {
+    this.setState({ protocol: event.target.id })
+  }
 
+  resetGrid() {
+    this.grid.models = {}
+    this.grid.state.source = null;
+    this.grid.state.dest = null;
+    this.grid.forceUpdate();
   }
 
   render() {
     console.log(this.state)
+
+    var running = "d-none"
+    if (this.state.running) running = ""
 
     return (
         <div className="row fill">
@@ -230,8 +260,16 @@ class App extends Component {
           <div className="col-sm-2" id="dashboard">
 
           <ul id="protocols">
-            <li><button type="button" id="dilution" className="btn" onClick={this.selectProtocol}>Dilution</button></li>
-            <li>
+            <li className={this.state.protocol == "dilution" ? "active-protocol" : ""}>
+              <button type="button" id="dilution" className="btn" onClick={this.selectProtocol}>Dilution</button>
+              <div className="protocol-parameters">
+                <div className="form-group row">
+                  <label className="col-sm-2 col-form-label ratio-label">1:</label>
+                  <div className="col-sm-10"><input type="text" id="ratio" className="form-control" placeholder="Ratio" onChange={this.handleChange} value={this.state.parameters['ratio']} /></div>
+                  </div>
+              </div>
+            </li>
+            <li className={this.state.protocol == "transfer" ? "active-protocol" : ""}>
               <button type="button" id="transfer" className="btn" onClick={this.selectProtocol}>Transfer</button>
               <div className="protocol-parameters">
                 <div className="input-group">
@@ -241,6 +279,12 @@ class App extends Component {
               </li>
 
               <li><button type="button" className="btn btn-success" onClick={this.runRobot}><i className="fa fa-play" aria-hidden="true"></i>Run</button></li>
+
+              <li><button type="button" className="btn btn-failure" onClick={this.resetGrid}><i className="fa fa-play" aria-hidden="true"></i>Reset</button></li>
+
+              <div className={running}>
+                <img src="loading.gif" />
+              </div>
           </ul>
         </div>
 
