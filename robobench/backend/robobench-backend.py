@@ -8,7 +8,7 @@ CORS(app)
 def get_labware():
     return {
         'A1': 'WellPlate',
-        'C2': 'WellPlate',
+        'B1': 'WellPlate',
     }
 
 @app.route('/')
@@ -98,8 +98,12 @@ def run():
         })
         return response
 
+    # add volume
+    data.update({'volume': 100})
     print(request.data)
+
     web_transfer(data['source'], data['dest'], data['volume'])
+
     response = jsonify({
         'status': 'ok'
     })
