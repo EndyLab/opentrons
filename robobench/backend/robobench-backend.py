@@ -34,7 +34,7 @@ TEST =  {
                 "slot":"A1",
                 "wells":["A1","A2","A3"]
             },
-            "dest": { 
+            "dest": {
                 "labware":"WellPlate",
                 "slot":"C2",
                 "wells":["B1", "B2", "B3"]
@@ -49,7 +49,7 @@ test_data =  {
                 "slot":"A1",
                 "wells":["A1","A2","A3"]
             },
-            "dest": { 
+            "dest": {
                 "labware":"96-flat",
                 "slot":"C2",
                 "wells":["B1", "B2", "B3"]
@@ -60,7 +60,7 @@ test_data =  {
 def run():
     # return response
     data = request.get_json()
-    
+
     # check that same number of wells are selected
     if len(data['source']['wells']) != len(data['dest']['wells']):
         response = jsonify({
@@ -81,5 +81,7 @@ def run():
 
     return response
 
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
+

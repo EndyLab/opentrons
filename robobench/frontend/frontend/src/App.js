@@ -25,7 +25,7 @@ class WellPlate extends Labware {
 
   render() {
     const wells = ["A","B","C","D","E","F","G","H"].map((id) => <td key={id} className='well'><div className='circle'></div></td>);
-    const rows = [1,2,3,4,5,6,7,8,9,10,11,12].map((id) => <tr key={id}>{wells}</tr>);
+    const rows = [12,11,10,9,8,7,6,5,4,3,2,1].map((id) => <tr key={id}>{wells}</tr>);
 
     return (
       <div className="labware-well-96">
@@ -161,8 +161,12 @@ class Grid extends Component {
 class App extends Component {
   constructor(props) {
     super(props)
-    this.state = {}
+    this.state = {
+      parameters: {}
+    }
 
+    this.handleChange = this.handleChange.bind(this);
+    this.selectProtocol = this.selectProtocol.bind(this);
     this.runRobot = this.runRobot.bind(this);
   }
 
@@ -174,7 +178,7 @@ class App extends Component {
     var destWells = [];
 
     ["A","B","C","D","E","F","G","H"].forEach((col, c) => {
-      [1,2,3,4,5,6,7,8,9,10,11,12].forEach((row, r) => {
+      [12,11,10,9,8,7,6,5,4,3,2,1].forEach((row, r) => {
         if (source[r][c]) sourceWells.push(col + row);
         if (dest[r][c]) destWells.push(col + row);
       })
@@ -188,6 +192,7 @@ class App extends Component {
       },
       body: JSON.stringify({
         protocol: 'transfer',
+        parameters: this.state.parameters,
         source: {
           labware: 'WellPlate',
           slot: this.grid.state.source,
@@ -203,28 +208,36 @@ class App extends Component {
   }
 
   componentDidMount() {
-    console.log('ok')
+    console.log('ok');
+  }
+
+  handleChange(event) {
+    this.state.parameters[event.target.id] = event.target.value;
+    console.log(this.state.parameters);
+    this.setState({ parameters: this.state.parameters });
+  }
+
+  selectProtocol(event) {
+
   }
 
   render() {
     console.log(this.state)
+
     return (
         <div className="row fill">
           {/* right window */}
           <div className="col-sm-2" id="dashboard">
 
           <ul id="protocols">
-            <li><button type="button" className="btn">Dilution</button></li>
+            <li><button type="button" id="dilution" className="btn" onClick={this.selectProtocol}>Dilution</button></li>
             <li>
-              <button type="button" className="btn">Transfer</button>
-            </li>
-            <li>
+              <button type="button" id="transfer" className="btn" onClick={this.selectProtocol}>Transfer</button>
+              <div className="protocol-parameters">
                 <div className="input-group">
-                <input type="text" className="form-control" placeholder="Volume..." />
-                <span className="input-group-btn">
-                  <button className="btn btn-default" type="button">Set</button>
-                </span>
+                  <input type="text" id="volume" className="form-control" placeholder="Volume..." onChange={this.handleChange} value={this.state.parameters['volume']} />
                 </div>
+              </div>
               </li>
 
               <li><button type="button" className="btn btn-success" onClick={this.runRobot}><i className="fa fa-play" aria-hidden="true"></i>Run</button></li>
