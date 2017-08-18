@@ -117,12 +117,12 @@ class Grid extends Component {
           </thead>
           <tbody>
             <tr>
-              <th scope="row">1</th>
-              <td>{grid['A1']}</td>
-              <td>{grid['B1']}</td>
-              <td>{grid['C1']}</td>
-              <td>{grid['D1']}</td>
-              <td>{grid['E1']}</td>
+              <th scope="row">3</th>
+              <td>{grid['A3']}</td>
+              <td>{grid['B3']}</td>
+              <td>{grid['C3']}</td>
+              <td>{grid['D3']}</td>
+              <td>{grid['E3']}</td>
             </tr>
             <tr>
               <th scope="row">2</th>
@@ -133,12 +133,12 @@ class Grid extends Component {
               <td>{grid['E2']}</td>
             </tr>
             <tr>
-              <th scope="row">3</th>
-              <td>{grid['A3']}</td>
-              <td>{grid['B3']}</td>
-              <td>{grid['C3']}</td>
-              <td>{grid['D3']}</td>
-              <td>{grid['E3']}</td>
+              <th scope="row">1</th>
+              <td>{grid['A1']}</td>
+              <td>{grid['B1']}</td>
+              <td>{grid['C1']}</td>
+              <td>{grid['D1']}</td>
+              <td>{grid['E1']}</td>
             </tr>
           </tbody>
         </table>
@@ -159,13 +159,13 @@ class App extends Component {
               <button type="button" className="btn">Transfer</button>
             </li>
             <li>
+              <form action = "http://localhost:5000/volume" method = "POST">
                 <div className="input-group">
-                <input type="text" className="form-control" placeholder="Volume..." />
-                <span className="input-group-btn">
-                  <button className="btn btn-default" type="button">Set</button>
-                </span>
+                  <input type="text" name="volume" className="form-control" placeholder="Volume..." />
+                  <input type="submit" value="set" />
                 </div>
-              </li>
+              </form>
+            </li>
 
             <li><button type="button" className="btn btn-success"><i className="fa fa-play" aria-hidden="true"></i> Run </button></li>
           </ul>

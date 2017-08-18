@@ -80,10 +80,10 @@ if __name__ == '__main__':
 	robot.home('xyzab')
 	# calibrate stuff on the deck
 
-	# tiprack = containers.load('tiprack-200ul', 'A1')
-	# water = containers.load('point', 'A1', 'water')
-	# plate_source = containers.load('96-flat', 'D1', 'plate')
-	# plate_dest = containers.load('96-flat', 'D2', 'plate')
+	tiprack = containers.load('tiprack-200ul', 'A1')
+	water = containers.load('point', 'A1', 'water')
+	plate_source = containers.load('96-flat', 'D1', 'plate')
+	plate_dest = containers.load('96-flat', 'D2', 'plate')
 	p200 = instruments.Pipette(axis='b', max_volume=200)
 
 	# given a slot, instantiate and calibrate a 96-well
