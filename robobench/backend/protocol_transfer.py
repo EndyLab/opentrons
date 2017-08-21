@@ -147,5 +147,5 @@ def test_web_trasnfer():
 
 	web_transfer(test_data['source'], test_data['dest'], test_data['volume'])
 
-if __name__ == '__main__':
-	test_web_trasnfer()
+# if __name__ == '__main__':
+# 	test_web_trasnfer()
