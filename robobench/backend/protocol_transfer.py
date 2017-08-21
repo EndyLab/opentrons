@@ -65,8 +65,11 @@ def calibrateToSlot(item_type, name, slot, instrument):
 def transfer(pipette, source_data, dest_data, wells, vol):
 	# source = calibrateToSlot(source_data['labware'], 'source', source_data['slot'], pipette)
 	# dest = calibrateToSlot(dest_data['labware'], 'dest', dest_data['slot'], pipette)
-	source = calibrateToSlot('96-flat', 'source', source_data['slot'], pipette)
-	dest = calibrateToSlot('96-flat', 'dest', dest_data['slot'], pipette)
+	labwareDict = {
+		'WellPlate': '96-flat',
+	}
+	source = calibrateToSlot(labwareDict[source_data['labware']], 'source', source_data['slot'], pipette)
+	dest = calibrateToSlot(labwareDict[dest_data['labware']], 'dest', dest_data['slot'], pipette)
 
 	# wells will be in form {source, dest}
 	for key, value in wells.items(): 

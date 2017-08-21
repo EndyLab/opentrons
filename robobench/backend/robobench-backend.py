@@ -6,6 +6,9 @@ app = Flask(__name__)
 CORS(app)
 
 def get_labware():
+    labwareDict = {
+        "96-flat": "WellPlate",
+    }
     return {
         'A1': 'WellPlate',
         'B1': 'WellPlate',
@@ -25,36 +28,6 @@ def grid():
     response.headers.add('Access-Control-Allow-Origin', '*')
 
     return response
-
-TEST =  {
-            "protocol": "transfer",
-            "volume": 10,
-            "source": {
-                "labware":"WellPlate",
-                "slot":"A1",
-                "wells":["A1","A2","A3"]
-            },
-            "dest": {
-                "labware":"WellPlate",
-                "slot":"C2",
-                "wells":["B1", "B2", "B3"]
-            }
-        }
-
-test_data =  {
-            "protocol": "transfer",
-            "volume": 10,
-            "source": {
-                "labware":"96-flat",
-                "slot":"A1",
-                "wells":["A1","A2","A3"]
-            },
-            "dest": {
-                "labware":"96-flat",
-                "slot":"C2",
-                "wells":["B1", "B2", "B3"]
-            }
-        }
 
 @app.route('/run', methods=['POST'])
 def run():
@@ -80,5 +53,7 @@ def run():
     response.headers.add('Access-Control-Allow-Origin', '*')
 
     return response
+
+
 
 
