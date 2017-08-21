@@ -12,6 +12,7 @@ def get_labware():
     return {
         'A1': 'WellPlate',
         'B1': 'WellPlate',
+        'D2': 'TipRack',
         'C3': 'Trash',
     }
 
@@ -53,7 +54,3 @@ def run():
     response.headers.add('Access-Control-Allow-Origin', '*')
 
     return response
-
-
-
-
