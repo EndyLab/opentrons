@@ -6,7 +6,7 @@ import TableDragSelect from 'react-table-drag-select';
 // import update from 'immutability-helper';
 // import 'react-table-drag-select/style.css';
 
-const SERVER = "http://localhost:5000"
+const SERVER = "http://10.34.178.45:5000"
 
 class Labware extends Component {
 

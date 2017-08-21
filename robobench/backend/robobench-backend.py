@@ -54,3 +54,6 @@ def run():
     response.headers.add('Access-Control-Allow-Origin', '*')
 
     return response
+
+if __name__== "__main__":
+    app.run(host='0.0.0.0')
