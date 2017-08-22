@@ -5,7 +5,7 @@ import sys
 
 sys.path.append("../calibration/labware_recognition/testing")
 
-import RobotVision
+# import RobotVision
 
 app = Flask(__name__)
 CORS(app)
@@ -24,8 +24,10 @@ def get_labware():
     # get_labware_count = get_labware_count + 1
     # return slot_to_name_dict
 
-    return {'A1':'WellPlate',
-            'B2':'WellPlate'}
+    return {
+        'A1':'WellPlate',
+        'C1':'WellPlate'
+    }
 
 
 @app.route('/')
@@ -55,7 +57,7 @@ def run():
     #     })
     #     return response
 
-    import time; time.sleep(5);
+    # import time; time.sleep(5);
     # add volume
     data.update({'volume': 100})
     print(request.data)

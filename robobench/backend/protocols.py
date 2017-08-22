@@ -63,9 +63,11 @@ def calibrateToSlot(item_type, name, slot, instrument):
 	water: where the water is 
 """
 def transfer(pipette, source_data, dest_data, wells, vol):
+
 	labwareDict = {
 		'WellPlate': '96-flat',
 	}
+	"""
 	source = calibrateToSlot(labwareDict[source_data['labware']], 'source', source_data['slot'], pipette)
 	dest = calibrateToSlot(labwareDict[dest_data['labware']], 'dest', dest_data['slot'], pipette)
 
@@ -115,7 +117,21 @@ def transfer(pipette, source_data, dest_data, wells, vol):
 	# 	# dispense to dest
 	# 	pipette.dispense(dest.wells(value))
 	# 	print("dispense")
+	"""
+	print("transfer called")
+	source = calibrateToSlot(labwareDict[source_data['labware']], 'source', source_data['slot'], pipette)
+	dest = calibrateToSlot(labwareDict[dest_data['labware']], 'dest', dest_data['slot'], pipette)
+	print("source dest configured")
 
+	# wells will be in form {source, dest}
+	print("starting transfers")
+	for key, value in wells.items(): 
+		# aspirate from source
+		pipette.aspirate(vol, source.wells(key))
+
+		# dispense to dest
+		pipette.dispense(dest.wells(value))
+	print("finished transfers")
 
 
 # connects to robot automatrically and homes it and instantiates pipette
@@ -131,9 +147,12 @@ def web_transfer(source_data, dest_data, vol):
 	for source, dest in zip(source_data['wells'], dest_data['wells']):
 		wells.update({source: dest})
 
-	print("protocol-transfer.py:", wells)
+	print("protocols.py:", wells)
 
 	transfer(p200, source_data, dest_data, wells, vol)
+	print("robot homing")
+	robot.home('xyzab')
+	robot.disconnect()
 
 
 def test_transfer():

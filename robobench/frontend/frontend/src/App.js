@@ -247,6 +247,7 @@ class App extends Component {
           alert("Error running robot: " + json.status);
         }
       });
+    this.resetGrid();
   }
 
   componentDidMount() {

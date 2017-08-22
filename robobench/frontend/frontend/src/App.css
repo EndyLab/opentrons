@@ -106,6 +106,7 @@ th:first-child {
 	width: 14px;
 	height: 14px;
 	margin: 1px;
+	pointer-events: none;
 }
 
 .circle:hover {
