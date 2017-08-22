@@ -4,14 +4,15 @@ import ObjectDetector
 import time
 import copy
 from opentrons import robot
+from inspect import getsourcefile
+from os.path import abspath
 
-# ckpt_path = "../models/object_detection/FineTune1/outputs/38385/frozen_inference_graph.pb"
-ckpt_path = "../models/object_detection/TopViewPipeline/outputs/17806/frozen_inference_graph.pb"
-# label_path = "../models/object_detection/FineTune1/data/pascal_label_map_finetune1.pbtxt"
-label_path = "../models/object_detection/TopViewPipeline/data/pascal_label_map_top.pbtxt"
-#num_classes = 7
+# get absolute path to this file so can be called from other directories
+absolute_path = abspath(getsourcefile(lambda:0)) 
+ckpt_path = absolute_path + "../models/object_detection/FineTune1/outputs/38385/frozen_inference_graph.pb"
+label_path = absolute_path + "../models/object_detection/FineTune1/data/pascal_label_map_finetune1.pbtxt"
 num_classes = 5
-#classes = ['96wellplate', 'scale', 'tiprack', 'trough', 'trash', 'scale_screen', 'well']
+#num_classes = 7
 skip = ['well', 'scale_screen']
 
 
@@ -45,7 +46,6 @@ def scaleBoxes(name_to_boxes_map, img):
 	Scales box to pixels from normalized bounds
 	'''
 	height, width, _ = img.shape
-	# print("height/width: {}/{}".format(height, width))
 	for name, boxes in name_to_boxes_map.items():
 		for i in range(len(boxes)):
 			box = boxes[i]
@@ -59,7 +59,6 @@ def determineSlot(box):
 	slot_dict boxes are in positions are in format ((xmin, ymin), (xmax, ymax))
 	'''
 	middle = ((box[1] + box[3]) / 2, (box[0] + box[2]) / 2)
-	# print("Middle: {}".format(middle))
 	for pos, slot_box in slot_dict.items():
 		if middle[0] > slot_box[0][0] and middle[0] < slot_box[1][0] and middle[1] > slot_box[0][1] and middle[1] < slot_box[1][1]:
 			return pos
