@@ -6,7 +6,7 @@ import TableDragSelect from 'react-table-drag-select';
 // import update from 'immutability-helper';
 // import 'react-table-drag-select/style.css';
 
-const SERVER = "http://10.34.178.45:5000"
+const SERVER = "http://localhost:5000"
 
 class Labware extends Component {
 
@@ -34,8 +34,6 @@ class WellPlate extends Labware {
     this.state = {
       model: new TableDragSelect.Model(12, 8) // Specify rows and columns
     };
-
-    this.handleModelChange = this.handleModelChange.bind(this);
   }
 
   render() {
@@ -49,10 +47,6 @@ class WellPlate extends Labware {
         </TableDragSelect>
       </div>
     )
-  }
-
-  handleModelChange(model) {
-    this.props.updateModel(model);
   }
 }
 
@@ -83,6 +77,9 @@ class Grid extends Component {
     clearInterval(this.timerID);
   }
 
+  // This keeps track of which wells are selected on all the plates
+  // So model looks like:
+  // this.state.models { 'A1': <model> }
   updateModel(key, model) {
     console.log(model)
 
@@ -116,6 +113,8 @@ class Grid extends Component {
     }
 
     Object.keys(this.state.labware).forEach((key) => {
+      console.log(key + ": " + this.state.labware[key]);
+
       if (this.state.labware[key] == 'WellPlate') {
         var mode = 'none'
         if (this.state.source == key) mode = 'source'
@@ -194,8 +193,8 @@ class App extends Component {
       return;
     }
 
-    var source = this.grid.state.models[this.grid.state.source].getCellsSelected;
-    var dest = this.grid.state.models[this.grid.state.dest].getCellsSelected;
+    var source = this.grid.state.models[this.grid.state.source].getCellsSelected();
+    var dest = this.grid.state.models[this.grid.state.dest].getCellsSelected();
 
     var sourceWells = [];
     var destWells = [];
@@ -206,6 +205,8 @@ class App extends Component {
         if (dest[r][c]) destWells.push(col + row);
       })
     })
+
+    this.setState({ running: true })
 
     fetch(SERVER + '/run', {
       method: 'post',
@@ -229,7 +230,15 @@ class App extends Component {
       })
     })
       .then((response) => { return response.json() })
-      .then((json) => { console.log(json); if (json.status == "ok") this.setState({ running: true })})
+      .then((json) => {
+        console.log(json);
+        this.setState({ running: false })
+
+        if (json.status == "ok") {
+        } else {
+          alert("Error running robot: " + json.status);
+        }
+      });
   }
 
   componentDidMount() {
