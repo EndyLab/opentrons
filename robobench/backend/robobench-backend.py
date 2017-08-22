@@ -1,18 +1,30 @@
 from protocols import web_transfer
 from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
+import sys
+
+sys.path.append("../calibration/labware_recognition/testing")
+
+import RobotVision
 
 app = Flask(__name__)
 CORS(app)
 
+# janky way of reducing refreshes for get_labware
+get_labware_count = 0
+slot_to_name_dict = {}
+
 def get_labware():
-    return {
-        'A1': 'WellPlate',
-        'B1': 'WellPlate',
-        'D2': 'TipRack',
-        'C3': 'Trash',
-        'E2': 'Water',
-    }
+    # global get_labware_count, slot_to_name_dict
+    # if get_labware_count % 30 == 0:
+    #     print("Vision")
+    #     slot_to_name_dict = RobotVision.evaluateDeckSlots()
+    # print("Get labware")
+    # print(slot_to_name_dict)
+    # get_labware_count = get_labware_count + 1
+    # return slot_to_name_dict
+    # return {'A1':'WellPlate',
+    #         'B2':'WellPlate'}
 
 @app.route('/')
 def hello_world():
@@ -30,6 +42,7 @@ def grid():
 
 @app.route('/run', methods=['POST'])
 def run():
+    print("Run pressed")
     # return response
     data = request.get_json()
 
