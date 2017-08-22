@@ -40,36 +40,6 @@ def grid():
 
     return response
 
-TEST =  {
-            "protocol": "transfer",
-            "volume": 10,
-            "source": {
-                "labware":"WellPlate",
-                "slot":"A1",
-                "wells":["A1","A2","A3"]
-            },
-            "dest": {
-                "labware":"WellPlate",
-                "slot":"C2",
-                "wells":["B1", "B2", "B3"]
-            }
-        }
-
-test_data =  {
-            "protocol": "transfer",
-            "volume": 10,
-            "source": {
-                "labware":"96-flat",
-                "slot":"A1",
-                "wells":["A1","A2","A3"]
-            },
-            "dest": {
-                "labware":"96-flat",
-                "slot":"C2",
-                "wells":["B1", "B2", "B3"]
-            }
-        }
-
 @app.route('/run', methods=['POST'])
 def run():
     print("Run pressed")
@@ -96,4 +66,5 @@ def run():
 
     return response
 
-
+if __name__== "__main__":
+    app.run(host='0.0.0.0')
