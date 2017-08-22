@@ -189,8 +189,8 @@ class App extends Component {
   }
 
   runRobot() {
-    var source = this.grid.state.models[this.grid.state.source]._cellsSelected;
-    var dest = this.grid.state.models[this.grid.state.dest]._cellsSelected;
+    var source = this.grid.state.models[this.grid.state.source].getCellsSelected;
+    var dest = this.grid.state.models[this.grid.state.dest].getCellsSelected;
 
     var sourceWells = [];
     var destWells = [];
@@ -242,10 +242,15 @@ class App extends Component {
   }
 
   resetGrid() {
-    this.grid.models = {}
-    this.grid.state.source = null;
-    this.grid.state.dest = null;
-    this.grid.forceUpdate();
+    var newModels = {}
+    Object.keys(this.grid.state.models).forEach((key) => {
+      newModels[key] = this.grid.state.models[key].clone()
+      newModels[key] = this.grid.state.models[key].clear()
+    })
+
+    this.setState({ models: newModels });
+    this.setState({ source: null });
+    this.setState({ dest: null });
   }
 
   render() {
