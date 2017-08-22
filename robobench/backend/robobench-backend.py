@@ -23,8 +23,10 @@ def get_labware():
     # print(slot_to_name_dict)
     # get_labware_count = get_labware_count + 1
     # return slot_to_name_dict
-    # return {'A1':'WellPlate',
-    #         'B2':'WellPlate'}
+
+    return {'A1':'WellPlate',
+            'B2':'WellPlate'}
+
 
 @app.route('/')
 def hello_world():
@@ -53,6 +55,7 @@ def run():
     #     })
     #     return response
 
+    import time; time.sleep(5);
     # add volume
     data.update({'volume': 100})
     print(request.data)
