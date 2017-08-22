@@ -9,7 +9,9 @@ import cv2
 
 import collections
 
-from collections import defaultdict
+from inspect import getsourcefile
+from os.path import abspath, join, dirname
+
 from io import StringIO
 from matplotlib import pyplot as plt
 from PIL import Image
@@ -18,18 +20,19 @@ from PIL import Image
 # %matplotlib inline
 
 # This is needed since the notebook is stored in the object_detection folder.
-sys.path.append("../models")
-sys.path.append("../models/object_detection")
+absolute_dir_path = abspath(dirname(getsourcefile(lambda:0)))
+sys.path.append(join(absolute_dir_path, "../models"))
+sys.path.append(join(absolute_dir_path, "../models/object_detection"))
 
 from utils import label_map_util
 
 from utils import calibration_visualization_utils as vis_utils
 
 # Path to frozen detection graph. This is the actual model that is used for the object detection.
-PATH_TO_CKPT = "../models/object_detection/TopViewPipeline/outputs/17806/frozen_inference_graph.pb"
+PATH_TO_CKPT = join(absolute_dir_path, "../models/object_detection/TopViewPipeline/outputs/17806/frozen_inference_graph.pb")
 
 # List of the strings that is used to add correct label for each box.
-PATH_TO_LABELS = "../models/object_detection/TopViewPipeline/data/pascal_label_map_top.pbtxt"
+PATH_TO_LABELS = join(absolute_dir_path, "../models/object_detection/TopViewPipeline/data/pascal_label_map_top.pbtxt")
 
 NUM_CLASSES = 5
 
@@ -138,8 +141,8 @@ def detectMat(image, num_classes=NUM_CLASSES, graph_path=PATH_TO_CKPT, label_pat
             category_index,
             use_normalized_coordinates=True,
             line_thickness=8)
-        plt.figure(figsize=IMAGE_SIZE)
-        plt.imshow(image_np)
+        # plt.figure(figsize=IMAGE_SIZE)
+        # plt.imshow(image_np)
         # cv2.imshow("Items", image_np)
         # cv2.waitKey(0)
 

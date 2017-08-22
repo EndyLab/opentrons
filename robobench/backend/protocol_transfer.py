@@ -63,21 +63,23 @@ def calibrateToSlot(item_type, name, slot, instrument):
 	water: where the water is 
 """
 def transfer(pipette, source_data, dest_data, wells, vol):
+	print("tranfer called")
 	# source = calibrateToSlot(source_data['labware'], 'source', source_data['slot'], pipette)
 	# dest = calibrateToSlot(dest_data['labware'], 'dest', dest_data['slot'], pipette)
-	labwareDict = {
-		'WellPlate': '96-flat',
-	}
-	source = calibrateToSlot(labwareDict[source_data['labware']], 'source', source_data['slot'], pipette)
-	dest = calibrateToSlot(labwareDict[dest_data['labware']], 'dest', dest_data['slot'], pipette)
+	source = calibrateToSlot('96-flat', 'source', source_data['slot'], pipette)
+	dest = calibrateToSlot('96-flat', 'dest', dest_data['slot'], pipette)
+	print("source/dest processed")
+	print(pipette)
 
 	# wells will be in form {source, dest}
 	for key, value in wells.items(): 
 		# aspirate from source
 		pipette.aspirate(vol, source.wells(key))
+		print("aspirate")
 
 		# dispense to dest
 		pipette.dispense(dest.wells(value))
+		print("dispense")
 
 
 # connects to robot automatrically and homes it and instantiates pipette
@@ -85,15 +87,15 @@ def web_transfer(source_data, dest_data, vol):
 	opentrons_connect()
 	robot.home('xyzab')
 	p200 = instruments.Pipette(axis='b', max_volume=200)
-	# p200.calibrate_plunger(top=5, bottom=15, blow_out=15, drop_tip=15)
-	# p200.update_calibrations()
+	p200.calibrate_plunger(top=5, bottom=20, blow_out=20, drop_tip=20)
+	p200.update_calibrations()
 
 	# make well dictionary
 	wells = {}
 	for source, dest in zip(source_data['wells'], dest_data['wells']):
 		wells.update({source: dest})
 
-	print(wells)
+	print("protocol-transfer.py:", wells)
 
 	transfer(p200, source_data, dest_data, wells, vol)
 
