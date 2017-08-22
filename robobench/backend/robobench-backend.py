@@ -13,7 +13,7 @@ def get_labware():
         'A1': 'WellPlate',
         'B1': 'WellPlate',
         'D2': 'TipRack',
-        'C3': 'Trash',
+        'C3': 'Trash'
     }
 
 @app.route('/')
@@ -42,6 +42,7 @@ def run():
         })
         return response
 
+    import time; time.sleep(5);
     # add volume
     data.update({'volume': 100})
     print(request.data)
