@@ -189,6 +189,11 @@ class App extends Component {
   }
 
   runRobot() {
+    if (!this.grid.state.source || !this.grid.state.dest) {
+      alert("Please select source or destination wells.");
+      return;
+    }
+
     var source = this.grid.state.models[this.grid.state.source].getCellsSelected;
     var dest = this.grid.state.models[this.grid.state.dest].getCellsSelected;
 
