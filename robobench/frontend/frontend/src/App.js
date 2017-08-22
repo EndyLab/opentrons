@@ -7,6 +7,7 @@ import TableDragSelect from 'react-table-drag-select';
 // import 'react-table-drag-select/style.css';
 
 const SERVER = "http://10.34.178.45:5000"
+// const SERVER = "http://localhost:5000"
 
 class Labware extends Component {
 
@@ -128,8 +129,9 @@ class Grid extends Component {
         grid[key] = <WellPlate key={key} mode={mode} model={model} updateModel={(model) => this.updateModel(key, model)}/>;
       }
       else if (this.state.labware[key] == 'Trash') grid[key] = <img src="trash.svg" width="50px"/>;
-      else if (this.state.labware[key] == 'Scale') grid[key] = <img src="scale.svg" width="80px"/>
+      else if (this.state.labware[key] == 'Scale') grid[key] = <img src="scale.svg" width="80px"/>;
       else if (this.state.labware[key] == 'TipRack') grid[key] = <TipRack />;
+      else if (this.state.labware[key] == 'Water') grid[key] = <img src="water.svg" width="50px"/>;
     })
 
     return (
@@ -220,6 +222,10 @@ class App extends Component {
           labware: 'WellPlate',
           slot: this.grid.state.dest,
           wells: destWells
+        }, 
+        tiprack: {
+          labware: 'TipRack',
+          slot: this.grid.state.tiprack,
         }
       })
     })
@@ -278,9 +284,9 @@ class App extends Component {
               </div>
               </li>
 
-              <li><button type="button" className="btn btn-success" onClick={this.runRobot}><i className="fa fa-play" aria-hidden="true"></i>Run</button></li>
+              <li><button type="button" className="btn btn-success" onClick={this.runRobot}><i className="fa fa-play" aria-hidden="true"></i> Run</button></li>
 
-              <li><button type="button" className="btn btn-failure" onClick={this.resetGrid}><i className="fa fa-play" aria-hidden="true"></i>Reset</button></li>
+              <li><button type="button" className="btn btn-failure" onClick={this.resetGrid}><i className="fa fa-play" aria-hidden="true"></i> Reset</button></li>
 
               <div className={running}>
                 <img src="loading.gif" />

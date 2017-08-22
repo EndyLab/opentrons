@@ -63,8 +63,6 @@ def calibrateToSlot(item_type, name, slot, instrument):
 	water: where the water is 
 """
 def transfer(pipette, source_data, dest_data, wells, vol):
-	# source = calibrateToSlot(source_data['labware'], 'source', source_data['slot'], pipette)
-	# dest = calibrateToSlot(dest_data['labware'], 'dest', dest_data['slot'], pipette)
 	labwareDict = {
 		'WellPlate': '96-flat',
 	}
@@ -72,12 +70,33 @@ def transfer(pipette, source_data, dest_data, wells, vol):
 	dest = calibrateToSlot(labwareDict[dest_data['labware']], 'dest', dest_data['slot'], pipette)
 
 	# wells will be in form {source, dest}
-	for key, value in wells.items(): 
-		# aspirate from source
-		pipette.aspirate(vol, source.wells(key))
+	# determine type of transfer
+	source_wells = wells.keys()
+	dest_wells = wells.values()
 
-		# dispense to dest
-		pipette.dispense(dest.wells(value))
+	# 1:1 transfer
+	if len(source_wells) == len(dest_wells):
+		print("1 to 1 transfer")
+		for key, value in wells.items(): 
+			# aspirate from source
+			pipette.aspirate(vol, source.wells(key))
+
+			# dispense to dest
+			pipette.dispense(dest.wells(value))
+
+	# 1:many aka distribute transfer
+	elif len(source) == 1 and len(dest) > 1:
+		print("1 to many transfer aka distribute")
+		tiprack = containers.load('tiprack-200ul', 'A1')
+		trash = containers.load('point', 'D2')
+		pipette.distribute(vol, source.wells(source_wells[0]), dest.wells(dest_wells))
+
+	# many:1 aka consolidate transfer
+	elif len(source) > 1 and len(dest) == 1:
+		print("many to 1 transfer aka consolidate")
+		tiprack = containers.load('tiprack-200ul', 'A1')
+		trash = containers.load('point', 'D2')
+		pipette.consolidate(vol,  source.wells(source_wells), dest.wells(dest_wells))
 
 
 # connects to robot automatrically and homes it and instantiates pipette
@@ -97,7 +116,6 @@ def web_transfer(source_data, dest_data, vol):
 
 	transfer(p200, source_data, dest_data, wells, vol)
 
-	#
 
 def test_transfer():
 	opentrons_connect()
