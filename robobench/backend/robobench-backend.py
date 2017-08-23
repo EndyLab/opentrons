@@ -154,5 +154,17 @@ def record_show():
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
+@app.route('/record/clear')
+def record_clear():
+    print("hi clearing protocol list now")
+    global LAMBDA_QUEUE
+    LAMBDA_QUEUE = []
+    response = jsonify({
+        # 'status': 'ok',
+        'lambdas': LAMBDA_QUEUE
+    })
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
 if __name__== "__main__":
     app.run(host='0.0.0.0')

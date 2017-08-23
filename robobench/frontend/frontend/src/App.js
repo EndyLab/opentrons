@@ -205,16 +205,12 @@ class ProtocolList extends Component {
       list_items.push(<li key={i}>{curr_protocol['protocol']}</li>);
     }
     return (
-       <div>
-       <ol>
-        {list_items}
+      <div>
+        <ol>
+          {list_items}
         </ol>
-       </div>
+      </div>
     );
-
-    // return (
-    //   <div>{this.state.lambdas['hi']}</div>
-    // );
   }
 }
 
@@ -244,6 +240,7 @@ class App extends Component {
     this.recordStop = this.recordStop.bind(this);
     this.recordRun = this.recordRun.bind(this);
     this.recordShow = this.recordShow.bind(this);
+    this.recordClear = this.recordClear.bind(this);
   }
 
   runRobot() {
@@ -331,6 +328,15 @@ class App extends Component {
     this.setState({ dest: null });
     this.setState({ protocol: null });
     this.setState({ record: false });
+  }
+
+  recordClear() {
+    // tell backend to clear protocol list
+    fetch(SERVER + '/record/clear')
+      .then((response) => response.json())
+      .then((json) => this.setState(json))
+    console.log("showing stored protocols after clear")
+    console.log(this.state.lambdas)
   }
 
   recordShow() {
@@ -438,8 +444,9 @@ class App extends Component {
               <li><button type="button" className="btn btn-info" onClick={this.resetGrid}><i className="fa fa-refresh" aria-hidden="true"></i> Reset</button></li>
               <li><button type="button" className="btn btn-info" onClick={this.recordStart}><i className="fa fa-video-camera" aria-hidden="true"></i> Record</button></li>
               <li><button type="button" className="btn btn-info" onClick={this.recordStop}><i className="fa fa-stop" aria-hidden="true"></i> Stop</button></li>
-              <li><button type="button" className="btn btn-info" onClick={this.recordRun}><i className="fa fa-play" aria-hidden="true"></i> Run Lambdas</button></li>
-              <li><button type="button" className="btn btn-info" id={this.state.show_lambdas == true ? "show-btn" : "hide-btn"} onClick={this.recordShow}><i className="fa fa-eye" aria-hidden="true"></i> Show Lambdas</button></li>
+              <li><button type="button" className="btn btn-info" onClick={this.recordRun}><i className="fa fa-play" aria-hidden="true"></i> Run List</button></li>
+              <li><button type="button" className="btn btn-info" onClick={this.recordClear}><i className="fa fa-trash" aria-hidden="true"></i> Clear List</button></li>
+              <li><button type="button" className="btn btn-info" id={this.state.show_lambdas == true ? "show-btn" : "hide-btn"} onClick={this.recordShow}><i className="fa fa-eye" aria-hidden="true"></i> Show List</button></li>
               
               <li className={this.state.show_lambdas == true ? "active-protocol" : "d-none"}>
                 <ProtocolList protocols={this.state.lambdas}/>
