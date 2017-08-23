@@ -14,6 +14,10 @@ CORS(app)
 get_labware_count = 0
 slot_to_name_dict = {}
 
+# janky way to "record procedures"
+LAMBDA_QUEUE = []
+RECORD = False
+
 def get_labware():
     # global get_labware_count, slot_to_name_dict
     # if get_labware_count % 30 == 0:
@@ -44,11 +48,40 @@ def grid():
 
     return response
 
+#  example data from website
+SAMPLE = {
+    'source': {
+        'labware': 'WellPlate', 
+        'wells': ['E11'], 
+        'slot': 'A1'
+    }, 
+    'parameters': {'volume': '78'}, 
+    'protocol': 'transfer', 
+    'dest': {
+        'labware': 'WellPlate', 
+        'wells': ['C8'], 
+        'slot': 'C1'
+    }, 
+    'tiprack': {'labware': 'TipRack'}
+}
+
+# runs a lambda protocol from a dict of data
+def run_lambda_protocol(data):
+    protocol_name = data['protocol']
+    volume = data['parameters']['volume']
+
+    protocolDict = {
+        'transfer': lambda: web_transfer(data['source'], data['dest'], volume),
+        'dilution': lambda: web_transfer(data['source'], data['dest'], volume),
+    }
+    protocolDict[protocol_name]()
+
 @app.route('/run', methods=['POST'])
 def run():
     print("Run pressed")
     # return response
     data = request.get_json()
+    print("DATA:", data)
 
     # check that same number of wells are selected
     # if len(data['source']['wells']) != len(data['dest']['wells']):
@@ -57,18 +90,67 @@ def run():
     #     })
     #     return response
 
-    # import time; time.sleep(5);
-    # add volume
-    data.update({'volume': 100})
-    print(request.data)
+    # check if protocols should be recorded
+    global RECORD
+    if RECORD == True:
+        # temp = lambda: web_transfer(data['source'], data['dest'], data['volume'])
+        LAMBDA_QUEUE.append(data)
 
-    web_transfer(data['source'], data['dest'], data['volume'])
+    print("protocol LIST: ", LAMBDA_QUEUE)
+    run_lambda_protocol(data)
 
     response = jsonify({
         'status': 'ok'
     })
     response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
+# record user protocol stack
+@app.route('/record', methods=['POST'])
+def record():
+    data = request.get_json()
+    global RECORD
+    RECORD = data['record']
+    print(data, RECORD)
+
+    response = jsonify({
+        'status': 'ok'
+    })
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+def run_lambda_queue():
+    global LAMBDA_QUEUE
+    for data in LAMBDA_QUEUE:
+        run_lambda_protocol(data)
+
+# run user defined protocol stack
+@app.route('/record/run', methods=['POST'])
+def record_run():
+    print("hi running record button hit")
+    # data = request.get_json()
+    # if data['running_record'] == True:
+    run_lambda_queue()
+
+
+    response = jsonify({
+        'status': 'ok'
+    })
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+@app.route('/record/show', methods=['POST'])
+def record_show():
+    print("hi showing recording functions")
+    # data = request.get_json()
+    # if data['running_record'] == True:
+    print(LAMBDA_QUEUE)
+
+
+    response = jsonify({
+        'status': 'ok'
+    })
+    response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
 if __name__== "__main__":

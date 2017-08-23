@@ -62,11 +62,11 @@ def calibrateToSlot(item_type, name, slot, instrument):
 	96-flate the pipette gets its tips from
 	water: where the water is 
 """
-def transfer(pipette, source_data, dest_data, wells, vol):
+labwareDict =	{
+	'WellPlate': '96-flat',
+}
 
-	labwareDict = {
-		'WellPlate': '96-flat',
-	}
+def transfer(pipette, source_data, dest_data, wells, vol):
 	"""
 	source = calibrateToSlot(labwareDict[source_data['labware']], 'source', source_data['slot'], pipette)
 	dest = calibrateToSlot(labwareDict[dest_data['labware']], 'dest', dest_data['slot'], pipette)
@@ -154,6 +154,11 @@ def web_transfer(source_data, dest_data, vol):
 	robot.home('xyzab')
 	robot.disconnect()
 
+def dilution(pipette, source_data, dest_data, wells, ratio):
+	source = calibrateToSlot(labwareDict[source_data['labware']], 'source', source_data['slot'], pipette)
+	dest = calibrateToSlot(labwareDict[dest_data['labware']], 'dest', dest_data['slot'], pipette)
+
+
 
 def test_transfer():
 	opentrons_connect()
@@ -188,7 +193,7 @@ def test_transfer():
 
 	robot.disconnect()
 
-def test_web_trasnfer():
+def test_web_transfer():
 	test_data =  {
             "protocol": "transfer",
             "volume": 10,

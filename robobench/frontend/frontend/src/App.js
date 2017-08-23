@@ -189,6 +189,10 @@ class App extends Component {
     this.selectProtocol = this.selectProtocol.bind(this);
     this.runRobot = this.runRobot.bind(this);
     this.resetGrid = this.resetGrid.bind(this);
+    this.recordStart = this.recordStart.bind(this);
+    this.recordStop = this.recordStop.bind(this);
+    this.recordRun = this.recordRun.bind(this);
+    this.recordShow = this.recordShow.bind(this);
   }
 
   runRobot() {
@@ -240,14 +244,14 @@ class App extends Component {
       .then((response) => { return response.json() })
       .then((json) => {
         console.log(json);
-        this.setState({ running: false })
+        this.setState({ running: false });
+        this.resetGrid();
 
         if (json.status == "ok") {
         } else {
           alert("Error running robot: " + json.status);
         }
       });
-    this.resetGrid();
   }
 
   componentDidMount() {
@@ -274,6 +278,77 @@ class App extends Component {
     this.setState({ models: newModels });
     this.setState({ source: null });
     this.setState({ dest: null });
+    this.setState({ record: false });
+    this.setState({ show_lambdas: false });
+  }
+
+  recordShow() {
+    this.setState({ show_lambdas: true });
+    fetch(SERVER + '/record/show', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        show_lambdas: true
+      })
+    })
+  }
+
+  // recording user protocol command stack
+  recordStart() {
+    this.setState({ record: true });
+    fetch(SERVER + '/record', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        record: true
+      })
+    })
+  }
+
+  recordStop() {
+    this.setState({ record: false });
+    fetch(SERVER + '/record', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        record: false
+      })
+    })
+  }
+
+  recordRun() {
+    this.setState({ running: true })
+    fetch(SERVER + '/record/run', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        running_record: true
+      })
+    })
+
+   .then((response) => { return response.json() })
+    .then((json) => {
+      console.log(json);
+      this.setState({ running: false });
+      this.resetGrid();
+
+      if (json.status == "ok") {
+      } else {
+        alert("Error running protcol list: " + json.status);
+      }
+    });
   }
 
   render() {
@@ -306,10 +381,13 @@ class App extends Component {
               </div>
               </li>
 
-              <li><button type="button" className="btn btn-success" onClick={this.runRobot}><i className="fa fa-play" aria-hidden="true"></i> Run</button></li>
+              <li><button type="button" className="btn btn-info" onClick={this.runRobot}><i className="fa fa-play" aria-hidden="true"></i> Run</button></li>
 
-              <li><button type="button" className="btn btn-failure" onClick={this.resetGrid}><i className="fa fa-play" aria-hidden="true"></i> Reset</button></li>
-
+              <li><button type="button" className="btn btn-info" onClick={this.resetGrid}><i className="fa fa-refresh" aria-hidden="true"></i> Reset</button></li>
+              <li><button type="button" className="btn btn-info" onClick={this.recordStart}><i className="fa fa-video-camera" aria-hidden="true"></i> Record</button></li>
+              <li><button type="button" className="btn btn-info" onClick={this.recordStop}><i className="fa fa-stop" aria-hidden="true"></i> Stop</button></li>
+              <li><button type="button" className="btn btn-info" onClick={this.recordShow}><i className="fa fa-stop" aria-hidden="true"></i> Show Lambdas</button></li>
+              <li><button type="button" className="btn btn-info" onClick={this.recordRun}><i className="fa fa-play" aria-hidden="true"></i> Run Recorded Lambdas</button></li>
               <div className={running}>
                 <img src="loading.gif" />
               </div>
