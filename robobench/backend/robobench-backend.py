@@ -139,7 +139,7 @@ def record_run():
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
-@app.route('/record/show', methods=['POST'])
+@app.route('/record/show')
 def record_show():
     print("hi showing recording functions")
     # data = request.get_json()
@@ -148,7 +148,8 @@ def record_show():
 
 
     response = jsonify({
-        'status': 'ok'
+        # 'status': 'ok',
+        'lambdas': LAMBDA_QUEUE
     })
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
