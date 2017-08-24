@@ -157,14 +157,12 @@ def record_run():
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
+# returns the list of protocols so frontend can display 
 @app.route('/record/show')
 def record_show():
     print("hi showing recording functions")
-    # data = request.get_json()
-    # if data['running_record'] == True:
     print(LAMBDA_QUEUE)
-
-
+    
     response = jsonify({
         # 'status': 'ok',
         'lambdas': LAMBDA_QUEUE

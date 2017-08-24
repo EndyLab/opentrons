@@ -183,8 +183,8 @@ class ProtocolList extends Component {
     super(props);
 
     this.state = {
+      // :JANKY: need to have internal state otherwise app crashes?????
       lambdas: {'hi':'test'}
-      // lambdas: this.props.protocols,
     }
   }
 
@@ -242,6 +242,7 @@ class App extends Component {
     this.recordStop = this.recordStop.bind(this);
     this.recordRun = this.recordRun.bind(this);
     this.recordShow = this.recordShow.bind(this);
+    this.recordHide = this.recordHide.bind(this);
     this.recordClear = this.recordClear.bind(this);
     this.recordSave = this.recordSave.bind(this);
     this.getData = this.getData.bind(this);
@@ -386,7 +387,10 @@ class App extends Component {
       .then((json) => this.setState(json))
     console.log("show button hit")
     console.log(this.state.lambdas)
-
+  }
+  
+  recordHide() {
+     this.setState({ show_lambdas: false });
   }
 
   // recording user protocol command stack
@@ -477,9 +481,9 @@ class App extends Component {
               <li><button type="button" className="btn btn-info" onClick={this.recordSave}><i className="fa fa-floppy-o" aria-hidden="true"></i> Save to List</button></li>
               <li><button type="button" className="btn btn-info" onClick={this.recordRun}><i className="fa fa-play" aria-hidden="true"></i> Run List</button></li>
               <li><button type="button" className="btn btn-info" onClick={this.recordClear}><i className="fa fa-trash" aria-hidden="true"></i> Clear List</button></li>
-              <li><button type="button" className="btn btn-info" id={this.state.show_lambdas == true ? "show-btn" : "hide-btn"} onClick={this.recordShow}><i className="fa fa-eye" aria-hidden="true"></i> Show List</button></li>
+              <li><button type="button" className="btn btn-info" onClick={this.state.show_lambdas == true? this.recordHide: this.recordShow}><i className={this.state.show_lambdas == true? "fa fa-eye-slash":"fa fa-eye"} aria-hidden="true"></i> {this.state.show_lambdas == true ? "Hide List" : "Show List"} </button></li>
               
-              <li className={this.state.show_lambdas == true ? "active-protocol" : "d-none"}>
+              <li className={this.state.show_lambdas == true ? "show-protocols" : "d-none"}>
                 <ProtocolList protocols={this.state.lambdas}/>
               </li>
 
