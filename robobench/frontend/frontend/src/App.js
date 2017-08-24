@@ -188,6 +188,11 @@ class ProtocolList extends Component {
     }
   }
 
+//   componentWillReceiveProps(nextProps) {
+//   this.setState({
+//     lambdas: {'hi':'test1'}
+//   });
+// }
   render() {
       Object.keys(this.state.lambdas).forEach((key) => {
       console.log("protocol list")
@@ -241,6 +246,7 @@ class App extends Component {
     this.recordRun = this.recordRun.bind(this);
     this.recordShow = this.recordShow.bind(this);
     this.recordClear = this.recordClear.bind(this);
+    this.recordSave = this.recordSave.bind(this);
   }
 
   runRobot() {
@@ -262,15 +268,11 @@ class App extends Component {
       })
     })
 
-    this.setState({ running: true })
+    this.setState(
+      { running: true },
+    )
 
-    fetch(SERVER + '/run', {
-      method: 'post',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
+    var user_data = {
         protocol: 'transfer',
         parameters: this.state.parameters,
         source: {
@@ -287,7 +289,19 @@ class App extends Component {
           labware: 'TipRack',
           slot: this.grid.state.tiprack,
         }
-      })
+      }
+    this.setState({ curr_user_data: user_data }, () => {
+      this.recordSave();
+    }); 
+    // this.setState({ curr_user_data: user_data })
+
+    fetch(SERVER + '/run', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(user_data)
     })
       .then((response) => { return response.json() })
       .then((json) => {
@@ -335,7 +349,24 @@ class App extends Component {
     fetch(SERVER + '/record/clear')
       .then((response) => response.json())
       .then((json) => this.setState(json))
-    console.log("showing stored protocols after clear")
+    console.log("clear button hit")
+    console.log(this.state.lambdas)
+  }
+
+  recordSave() {
+    // tell backend to do stuff
+    var data = this.state.curr_user_data
+     fetch(SERVER + '/record/save', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+      .then((response) => response.json())
+      .then((json) => this.setState(json))
+    console.log("saved button hit")
     console.log(this.state.lambdas)
   }
 
@@ -346,7 +377,7 @@ class App extends Component {
     fetch(SERVER + '/record/show')
       .then((response) => response.json())
       .then((json) => this.setState(json))
-    console.log("showing stored protocols")
+    console.log("show button hit")
     console.log(this.state.lambdas)
 
   }
@@ -364,6 +395,7 @@ class App extends Component {
         record: true
       })
     })
+    console.log("record start button hit")
   }
 
   recordStop() {
@@ -378,6 +410,7 @@ class App extends Component {
         record: false
       })
     })
+    console.log("record stop button hit")
   }
 
   recordRun() {
@@ -444,6 +477,7 @@ class App extends Component {
               <li><button type="button" className="btn btn-info" onClick={this.resetGrid}><i className="fa fa-refresh" aria-hidden="true"></i> Reset</button></li>
               <li><button type="button" className="btn btn-info" onClick={this.recordStart}><i className="fa fa-video-camera" aria-hidden="true"></i> Record</button></li>
               <li><button type="button" className="btn btn-info" onClick={this.recordStop}><i className="fa fa-stop" aria-hidden="true"></i> Stop</button></li>
+              <li><button type="button" className="btn btn-info" onClick={this.recordSave}><i className="fa fa-floppy-o" aria-hidden="true"></i> Save to List</button></li>
               <li><button type="button" className="btn btn-info" onClick={this.recordRun}><i className="fa fa-play" aria-hidden="true"></i> Run List</button></li>
               <li><button type="button" className="btn btn-info" onClick={this.recordClear}><i className="fa fa-trash" aria-hidden="true"></i> Clear List</button></li>
               <li><button type="button" className="btn btn-info" id={this.state.show_lambdas == true ? "show-btn" : "hide-btn"} onClick={this.recordShow}><i className="fa fa-eye" aria-hidden="true"></i> Show List</button></li>

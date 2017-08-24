@@ -91,10 +91,10 @@ def run():
     #     return response
 
     # check if protocols should be recorded
-    global RECORD
-    if RECORD == True:
-        # temp = lambda: web_transfer(data['source'], data['dest'], data['volume'])
-        LAMBDA_QUEUE.append(data)
+    # global RECORD
+    # if RECORD == True:
+    #     # temp = lambda: web_transfer(data['source'], data['dest'], data['volume'])
+    #     LAMBDA_QUEUE.append(data)
 
     print("protocol LIST: ", LAMBDA_QUEUE)
     run_lambda_protocol(data)
@@ -124,6 +124,23 @@ def run_lambda_queue():
     for data in LAMBDA_QUEUE:
         run_lambda_protocol(data)
 
+# save a protocol top the stack
+@app.route('/record/save', methods=['POST'])
+def record_save():
+    print("python responding to button press, ACTION: saving protocols")
+    data = request.get_json()
+    print(data)
+    global RECORD
+    if RECORD == True:
+        # temp = lambda: web_transfer(data['source'], data['dest'], data['volume'])
+        LAMBDA_QUEUE.append(data)
+    response = jsonify({
+        # 'status': 'ok',
+        'lambdas': LAMBDA_QUEUE
+    })
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
 # run user defined protocol stack
 @app.route('/record/run', methods=['POST'])
 def record_run():
@@ -131,7 +148,6 @@ def record_run():
     # data = request.get_json()
     # if data['running_record'] == True:
     run_lambda_queue()
-
 
     response = jsonify({
         'status': 'ok'
