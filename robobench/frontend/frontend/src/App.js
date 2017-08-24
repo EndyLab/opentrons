@@ -347,9 +347,9 @@ class App extends Component {
     this.setState({ source: null });
     this.setState({ dest: null });
     this.setState({ protocol: null });
-    this.setState({ record: false });
   }
 
+  //  clears the protocol list
   recordClear() {
     // tell backend to clear protocol list
     fetch(SERVER + '/record/clear')
@@ -378,6 +378,7 @@ class App extends Component {
     console.log(this.state.lambdas)
   }
 
+  // shows/hides the protocol list
   recordShow() {
     this.setState({ show_lambdas: true });
 
@@ -388,7 +389,7 @@ class App extends Component {
     console.log("show button hit")
     console.log(this.state.lambdas)
   }
-  
+
   recordHide() {
      this.setState({ show_lambdas: false });
   }
@@ -409,6 +410,7 @@ class App extends Component {
     console.log("record start button hit")
   }
 
+  // stops recording
   recordStop() {
     this.setState({ record: false });
     fetch(SERVER + '/record', {
@@ -424,6 +426,7 @@ class App extends Component {
     console.log("record stop button hit")
   }
 
+  // runs every protocol in the list
   recordRun() {
     this.setState({ running: true })
     fetch(SERVER + '/record/run')
@@ -476,12 +479,11 @@ class App extends Component {
 
               <li><button type="button" className="btn btn-info" onClick={this.runRobot}><i className="fa fa-play" aria-hidden="true"></i> Run</button></li>
               <li><button type="button" className="btn btn-info" onClick={this.resetGrid}><i className="fa fa-refresh" aria-hidden="true"></i> Reset</button></li>
-              <li><button type="button" className="btn btn-info" onClick={this.recordStart}><i className="fa fa-video-camera" aria-hidden="true"></i> Record</button></li>
-              <li><button type="button" className="btn btn-info" onClick={this.recordStop}><i className="fa fa-stop" aria-hidden="true"></i> Stop</button></li>
+              <li><button type="button" className="btn btn-info" onClick={this.state.record == true ? this.recordStop: this.recordStart}><i className={this.state.record == true ? "fa fa-stop" : "fa fa-video-camera"} aria-hidden="true"></i> {this.state.record == true ? "Stop Recording" : "Record"}</button></li>
               <li><button type="button" className="btn btn-info" onClick={this.recordSave}><i className="fa fa-floppy-o" aria-hidden="true"></i> Save to List</button></li>
               <li><button type="button" className="btn btn-info" onClick={this.recordRun}><i className="fa fa-play" aria-hidden="true"></i> Run List</button></li>
               <li><button type="button" className="btn btn-info" onClick={this.recordClear}><i className="fa fa-trash" aria-hidden="true"></i> Clear List</button></li>
-              <li><button type="button" className="btn btn-info" onClick={this.state.show_lambdas == true? this.recordHide: this.recordShow}><i className={this.state.show_lambdas == true? "fa fa-eye-slash":"fa fa-eye"} aria-hidden="true"></i> {this.state.show_lambdas == true ? "Hide List" : "Show List"} </button></li>
+              <li><button type="button" className="btn btn-info" onClick={this.state.show_lambdas == true ? this.recordHide: this.recordShow}><i className={this.state.show_lambdas == true? "fa fa-eye-slash":"fa fa-eye"} aria-hidden="true"></i> {this.state.show_lambdas == true ? "Hide List" : "Show List"} </button></li>
               
               <li className={this.state.show_lambdas == true ? "show-protocols" : "d-none"}>
                 <ProtocolList protocols={this.state.lambdas}/>
