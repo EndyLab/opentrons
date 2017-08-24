@@ -178,32 +178,82 @@ class Grid extends Component {
   }
 }
 
+// list of protocols
+// currently veyr :JANKY: but #itworks
+class ProtocolItem extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      hover_flag: false,
+    }
+
+    this.hoverEvent = this.hoverEvent.bind(this);
+  }
+
+  hoverEvent() {
+    this.setState({hover_flag: !this.state.hover_flag})
+  }
+
+
+  render() {
+   var liStyle = {
+          'background-color': '#eeeeee'
+      };
+      if (this.props.isSelected || this.state.hover_flag) {
+          liStyle['background'] = '#C4C4C4';
+      }
+    return (
+      <li id={this.props.id_string} onClick={this.props.methodHolder} onMouseEnter={this.hoverEvent} onMouseLeave={this.hoverEvent} style={liStyle}>{this.props.val}</li>
+    );
+  }
+}
+
 class ProtocolList extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      // :JANKY: need to have internal state otherwise app crashes?????
-      lambdas: {'hi':'test'}
+      hover_flag: false,
     }
+
+    this.hoverEvent = this.hoverEvent.bind(this);
+    this.clickHandler = this.clickHandler.bind(this)
+  }
+
+  hoverEvent() {
+    this.setState({hover_flag: !this.state.hover_flag})
+  }
+
+  clickHandler(event) {
+    this.setState({selectedItem: event.target.id});
+    console.log('list item clicked')
+    console.log(event.target)
   }
 
   render() {
-      Object.keys(this.state.lambdas).forEach((key) => {
-      console.log("protocol list")
-      console.log(key + ": " + this.state.lambdas[key]);
-      var protocolList = this.props.protocols
-      console.log(protocolList)
-      console.log("rip me")
-    })
-
     var list_items = [];
     for (var i = 0; i < this.props.protocols.length; i++) {
+      var base = 'id'
+      var id_string = base.concat(i.toString())
+
       var curr_protocol = this.props.protocols[i]
-      console.log("name:")
-      console.log(curr_protocol)
-      list_items.push(<li key={i}>{curr_protocol['protocol']}</li>);
+      var is_selected = this.state.selectedItem === id_string
+      console.log(this.state)
+      console.log("IS SELECTED PROP")
+      console.log(i)
+      console.log(is_selected)
+      
+      list_items.push(<ProtocolItem 
+                        id_string={id_string}
+                        key={i} 
+                        val={curr_protocol['protocol']} 
+                        isSelected={is_selected}
+                        methodHolder={this.clickHandler}
+                        // onClick={this.clickHandler}
+                      />);
     }
+    
     return (
       <div>
         <ol>
@@ -213,14 +263,6 @@ class ProtocolList extends Component {
     );
   }
 }
-
-var AdaptiveButton = React.createClass({
-  render() {
-    return (
-      <div>{this.props.message}</div>
-    );
-  }
-});
 
 
 class App extends Component {
@@ -334,6 +376,9 @@ class App extends Component {
 
   selectProtocol(event) {
     this.setState({ protocol: event.target.id })
+    console.log("this is protocol button PRESSED")
+    console.log(event)
+    console.log(event.target.id)
   }
 
   resetGrid() {
@@ -467,7 +512,7 @@ class App extends Component {
                 </div>
               </li>
 
-              {/* trasnfer */}
+              {/* transfer */}
               <li className={this.state.protocol == "transfer" ? "active-protocol" : ""}>
                 <button type="button" id="transfer" className="btn" onClick={this.selectProtocol}>Transfer</button>
                 <div className="protocol-parameters">
