@@ -128,12 +128,14 @@ def run_lambda_queue():
 @app.route('/record/save', methods=['POST'])
 def record_save():
     print("python responding to button press, ACTION: saving protocols")
+
+    # gets protocol data from frontend
     data = request.get_json()
     print(data)
-    global RECORD
-    if RECORD == True:
-        # temp = lambda: web_transfer(data['source'], data['dest'], data['volume'])
-        LAMBDA_QUEUE.append(data)
+    # global RECORD
+    # if RECORD == True:
+    # temp = lambda: web_transfer(data['source'], data['dest'], data['volume'])
+    LAMBDA_QUEUE.append(data)
     response = jsonify({
         # 'status': 'ok',
         'lambdas': LAMBDA_QUEUE
@@ -142,7 +144,7 @@ def record_save():
     return response
 
 # run user defined protocol stack
-@app.route('/record/run', methods=['POST'])
+@app.route('/record/run')
 def record_run():
     print("hi running record button hit")
     # data = request.get_json()

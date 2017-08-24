@@ -188,11 +188,6 @@ class ProtocolList extends Component {
     }
   }
 
-//   componentWillReceiveProps(nextProps) {
-//   this.setState({
-//     lambdas: {'hi':'test1'}
-//   });
-// }
   render() {
       Object.keys(this.state.lambdas).forEach((key) => {
       console.log("protocol list")
@@ -234,7 +229,9 @@ class App extends Component {
     this.state = {
       parameters: {},
       show_lambdas: false,
-      lambdas: {}
+      lambdas: {},
+      record: false,
+      curr_user_data: {},
     }
 
     this.handleChange = this.handleChange.bind(this);
@@ -247,10 +244,12 @@ class App extends Component {
     this.recordShow = this.recordShow.bind(this);
     this.recordClear = this.recordClear.bind(this);
     this.recordSave = this.recordSave.bind(this);
+    this.getData = this.getData.bind(this);
   }
 
-  runRobot() {
-    if (!this.grid.state.source || !this.grid.state.dest) {
+  // gets user data from web app
+  getData() {
+     if (!this.grid.state.source || !this.grid.state.dest) {
       alert("Please select source or destination wells.");
       return;
     }
@@ -267,10 +266,6 @@ class App extends Component {
         if (dest[r][c]) destWells.push(col + row);
       })
     })
-
-    this.setState(
-      { running: true },
-    )
 
     var user_data = {
         protocol: 'transfer',
@@ -289,11 +284,21 @@ class App extends Component {
           labware: 'TipRack',
           slot: this.grid.state.tiprack,
         }
-      }
+      };
+
+    return user_data;
+  }
+  runRobot() {
+    var user_data = this.getData()
+    this.setState(
+      { running: true },
+    )
+    // the run button basically calls the save button 
     this.setState({ curr_user_data: user_data }, () => {
-      this.recordSave();
+      if (this.state.record) {
+        this.recordSave();
+      }
     }); 
-    // this.setState({ curr_user_data: user_data })
 
     fetch(SERVER + '/run', {
       method: 'post',
@@ -353,9 +358,11 @@ class App extends Component {
     console.log(this.state.lambdas)
   }
 
+
+  // TODO: the difference between save and run is that save does NOT require record button to be hit first
   recordSave() {
     // tell backend to do stuff
-    var data = this.state.curr_user_data
+    var data = this.getData()
      fetch(SERVER + '/record/save', {
       method: 'post',
       headers: {
@@ -415,28 +422,18 @@ class App extends Component {
 
   recordRun() {
     this.setState({ running: true })
-    fetch(SERVER + '/record/run', {
-      method: 'post',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        running_record: true
-      })
-    })
+    fetch(SERVER + '/record/run')
+      .then((response) => { return response.json() })
+      .then((json) => {
+        console.log(json);
+        this.setState({ running: false });
+        this.resetGrid();
 
-   .then((response) => { return response.json() })
-    .then((json) => {
-      console.log(json);
-      this.setState({ running: false });
-      this.resetGrid();
-
-      if (json.status == "ok") {
-      } else {
-        alert("Error running protcol list: " + json.status);
-      }
-    });
+        if (json.status == "ok") {
+        } else {
+          alert("Error running protcol list: " + json.status);
+        }
+      });
   }
 
   render() {
