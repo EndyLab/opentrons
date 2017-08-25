@@ -30,7 +30,8 @@ def get_labware():
 
     return {
         'A1':'WellPlate',
-        'C1':'WellPlate'
+        'C1':'WellPlate',
+        'C3': 'TipRack',
     }
 
 

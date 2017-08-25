@@ -139,7 +139,11 @@ def web_transfer(source_data, dest_data, vol):
 	opentrons_connect()
 	robot.home('xyzab')
 	p200 = instruments.Pipette(axis='b', max_volume=200)
-	p200.calibrate_plunger(top=5, bottom=20, blow_out=20, drop_tip=20)
+	# "drop_tip": 18.01,
+ #                "top": 3.01,
+ #                "blow_out": 18.01,
+ #                "bottom": 18.01
+	p200.calibrate_plunger(top=3, bottom=18, blow_out=18, drop_tip=18)
 	p200.update_calibrations()
 
 	# make well dictionary

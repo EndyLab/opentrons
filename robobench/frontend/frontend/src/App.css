@@ -141,10 +141,17 @@ th:first-child {
   background-color: #eeeeee;
   border-radius: 5%;
 }
-/*.active-protocol > .protocol-parameters {
-  display: block;
-}*/
 
-/*#show-protocols > li {
-	padding-left: 0;
-}*/
+/* protocol cards*/
+.protocol-card {
+	display: none;
+}
+
+.protocol-card-active {
+	padding: 1em 0;
+ 	background-color: #eeeeee;
+}
+
+.protocol-card-active > .protocol-card {
+  	display: block;
+}

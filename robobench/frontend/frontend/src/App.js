@@ -7,8 +7,8 @@ import TableDragSelect from 'react-table-drag-select';
 // import 'react-table-drag-select/style.css';
 
 
-const SERVER = "http://10.34.178.45:5000"
-// const SERVER = "http://localhost:5000"
+// const SERVER = "http://10.34.183.189:5000"
+const SERVER = "http://localhost:5000"
 
 
 class Labware extends Component {
@@ -180,6 +180,46 @@ class Grid extends Component {
 
 // list of protocols
 // currently veyr :JANKY: but #itworks
+
+//  protocol parameters, shown on click, hidden otherwisde
+class ProtocolCard extends Component {
+  constructor(props) {
+    super(props);
+
+  }
+
+  render() {
+    var keys = Object.keys(this.props.protocol_data)
+
+    // dont display protocol field since the lit heading is already the protocol
+    var index = keys.indexOf('protocol');
+    if (index > -1) {
+      keys.splice(index, 1);
+    }
+    var index = keys.indexOf('tiprack');
+    if (index > -1) {
+      keys.splice(index, 1);
+    }
+
+    var paramsList = keys.map((key, id) => <li className={key} key={id}>{key} : {JSON.stringify(this.props.protocol_data[key])}</li>);
+    
+    console.log("keys of protocol data")
+    console.log(keys)
+    console.log(this.props.protocol_data[keys[0]])
+    console.log(JSON.stringify(this.props.protocol_data[keys[1]]))
+
+    return (
+      <div className="protocol-card">
+        <ul>
+          {paramsList}
+        </ul>
+      </div>
+    );
+  }
+}
+
+// a protocol list item
+//  <ProtocolCard protocol_data={this.props.protocol_data}/>
 class ProtocolItem extends Component {
   constructor(props) {
     super(props);
@@ -187,7 +227,6 @@ class ProtocolItem extends Component {
     this.state = {
       hover_flag: false,
     }
-
     this.hoverEvent = this.hoverEvent.bind(this);
   }
 
@@ -195,16 +234,25 @@ class ProtocolItem extends Component {
     this.setState({hover_flag: !this.state.hover_flag})
   }
 
-
   render() {
-   var liStyle = {
+   var protocol_list_style = {
           'background-color': '#eeeeee'
       };
       if (this.props.isSelected || this.state.hover_flag) {
-          liStyle['background'] = '#C4C4C4';
+          protocol_list_style['background-color'] = '#C4C4C4';
       }
     return (
-      <li id={this.props.id_string} onClick={this.props.methodHolder} onMouseEnter={this.hoverEvent} onMouseLeave={this.hoverEvent} style={liStyle}>{this.props.val}</li>
+      <li 
+        id={this.props.id_string} 
+        onClick={this.props.methodHolder} 
+        onMouseEnter={this.hoverEvent} 
+        onMouseLeave={this.hoverEvent} 
+        style={protocol_list_style}
+        className={this.props.isSelected == true ? "protocol-card-active" : ""}
+      >
+        {this.props.protocol_name}
+        <ProtocolCard protocol_data={this.props.protocol_data} isSelected={this.props.isSelected}/>
+      </li>
     );
   }
 }
@@ -218,14 +266,14 @@ class ProtocolList extends Component {
     }
 
     this.hoverEvent = this.hoverEvent.bind(this);
-    this.clickHandler = this.clickHandler.bind(this)
+    this.handleClick = this.handleClick.bind(this)
   }
 
   hoverEvent() {
     this.setState({hover_flag: !this.state.hover_flag})
   }
 
-  clickHandler(event) {
+  handleClick(event) {
     this.setState({selectedItem: event.target.id});
     console.log('list item clicked')
     console.log(event.target)
@@ -234,7 +282,7 @@ class ProtocolList extends Component {
   render() {
     var list_items = [];
     for (var i = 0; i < this.props.protocols.length; i++) {
-      var base = 'id'
+      var base = 'protocol-item-'
       var id_string = base.concat(i.toString())
 
       var curr_protocol = this.props.protocols[i]
@@ -245,12 +293,12 @@ class ProtocolList extends Component {
       console.log(is_selected)
       
       list_items.push(<ProtocolItem 
-                        id_string={id_string}
                         key={i} 
-                        val={curr_protocol['protocol']} 
+                        id_string={id_string}
+                        protocol_data={curr_protocol}
+                        protocol_name={curr_protocol['protocol']} 
                         isSelected={is_selected}
-                        methodHolder={this.clickHandler}
-                        // onClick={this.clickHandler}
+                        methodHolder={this.handleClick}
                       />);
     }
     
