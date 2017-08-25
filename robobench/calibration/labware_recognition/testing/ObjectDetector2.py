@@ -47,10 +47,10 @@ class ObjectDetector:
                 self.label_map = label_map_util.load_labelmap(label_path)
                 self.categories = label_map_util.convert_label_map_to_categories(self.label_map, max_num_classes=num_classes, use_display_name=True)
                 self.category_index = label_map_util.create_category_index(self.categories)
+                self.sess = tf.Session(graph=self.detection_graph)
 
     def detect(self, image, deck_roi=None):
         '''
-        TODO: look at realtime example, pass in sess
         Detects objects in image and returns dictionary mapping 
         {object type:list of bounding boxes (ymin, xmin, ymax, xmax)}
         relative to uncropped image
@@ -61,38 +61,36 @@ class ObjectDetector:
 
         Returns:
             dict(str:list(box)): returns a dictionary mapping object types to a list of detected bounding boxes.
-                                Box positions are relative and formatted as (ymin, xmin, ymax, xmax)
+                                Box positions are normalized and formatted as (ymin, xmin, ymax, xmax)
         '''
         if deck_roi != None:
             cropped_image = image[deck_roi[0][1]:deck_roi[1][1], deck_roi[0][0]:deck_roi[1][0]]
         else:
             cropped_image = image
 
-        with self.detection_graph.as_default():
-            with tf.Session(graph=self.detection_graph) as sess:
-                # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
-                image_np_expanded = np.expand_dims(image, axis=0)
-                image_tensor = self.detection_graph.get_tensor_by_name('image_tensor:0')
-                # Each box represents a part of the image where a particular object was detected.
-                boxes = self.detection_graph.get_tensor_by_name('detection_boxes:0')
-                # Each score represent how level of confidence for each of the objects.
-                # Score is shown on the result image, together with the class label.
-                scores = self.detection_graph.get_tensor_by_name('detection_scores:0')
-                classes = self.detection_graph.get_tensor_by_name('detection_classes:0')
-                num_detections = self.detection_graph.get_tensor_by_name('num_detections:0')
-                # Actual detection.
-                (boxes, scores, classes, num_detections) = sess.run(
-                    [boxes, scores, classes, num_detections],
-                    feed_dict={image_tensor: image_np_expanded})
-                # Visualization of the results of a detection.
-                output = vis_utils.visualize_boxes_and_labels_on_image_array(
-                    image,
-                    np.squeeze(boxes),
-                    np.squeeze(classes).astype(np.int32),
-                    np.squeeze(scores),
-                    self.category_index,
-                    use_normalized_coordinates=True,
-                    line_thickness=8)
+        # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
+        image_np_expanded = np.expand_dims(image, axis=0)
+        image_tensor = self.detection_graph.get_tensor_by_name('image_tensor:0')
+        # Each box represents a part of the image where a particular object was detected.
+        boxes = self.detection_graph.get_tensor_by_name('detection_boxes:0')
+        # Each score represent how level of confidence for each of the objects.
+        # Score is shown on the result image, together with the class label.
+        scores = self.detection_graph.get_tensor_by_name('detection_scores:0')
+        classes = self.detection_graph.get_tensor_by_name('detection_classes:0')
+        num_detections = self.detection_graph.get_tensor_by_name('num_detections:0')
+        # Actual detection.
+        (boxes, scores, classes, num_detections) = self.sess.run(
+            [boxes, scores, classes, num_detections],
+            feed_dict={image_tensor: image_np_expanded})
+        # Visualization of the results of a detection.
+        output = vis_utils.visualize_boxes_and_labels_on_image_array(
+            image,
+            np.squeeze(boxes),
+            np.squeeze(classes).astype(np.int32),
+            np.squeeze(scores),
+            self.category_index,
+            use_normalized_coordinates=True,
+            line_thickness=8)
 
         if deck_roi != None:
             cropped_height, cropped_width, _ = cropped_image.shape
