@@ -135,23 +135,45 @@ th:first-child {
 }
 
 .show-protocols {
-  padding-left: 0;
-  padding-top: 1em;
-  padding-bottom: 1em;
-  background-color: #eeeeee;
-  border-radius: 5%;
+  padding: 0;
+  margin: 15px 0;
+  /*background-color: #eeeeee;*/
+  /*border-radius: 5%;*/
 }
 
 /* protocol cards*/
 .protocol-card {
 	display: none;
+	list-style-type: none;
+    margin: 0;
+    padding: 0;
+    padding-left: 1em;
+    background-color: #CFD8DC;
+
+}
+
+.protocol-card-title {
+ 	/*background-color: red;*/
+	/*pointer-events: none;*/
+	padding: 0.5em;
 }
 
 .protocol-card-active {
-	padding: 1em 0;
+	padding: 0;
  	background-color: #eeeeee;
 }
 
 .protocol-card-active > .protocol-card {
   	display: block;
+}
+
+#protocol-list {
+	list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#protocol-list > li {
+	/*padding: 0.5em;*/
+	/*padding-bottom: 0;*/
 }

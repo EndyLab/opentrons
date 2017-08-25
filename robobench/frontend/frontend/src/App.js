@@ -201,7 +201,7 @@ class ProtocolCard extends Component {
       keys.splice(index, 1);
     }
 
-    var paramsList = keys.map((key, id) => <li className={key} key={id}>{key} : {JSON.stringify(this.props.protocol_data[key])}</li>);
+    var paramsList = keys.map((key, id) => <li className={key} key={id}><b>{key}:</b> {JSON.stringify(this.props.protocol_data[key])}</li>);
     
     console.log("keys of protocol data")
     console.log(keys)
@@ -209,11 +209,9 @@ class ProtocolCard extends Component {
     console.log(JSON.stringify(this.props.protocol_data[keys[1]]))
 
     return (
-      <div className="protocol-card">
-        <ul>
-          {paramsList}
-        </ul>
-      </div>
+      <ul className="protocol-card">
+        {paramsList}
+      </ul>
     );
   }
 }
@@ -236,21 +234,25 @@ class ProtocolItem extends Component {
 
   render() {
    var protocol_list_style = {
-          'background-color': '#eeeeee'
+          // 'background-color': '#eeeeee'
+          'background': '#90A4AE'
+          // 'background' : '#78909C'
       };
       if (this.props.isSelected || this.state.hover_flag) {
-          protocol_list_style['background-color'] = '#C4C4C4';
+          protocol_list_style['background'] = '#546E7A';
       }
     return (
-      <li 
-        id={this.props.id_string} 
-        onClick={this.props.methodHolder} 
-        onMouseEnter={this.hoverEvent} 
-        onMouseLeave={this.hoverEvent} 
-        style={protocol_list_style}
-        className={this.props.isSelected == true ? "protocol-card-active" : ""}
-      >
-        {this.props.protocol_name}
+      <li  className={this.props.isSelected == true ? "protocol-card-active" : ""}>
+        <div 
+          className="protocol-card-title"
+          style={protocol_list_style}
+          id={this.props.id_string} 
+          onClick={this.props.methodHolder} 
+          onMouseEnter={this.hoverEvent} 
+          onMouseLeave={this.hoverEvent} 
+        >
+          {this.props.protocol_name} 
+        </div>
         <ProtocolCard protocol_data={this.props.protocol_data} isSelected={this.props.isSelected}/>
       </li>
     );
@@ -303,11 +305,9 @@ class ProtocolList extends Component {
     }
     
     return (
-      <div>
-        <ol>
+        <ol id="protocol-list">
           {list_items}
         </ol>
-      </div>
     );
   }
 }
@@ -570,17 +570,17 @@ class App extends Component {
                 </div>
               </li>
 
-              <li><button type="button" className="btn btn-info" onClick={this.runRobot}><i className="fa fa-play" aria-hidden="true"></i> Run</button></li>
-              <li><button type="button" className="btn btn-info" onClick={this.resetGrid}><i className="fa fa-refresh" aria-hidden="true"></i> Reset</button></li>
+              <li><button type="button" className="btn btn-success" onClick={this.runRobot}><i className="fa fa-play" aria-hidden="true"></i> Run</button></li>
+              <li><button type="button" className="btn btn-success" onClick={this.resetGrid}><i className="fa fa-refresh" aria-hidden="true"></i> Reset</button></li>
               <li><button type="button" className="btn btn-info" onClick={this.state.record == true ? this.recordStop: this.recordStart}><i className={this.state.record == true ? "fa fa-stop" : "fa fa-video-camera"} aria-hidden="true"></i> {this.state.record == true ? "Stop Recording" : "Record"}</button></li>
               <li><button type="button" className="btn btn-info" onClick={this.recordSave}><i className="fa fa-floppy-o" aria-hidden="true"></i> Save to List</button></li>
               <li><button type="button" className="btn btn-info" onClick={this.recordRun}><i className="fa fa-play" aria-hidden="true"></i> Run List</button></li>
               <li><button type="button" className="btn btn-info" onClick={this.recordClear}><i className="fa fa-trash" aria-hidden="true"></i> Clear List</button></li>
               <li><button type="button" className="btn btn-info" onClick={this.state.show_lambdas == true ? this.recordHide: this.recordShow}><i className={this.state.show_lambdas == true? "fa fa-eye-slash":"fa fa-eye"} aria-hidden="true"></i> {this.state.show_lambdas == true ? "Hide List" : "Show List"} </button></li>
               
-              <li className={this.state.show_lambdas == true ? "show-protocols" : "d-none"}>
+              <div className={this.state.show_lambdas == true ? "show-protocols" : "d-none"}>
                 <ProtocolList protocols={this.state.lambdas}/>
-              </li>
+              </div>
 
               <div className={running}>
                 <img src="loading.gif" />
