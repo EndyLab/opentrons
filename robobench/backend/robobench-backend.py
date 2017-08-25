@@ -46,7 +46,6 @@ def grid():
     })
 
     response.headers.add('Access-Control-Allow-Origin', '*')
-
     return response
 
 #  example data from website
@@ -136,6 +135,7 @@ def record_save():
     # global RECORD
     # if RECORD == True:
     # temp = lambda: web_transfer(data['source'], data['dest'], data['volume'])
+    global LAMBDA_QUEUE
     LAMBDA_QUEUE.append(data)
     response = jsonify({
         # 'status': 'ok',
@@ -182,6 +182,23 @@ def record_clear():
     })
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
+
+@app.route('/record/update', methods=['POST'])
+def record_update():
+    data = request.get_json()
+
+    global LAMBDA_QUEUE
+    LAMBDA_QUEUE = data
+
+    print("UPDATING LAMBDAS")
+    print(data)
+    response = jsonify({
+        # 'status': 'ok',
+        'lambdas': LAMBDA_QUEUE
+    })
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
 
 if __name__== "__main__":
     app.run(host='0.0.0.0')

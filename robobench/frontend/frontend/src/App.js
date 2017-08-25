@@ -271,17 +271,6 @@ class ProtocolList extends Component {
 
     this.hoverEvent = this.hoverEvent.bind(this);
     this.handleClick = this.handleClick.bind(this);
-    this.deleteProtocol = this.deleteProtocol.bind(this);
-  }
-
-  deleteProtocol(event) {
-    // find the list item that contained the delete button that got hit
-    console.log("delete button hit", event.target.parentNode.parentNode.id)
-    var base = 'protocol-item-'
-    var str = event.target.parentNode.parentNode.id
-    var index = parseInt(str.substr(str.length - (str.length - base.length)))
-    console.log("index: ", index)
-    this.setState({delete_item: index})
   }
 
   hoverEvent() {
@@ -321,7 +310,7 @@ class ProtocolList extends Component {
                         protocol_name={curr_protocol['protocol']} 
                         isSelected={is_selected}
                         clickMethod={this.handleClick}
-                        deleteMethod={this.deleteProtocol}
+                        deleteMethod={this.props.deleteMethod}
                       />);
     }
     
@@ -343,6 +332,7 @@ class App extends Component {
       lambdas: {},
       record: false,
       curr_user_data: {},
+      delete_item: -1,
     }
 
     this.handleChange = this.handleChange.bind(this);
@@ -357,6 +347,39 @@ class App extends Component {
     this.recordClear = this.recordClear.bind(this);
     this.recordSave = this.recordSave.bind(this);
     this.getData = this.getData.bind(this);
+    this.deleteProtocol = this.deleteProtocol.bind(this);
+    this.updateLambdas = this.updateLambdas.bind(this);
+  }
+
+  deleteProtocol(event) {
+    // find the list item that contained the delete button that got hit
+    console.log("delete button hit [[[APP]]]", event.target.parentNode.parentNode.id)
+    var base = 'protocol-item-'
+    var str = event.target.parentNode.parentNode.id
+    var index = parseInt(str.substr(str.length - (str.length - base.length)))
+    console.log("index: ", index)
+    this.setState({delete_item: index}, () => {this.updateLambdas()})
+  }
+
+  // send updated lambdas to the backend
+  updateLambdas() {
+    console.log("UPDATED LAMBDAS: ", this.state.lambdas)
+
+    // tell backend to do stuff
+    var updatedData = this.state.lambdas
+     fetch(SERVER + '/record/update', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updatedData)
+    })
+      .then((response) => response.json())
+      .then((json) => this.setState(json))
+    console.log("saved button hit")
+    console.log(this.state.lambdas)
+
   }
 
   // gets user data from web app
@@ -406,11 +429,7 @@ class App extends Component {
       { running: true },
     )
     // the run button basically calls the save button 
-    this.setState({ curr_user_data: user_data }, () => {
-      if (this.state.record) {
-        this.recordSave();
-      }
-    }); 
+    this.setState({ curr_user_data: user_data }, () => { if (this.state.record) { this.recordSave(); } }); 
 
     fetch(SERVER + '/run', {
       method: 'post',
@@ -558,6 +577,11 @@ class App extends Component {
   }
 
   render() {
+    var index = this.state.delete_item
+    if (index > -1) {
+      this.state.lambdas.splice(index, 1);
+      this.setState({delete_item: -1})
+    }
     // console.log(this.state)
 
     // shows busy icon
@@ -600,7 +624,7 @@ class App extends Component {
               <li><button type="button" className="btn btn-info" onClick={this.state.show_lambdas == true ? this.recordHide: this.recordShow}><i className={this.state.show_lambdas == true? "fa fa-eye-slash":"fa fa-eye"} aria-hidden="true"></i> {this.state.show_lambdas == true ? "Hide List" : "Show List"} </button></li>
               
               <div className={this.state.show_lambdas == true ? "show-protocols" : "d-none"}>
-                <ProtocolList protocols={this.state.lambdas}/>
+                <ProtocolList protocols={this.state.lambdas} deleteMethod={this.deleteProtocol} />
               </div>
 
               <div className={running}>
