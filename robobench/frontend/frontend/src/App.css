@@ -141,10 +141,20 @@ th:first-child {
   /*border-radius: 5%;*/
 }
 
+/* delete protocol button */
 .delete-protocol {
 	float: right;
 	display: inline;
+	background-color: transparent;
+	color: white;
+	padding: 0;
+	border: none;
 }
+
+.delete-protocol:hover > i{
+	color: red;
+}
+
 /* protocol cards*/
 .protocol-card {
 	display: none;

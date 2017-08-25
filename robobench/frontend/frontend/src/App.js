@@ -266,7 +266,6 @@ class ProtocolList extends Component {
 
     this.state = {
       hover_flag: false,
-      delete_item: -1,
     }
 
     this.hoverEvent = this.hoverEvent.bind(this);
@@ -286,11 +285,6 @@ class ProtocolList extends Component {
   render() {
     // delete list items as needed
     // TODO: fix so that the parent this.props.protocols is changed not the child's version
-    var index = this.state.delete_item
-    if (index > -1) {
-      this.props.protocols.splice(index, 1);
-      this.setState({delete_item: -1})
-    }
     var list_items = [];
     for (var i = 0; i < this.props.protocols.length; i++) {
       var base = 'protocol-item-'
