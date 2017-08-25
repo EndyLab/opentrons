@@ -152,7 +152,7 @@ th:first-child {
 }
 
 .delete-protocol:hover > i{
-	color: red;
+	color: black;
 }
 
 /* protocol cards*/
@@ -163,6 +163,7 @@ th:first-child {
     padding: 0;
     padding-left: 1em;
     background-color: #CFD8DC;
+    word-wrap: break-word;
 
 }
 
