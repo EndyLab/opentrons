@@ -252,6 +252,7 @@ class ProtocolItem extends Component {
           onMouseLeave={this.hoverEvent} 
         >
           {this.props.protocol_name} 
+          <button type="button" className="delete-protocol" ><i className="fa fa-times-circle" aria-hidden="true"></i></button>
         </div>
         <ProtocolCard protocol_data={this.props.protocol_data} isSelected={this.props.isSelected}/>
       </li>

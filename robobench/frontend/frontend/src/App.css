@@ -141,6 +141,10 @@ th:first-child {
   /*border-radius: 5%;*/
 }
 
+.delete-protocol {
+	float: right;
+	display: inline;
+}
 /* protocol cards*/
 .protocol-card {
 	display: none;
