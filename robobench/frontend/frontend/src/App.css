@@ -13,6 +13,7 @@ th:first-child {
 
 .protocol-parameters {
   display: none;
+  padding-top: 1em;
 }
 
 .active-protocol {
@@ -131,4 +132,26 @@ th:first-child {
 
 .row {
 	height: 100%;
+}
+
+.show-protocols {
+  padding-left: 0;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  background-color: #eeeeee;
+  border-radius: 5%;
+}
+
+/* protocol cards*/
+.protocol-card {
+	display: none;
+}
+
+.protocol-card-active {
+	padding: 1em 0;
+ 	background-color: #eeeeee;
+}
+
+.protocol-card-active > .protocol-card {
+  	display: block;
 }

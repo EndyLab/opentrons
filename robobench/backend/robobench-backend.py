@@ -30,7 +30,8 @@ def get_labware():
 
     return {
         'A1':'WellPlate',
-        'C1':'WellPlate'
+        'C1':'WellPlate',
+        'C3': 'TipRack',
     }
 
 
@@ -91,10 +92,10 @@ def run():
     #     return response
 
     # check if protocols should be recorded
-    global RECORD
-    if RECORD == True:
-        # temp = lambda: web_transfer(data['source'], data['dest'], data['volume'])
-        LAMBDA_QUEUE.append(data)
+    # global RECORD
+    # if RECORD == True:
+    #     # temp = lambda: web_transfer(data['source'], data['dest'], data['volume'])
+    #     LAMBDA_QUEUE.append(data)
 
     print("protocol LIST: ", LAMBDA_QUEUE)
     run_lambda_protocol(data)
@@ -124,14 +125,32 @@ def run_lambda_queue():
     for data in LAMBDA_QUEUE:
         run_lambda_protocol(data)
 
+# save a protocol top the stack
+@app.route('/record/save', methods=['POST'])
+def record_save():
+    print("python responding to button press, ACTION: saving protocols")
+
+    # gets protocol data from frontend
+    data = request.get_json()
+    print(data)
+    # global RECORD
+    # if RECORD == True:
+    # temp = lambda: web_transfer(data['source'], data['dest'], data['volume'])
+    LAMBDA_QUEUE.append(data)
+    response = jsonify({
+        # 'status': 'ok',
+        'lambdas': LAMBDA_QUEUE
+    })
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
 # run user defined protocol stack
-@app.route('/record/run', methods=['POST'])
+@app.route('/record/run')
 def record_run():
     print("hi running record button hit")
     # data = request.get_json()
     # if data['running_record'] == True:
     run_lambda_queue()
-
 
     response = jsonify({
         'status': 'ok'
@@ -139,16 +158,27 @@ def record_run():
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
-@app.route('/record/show', methods=['POST'])
+# returns the list of protocols so frontend can display 
+@app.route('/record/show')
 def record_show():
     print("hi showing recording functions")
-    # data = request.get_json()
-    # if data['running_record'] == True:
     print(LAMBDA_QUEUE)
-
-
+    
     response = jsonify({
-        'status': 'ok'
+        # 'status': 'ok',
+        'lambdas': LAMBDA_QUEUE
+    })
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+@app.route('/record/clear')
+def record_clear():
+    print("hi clearing protocol list now")
+    global LAMBDA_QUEUE
+    LAMBDA_QUEUE = []
+    response = jsonify({
+        # 'status': 'ok',
+        'lambdas': LAMBDA_QUEUE
     })
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response

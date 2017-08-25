@@ -7,8 +7,8 @@ import TableDragSelect from 'react-table-drag-select';
 // import 'react-table-drag-select/style.css';
 
 
-const SERVER = "http://10.34.178.45:5000"
-// const SERVER = "http://localhost:5000"
+// const SERVER = "http://10.34.183.189:5000"
+const SERVER = "http://localhost:5000"
 
 
 class Labware extends Component {
@@ -59,7 +59,7 @@ class Grid extends Component {
 
     this.state = {
       labware: {},
-      models: {}
+      models: {},
     }
   }
 
@@ -116,7 +116,7 @@ class Grid extends Component {
     }
 
     Object.keys(this.state.labware).forEach((key) => {
-      console.log(key + ": " + this.state.labware[key]);
+      // console.log(key + ": " + this.state.labware[key]);
 
       if (this.state.labware[key] == 'WellPlate') {
         var mode = 'none'
@@ -178,11 +178,150 @@ class Grid extends Component {
   }
 }
 
+// list of protocols
+// currently veyr :JANKY: but #itworks
+
+//  protocol parameters, shown on click, hidden otherwisde
+class ProtocolCard extends Component {
+  constructor(props) {
+    super(props);
+
+  }
+
+  render() {
+    var keys = Object.keys(this.props.protocol_data)
+
+    // dont display protocol field since the lit heading is already the protocol
+    var index = keys.indexOf('protocol');
+    if (index > -1) {
+      keys.splice(index, 1);
+    }
+    var index = keys.indexOf('tiprack');
+    if (index > -1) {
+      keys.splice(index, 1);
+    }
+
+    var paramsList = keys.map((key, id) => <li className={key} key={id}>{key} : {JSON.stringify(this.props.protocol_data[key])}</li>);
+    
+    console.log("keys of protocol data")
+    console.log(keys)
+    console.log(this.props.protocol_data[keys[0]])
+    console.log(JSON.stringify(this.props.protocol_data[keys[1]]))
+
+    return (
+      <div className="protocol-card">
+        <ul>
+          {paramsList}
+        </ul>
+      </div>
+    );
+  }
+}
+
+// a protocol list item
+//  <ProtocolCard protocol_data={this.props.protocol_data}/>
+class ProtocolItem extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      hover_flag: false,
+    }
+    this.hoverEvent = this.hoverEvent.bind(this);
+  }
+
+  hoverEvent() {
+    this.setState({hover_flag: !this.state.hover_flag})
+  }
+
+  render() {
+   var protocol_list_style = {
+          'background-color': '#eeeeee'
+      };
+      if (this.props.isSelected || this.state.hover_flag) {
+          protocol_list_style['background-color'] = '#C4C4C4';
+      }
+    return (
+      <li 
+        id={this.props.id_string} 
+        onClick={this.props.methodHolder} 
+        onMouseEnter={this.hoverEvent} 
+        onMouseLeave={this.hoverEvent} 
+        style={protocol_list_style}
+        className={this.props.isSelected == true ? "protocol-card-active" : ""}
+      >
+        {this.props.protocol_name}
+        <ProtocolCard protocol_data={this.props.protocol_data} isSelected={this.props.isSelected}/>
+      </li>
+    );
+  }
+}
+
+class ProtocolList extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      hover_flag: false,
+    }
+
+    this.hoverEvent = this.hoverEvent.bind(this);
+    this.handleClick = this.handleClick.bind(this)
+  }
+
+  hoverEvent() {
+    this.setState({hover_flag: !this.state.hover_flag})
+  }
+
+  handleClick(event) {
+    this.setState({selectedItem: event.target.id});
+    console.log('list item clicked')
+    console.log(event.target)
+  }
+
+  render() {
+    var list_items = [];
+    for (var i = 0; i < this.props.protocols.length; i++) {
+      var base = 'protocol-item-'
+      var id_string = base.concat(i.toString())
+
+      var curr_protocol = this.props.protocols[i]
+      var is_selected = this.state.selectedItem === id_string
+      console.log(this.state)
+      console.log("IS SELECTED PROP")
+      console.log(i)
+      console.log(is_selected)
+      
+      list_items.push(<ProtocolItem 
+                        key={i} 
+                        id_string={id_string}
+                        protocol_data={curr_protocol}
+                        protocol_name={curr_protocol['protocol']} 
+                        isSelected={is_selected}
+                        methodHolder={this.handleClick}
+                      />);
+    }
+    
+    return (
+      <div>
+        <ol>
+          {list_items}
+        </ol>
+      </div>
+    );
+  }
+}
+
+
 class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      parameters: {}
+      parameters: {},
+      show_lambdas: false,
+      lambdas: {},
+      record: false,
+      curr_user_data: {},
     }
 
     this.handleChange = this.handleChange.bind(this);
@@ -193,10 +332,15 @@ class App extends Component {
     this.recordStop = this.recordStop.bind(this);
     this.recordRun = this.recordRun.bind(this);
     this.recordShow = this.recordShow.bind(this);
+    this.recordHide = this.recordHide.bind(this);
+    this.recordClear = this.recordClear.bind(this);
+    this.recordSave = this.recordSave.bind(this);
+    this.getData = this.getData.bind(this);
   }
 
-  runRobot() {
-    if (!this.grid.state.source || !this.grid.state.dest) {
+  // gets user data from web app
+  getData() {
+     if (!this.grid.state.source || !this.grid.state.dest) {
       alert("Please select source or destination wells.");
       return;
     }
@@ -214,15 +358,7 @@ class App extends Component {
       })
     })
 
-    this.setState({ running: true })
-
-    fetch(SERVER + '/run', {
-      method: 'post',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
+    var user_data = {
         protocol: 'transfer',
         parameters: this.state.parameters,
         source: {
@@ -239,7 +375,29 @@ class App extends Component {
           labware: 'TipRack',
           slot: this.grid.state.tiprack,
         }
-      })
+      };
+
+    return user_data;
+  }
+  runRobot() {
+    var user_data = this.getData()
+    this.setState(
+      { running: true },
+    )
+    // the run button basically calls the save button 
+    this.setState({ curr_user_data: user_data }, () => {
+      if (this.state.record) {
+        this.recordSave();
+      }
+    }); 
+
+    fetch(SERVER + '/run', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(user_data)
     })
       .then((response) => { return response.json() })
       .then((json) => {
@@ -266,6 +424,9 @@ class App extends Component {
 
   selectProtocol(event) {
     this.setState({ protocol: event.target.id })
+    console.log("this is protocol button PRESSED")
+    console.log(event)
+    console.log(event.target.id)
   }
 
   resetGrid() {
@@ -278,22 +439,52 @@ class App extends Component {
     this.setState({ models: newModels });
     this.setState({ source: null });
     this.setState({ dest: null });
-    this.setState({ record: false });
-    this.setState({ show_lambdas: false });
+    this.setState({ protocol: null });
   }
 
-  recordShow() {
-    this.setState({ show_lambdas: true });
-    fetch(SERVER + '/record/show', {
+  //  clears the protocol list
+  recordClear() {
+    // tell backend to clear protocol list
+    fetch(SERVER + '/record/clear')
+      .then((response) => response.json())
+      .then((json) => this.setState(json))
+    console.log("clear button hit")
+    console.log(this.state.lambdas)
+  }
+
+
+  // TODO: the difference between save and run is that save does NOT require record button to be hit first
+  recordSave() {
+    // tell backend to do stuff
+    var data = this.getData()
+     fetch(SERVER + '/record/save', {
       method: 'post',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        show_lambdas: true
-      })
+      body: JSON.stringify(data)
     })
+      .then((response) => response.json())
+      .then((json) => this.setState(json))
+    console.log("saved button hit")
+    console.log(this.state.lambdas)
+  }
+
+  // shows/hides the protocol list
+  recordShow() {
+    this.setState({ show_lambdas: true });
+
+    // response from backend
+    fetch(SERVER + '/record/show')
+      .then((response) => response.json())
+      .then((json) => this.setState(json))
+    console.log("show button hit")
+    console.log(this.state.lambdas)
+  }
+
+  recordHide() {
+     this.setState({ show_lambdas: false });
   }
 
   // recording user protocol command stack
@@ -309,8 +500,10 @@ class App extends Component {
         record: true
       })
     })
+    console.log("record start button hit")
   }
 
+  // stops recording
   recordStop() {
     this.setState({ record: false });
     fetch(SERVER + '/record', {
@@ -323,76 +516,77 @@ class App extends Component {
         record: false
       })
     })
+    console.log("record stop button hit")
   }
 
+  // runs every protocol in the list
   recordRun() {
     this.setState({ running: true })
-    fetch(SERVER + '/record/run', {
-      method: 'post',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        running_record: true
-      })
-    })
+    fetch(SERVER + '/record/run')
+      .then((response) => { return response.json() })
+      .then((json) => {
+        console.log(json);
+        this.setState({ running: false });
+        this.resetGrid();
 
-   .then((response) => { return response.json() })
-    .then((json) => {
-      console.log(json);
-      this.setState({ running: false });
-      this.resetGrid();
-
-      if (json.status == "ok") {
-      } else {
-        alert("Error running protcol list: " + json.status);
-      }
-    });
+        if (json.status == "ok") {
+        } else {
+          alert("Error running protcol list: " + json.status);
+        }
+      });
   }
 
   render() {
-    console.log(this.state)
+    // console.log(this.state)
 
-    var running = "d-none"
-    if (this.state.running) running = ""
+    // shows busy icon
+    var running = "d-none";
+    if (this.state.running) running = "";
 
     return (
         <div className="row fill">
           {/* right window */}
           <div className="col-sm-2" id="dashboard">
 
-          <ul id="protocols">
-            <li className={this.state.protocol == "dilution" ? "active-protocol" : ""}>
-              <button type="button" id="dilution" className="btn" onClick={this.selectProtocol}>Dilution</button>
-              <div className="protocol-parameters">
-                <div className="form-group row">
-                  <label className="col-sm-2 col-form-label ratio-label">1:</label>
-                  <div className="col-sm-10"><input type="text" id="ratio" className="form-control" placeholder="Ratio" onChange={this.handleChange} value={this.state.parameters['ratio']} /></div>
-                  </div>
-              </div>
-            </li>
-            <li className={this.state.protocol == "transfer" ? "active-protocol" : ""}>
-              <button type="button" id="transfer" className="btn" onClick={this.selectProtocol}>Transfer</button>
-              <div className="protocol-parameters">
-                <div className="input-group">
-                  <input type="text" id="volume" className="form-control" placeholder="Volume..." onChange={this.handleChange} value={this.state.parameters['volume']} />
+            <ul id="protocols">
+              {/* dilution */}
+              <li className={this.state.protocol == "dilution" ? "active-protocol" : ""}>
+                <button type="button" id="dilution" className="btn" onClick={this.selectProtocol}>Dilution</button>
+                <div className="protocol-parameters">
+                  <div className="form-group row">
+                    <label className="col-sm-2 col-form-label ratio-label">1:</label>
+                    <div className="col-sm-10"><input type="text" id="ratio" className="form-control" placeholder="Ratio" onChange={this.handleChange} value={this.state.parameters['ratio']} /></div>
+                    </div>
                 </div>
-              </div>
+              </li>
+
+              {/* transfer */}
+              <li className={this.state.protocol == "transfer" ? "active-protocol" : ""}>
+                <button type="button" id="transfer" className="btn" onClick={this.selectProtocol}>Transfer</button>
+                <div className="protocol-parameters">
+                  <div className="input-group">
+                    <input type="text" id="volume" className="form-control" placeholder="Volume..." onChange={this.handleChange} value={this.state.parameters['volume']} />
+                  </div>
+                </div>
               </li>
 
               <li><button type="button" className="btn btn-info" onClick={this.runRobot}><i className="fa fa-play" aria-hidden="true"></i> Run</button></li>
-
               <li><button type="button" className="btn btn-info" onClick={this.resetGrid}><i className="fa fa-refresh" aria-hidden="true"></i> Reset</button></li>
-              <li><button type="button" className="btn btn-info" onClick={this.recordStart}><i className="fa fa-video-camera" aria-hidden="true"></i> Record</button></li>
-              <li><button type="button" className="btn btn-info" onClick={this.recordStop}><i className="fa fa-stop" aria-hidden="true"></i> Stop</button></li>
-              <li><button type="button" className="btn btn-info" onClick={this.recordShow}><i className="fa fa-stop" aria-hidden="true"></i> Show Lambdas</button></li>
-              <li><button type="button" className="btn btn-info" onClick={this.recordRun}><i className="fa fa-play" aria-hidden="true"></i> Run Recorded Lambdas</button></li>
+              <li><button type="button" className="btn btn-info" onClick={this.state.record == true ? this.recordStop: this.recordStart}><i className={this.state.record == true ? "fa fa-stop" : "fa fa-video-camera"} aria-hidden="true"></i> {this.state.record == true ? "Stop Recording" : "Record"}</button></li>
+              <li><button type="button" className="btn btn-info" onClick={this.recordSave}><i className="fa fa-floppy-o" aria-hidden="true"></i> Save to List</button></li>
+              <li><button type="button" className="btn btn-info" onClick={this.recordRun}><i className="fa fa-play" aria-hidden="true"></i> Run List</button></li>
+              <li><button type="button" className="btn btn-info" onClick={this.recordClear}><i className="fa fa-trash" aria-hidden="true"></i> Clear List</button></li>
+              <li><button type="button" className="btn btn-info" onClick={this.state.show_lambdas == true ? this.recordHide: this.recordShow}><i className={this.state.show_lambdas == true? "fa fa-eye-slash":"fa fa-eye"} aria-hidden="true"></i> {this.state.show_lambdas == true ? "Hide List" : "Show List"} </button></li>
+              
+              <li className={this.state.show_lambdas == true ? "show-protocols" : "d-none"}>
+                <ProtocolList protocols={this.state.lambdas}/>
+              </li>
+
               <div className={running}>
                 <img src="loading.gif" />
               </div>
-          </ul>
-        </div>
+            </ul>
+          </div>
 
 
         {/* deck grid */}
