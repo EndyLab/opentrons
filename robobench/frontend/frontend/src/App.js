@@ -296,6 +296,7 @@ class ProtocolList extends Component {
 
   render() {
     // delete list items as needed
+    // TODO: fix so that the parent this.props.protocols is changed not the child's version
     var index = this.state.delete_item
     if (index > -1) {
       this.props.protocols.splice(index, 1);
