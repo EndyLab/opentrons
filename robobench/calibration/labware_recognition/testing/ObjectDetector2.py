@@ -48,8 +48,9 @@ class ObjectDetector:
                 self.categories = label_map_util.convert_label_map_to_categories(self.label_map, max_num_classes=num_classes, use_display_name=True)
                 self.category_index = label_map_util.create_category_index(self.categories)
 
-    def detectMat(self, image, deck_roi=None):
+    def detect(self, image, deck_roi=None):
         '''
+        TODO: look at realtime example, pass in sess
         Detects objects in image and returns dictionary mapping 
         {object type:list of bounding boxes (ymin, xmin, ymax, xmax)}
         relative to uncropped image
@@ -99,10 +100,6 @@ class ObjectDetector:
             for item, boxes in output.items():
                 for box in boxes:
                     # adjust normalized values to uncropped image
-                    print(box[0])
-                    print(deck_roi[0][1])
-                    print(box[0] * cropped_height + deck_roi[0][1])
-                    print((box[0] * cropped_height + deck_roi[0][1]) / full_height)
                     box = ((box[0] * cropped_height + deck_roi[0][1]) / full_height, 
                             (box[1] * cropped_width + deck_roi[0][0]) / full_width,
                             (box[2] * cropped_height + deck_roi[0][1]) / full_height, 
@@ -115,8 +112,8 @@ if __name__ == "__main__":
     detector = ObjectDetector(5, "../models/object_detection/TopViewPipeline/outputs/17806/frozen_inference_graph.pb", "../models/object_detection/TopViewPipeline/data/pascal_label_map_top.pbtxt")
     img = cv2.imread("../models/object_detection/TopViewPipeline/VOCdevkit_top/VOC2012/JPEGImages/96wellplate_enzo_D3_t-0.jpg")
     img2 = cv2.imread("../models/object_detection/TopViewPipeline/VOCdevkit_top/VOC2012/JPEGImages/96wellplate_enzo_D3_t-0.jpg")
-    print(detector.detectMat(img, ((50, 10), (1000, 1000))))
-    print(detector.detectMat(img2))
+    print(detector.detect(img, ((50, 10), (1000, 1000))))
+    print(detector.detect(img2))
     cv2.imshow("img", img)
     cv2.imshow("img2", img2)
     cv2.waitKey(0)

@@ -1,0 +1,122 @@
+import cv2
+import imutils
+import ObjectDetector2
+import time
+from inspect import getsourcefile
+from os.path import abspath, join, dirname
+
+class RobotVision:
+
+    def __init__(self, camera=None):
+        if camera == None:
+            camera = cv2.VideoCapture(0)
+            time.sleep(.25)
+        self.camera = camera
+        #TODO: not necessary when done testing
+        self.absolute_dir_path = abspath(dirname(getsourcefile(lambda:0)))
+        # TODO: determine whether these values should be passed in
+        self.ckpt_path = join(self.absolute_dir_path, "../models/object_detection/TopViewPipeline/outputs/17806/frozen_inference_graph.pb")
+        self.label_path = join(self.absolute_dir_path, "../models/object_detection/TopViewPipeline/data/pascal_label_map_top.pbtxt")
+        self.num_classes = 5
+        self.object_detector = ObjectDetector2.ObjectDetector(self.num_classes, self.ckpt_path, self.label_path)
+        self.deck_roi = []
+        # TODO: remove, for testing
+        #frame = cv2.imread(join(self.absolute_dir_path,'../calibration/checkerboard_images/img21.jpg'))
+        frame = cv2.imread(join(self.absolute_dir_path, "../models/object_detection/TopViewPipeline/VOCdevkit_top/VOC2012/JPEGImages/96wellplate_enzo_D3_t-0.jpg"))
+        self.select_deck_roi(frame)
+        self.deck_dimensions = (5, 3)
+        # self.select_deck_roi()
+
+    def get_roi(self, event, x, y, flags, param):
+        """
+        TODO: have point sort itself, draw frame when cropping
+        Mouse event handler
+        Expects ROI drawn as rect from top left to bottom right
+        Stores corner points in crop_points
+        """
+        roi = param
+        if event == cv2.EVENT_LBUTTONDOWN:
+            roi.clear()
+            roi.append((x,y))
+            print('down')
+        elif event == cv2.EVENT_LBUTTONUP:
+            roi.append((x,y))
+
+            print('up')
+
+        print(roi)
+
+    def select_deck_roi(self, frame=None):
+        """
+        Opens window with passed in img and allows ROI to be drawn. Closes when key pressed
+        """
+        if frame is None:
+            # TODO: don't assume read works
+            _, frame = self.camera.read()
+        cv2.namedWindow('Set crop')
+        cv2.imshow('Set crop', frame)
+        cv2.setMouseCallback('Set crop', self.get_roi, self.deck_roi)
+        cv2.waitKey(0)
+        print(self.deck_roi)
+        cv2.destroyWindow('Set crop')
+
+    def boxes_map_to_slots_map(self, name_to_boxes_map, frame):
+        '''
+        Generates name_to_slots_boxes_map based on name_to_boxes_map, self.deck_dimensions and self.deck_roi
+        '''
+        name_to_slots_boxes_map = {}
+        for name, boxes in name_to_boxes_map.items():
+            slot_list = []
+            for box in boxes:
+                midx = (box[1] + box[3]) / 2
+                midy = (box[0] + box[2]) /2
+                #A1 bottom left, E3 top right
+                if len(self.deck_roi) == 2:
+                    cropw = self.deck_roi[1][0] - self.deck_roi[0][0]
+                    croph = self.deck_roi[1][1] - self.deck_roi[0][1]
+                    height, width, _ = frame.shape
+                    midx = (midx * width - self.deck_roi[0][0]) / cropw
+                    midy = (midy * height - self.deck_roi[0][1]) / croph
+
+                print(self.deck_dimensions[0] * midx)
+                letter = chr(ord('A') + int(self.deck_dimensions[0] * midx))
+                number = self.deck_dimensions[1] - int(self.deck_dimensions[1] * midy)
+                slot = letter + str(number)
+                #TODO: is copy needed of box? Any chance ref is changed?
+                slot_list.append((slot, box))
+
+            name_to_slots_boxes_map[name] = slot_list
+
+        return name_to_slots_boxes_map
+
+
+    def evaluate_deck(self, frame=None):
+        '''
+        Determines what objects are on the deck and returns a dictionary {object type: [(slot, robot coordinate positions)]}
+
+        Args:
+            frame(cv2::Mat, optional): image to evaluate, by default captures image from instance camera
+
+        Returns:
+            dictionary {object type (str): [(slot (str), robot coordinate positions(tuple))]}
+        '''
+
+        if frame is None:
+            _, frame = self.camera.read()
+        if len(self.deck_roi) == 2:
+            name_to_boxes_map = self.object_detector.detect(frame, self.deck_roi)
+        else: 
+            name_to_boxes_map = self.object_detector.detect(frame)
+        print(name_to_boxes_map)
+        name_to_slots_map = self.boxes_map_to_slots_map(name_to_boxes_map, frame)
+        print(name_to_slots_map)
+        cv2.imshow("Detected", frame)
+        cv2.waitKey(0)
+
+if __name__ == "__main__":
+    vis = RobotVision()
+    frame = cv2.imread(join(vis.absolute_dir_path, "../models/object_detection/TopViewPipeline/VOCdevkit_top/VOC2012/JPEGImages/96wellplate_enzo_D3_t-0.jpg"))
+    vis.evaluate_deck(frame)
+
+
+
