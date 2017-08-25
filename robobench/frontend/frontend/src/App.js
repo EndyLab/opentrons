@@ -247,12 +247,12 @@ class ProtocolItem extends Component {
           className="protocol-card-title"
           style={protocol_list_style}
           id={this.props.id_string} 
-          onClick={this.props.methodHolder} 
+          onClick={this.props.clickMethod} 
           onMouseEnter={this.hoverEvent} 
           onMouseLeave={this.hoverEvent} 
         >
           {this.props.protocol_name} 
-          <button type="button" className="delete-protocol" ><i className="fa fa-times-circle" aria-hidden="true"></i></button>
+          <button type="button" className="delete-protocol" onClick={this.props.deleteMethod}><i className="fa fa-times-circle" aria-hidden="true"></i></button>
         </div>
         <ProtocolCard protocol_data={this.props.protocol_data} isSelected={this.props.isSelected}/>
       </li>
@@ -266,10 +266,22 @@ class ProtocolList extends Component {
 
     this.state = {
       hover_flag: false,
+      delete_item: -1,
     }
 
     this.hoverEvent = this.hoverEvent.bind(this);
-    this.handleClick = this.handleClick.bind(this)
+    this.handleClick = this.handleClick.bind(this);
+    this.deleteProtocol = this.deleteProtocol.bind(this);
+  }
+
+  deleteProtocol(event) {
+    // find the list item that contained the delete button that got hit
+    console.log("delete button hit", event.target.parentNode.parentNode.id)
+    var base = 'protocol-item-'
+    var str = event.target.parentNode.parentNode.id
+    var index = parseInt(str.substr(str.length - (str.length - base.length)))
+    console.log("index: ", index)
+    this.setState({delete_item: index})
   }
 
   hoverEvent() {
@@ -283,6 +295,12 @@ class ProtocolList extends Component {
   }
 
   render() {
+    // delete list items as needed
+    var index = this.state.delete_item
+    if (index > -1) {
+      this.props.protocols.splice(index, 1);
+      this.setState({delete_item: -1})
+    }
     var list_items = [];
     for (var i = 0; i < this.props.protocols.length; i++) {
       var base = 'protocol-item-'
@@ -301,7 +319,8 @@ class ProtocolList extends Component {
                         protocol_data={curr_protocol}
                         protocol_name={curr_protocol['protocol']} 
                         isSelected={is_selected}
-                        methodHolder={this.handleClick}
+                        clickMethod={this.handleClick}
+                        deleteMethod={this.deleteProtocol}
                       />);
     }
     
