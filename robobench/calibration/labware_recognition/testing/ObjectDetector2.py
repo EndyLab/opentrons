@@ -63,13 +63,17 @@ class ObjectDetector:
             dict(str:list(box)): returns a dictionary mapping object types to a list of detected bounding boxes.
                                 Box positions are normalized and formatted as (ymin, xmin, ymax, xmax)
         '''
-        if deck_roi != None:
+        print(deck_roi)
+        if deck_roi is not None:
             cropped_image = image[deck_roi[0][1]:deck_roi[1][1], deck_roi[0][0]:deck_roi[1][0]]
         else:
             cropped_image = image
+        print(deck_roi)
+        cv2.imshow("img to detect", cropped_image)
+        cv2.waitKey(0)
 
         # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
-        image_np_expanded = np.expand_dims(image, axis=0)
+        image_np_expanded = np.expand_dims(cropped_image, axis=0)
         image_tensor = self.detection_graph.get_tensor_by_name('image_tensor:0')
         # Each box represents a part of the image where a particular object was detected.
         boxes = self.detection_graph.get_tensor_by_name('detection_boxes:0')
@@ -84,7 +88,7 @@ class ObjectDetector:
             feed_dict={image_tensor: image_np_expanded})
         # Visualization of the results of a detection.
         output = vis_utils.visualize_boxes_and_labels_on_image_array(
-            image,
+            cropped_image,
             np.squeeze(boxes),
             np.squeeze(classes).astype(np.int32),
             np.squeeze(scores),

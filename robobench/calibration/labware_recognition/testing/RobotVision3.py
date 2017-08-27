@@ -1,6 +1,7 @@
 import cv2
 import imutils
 import ObjectDetector2
+import FineTuner
 import time
 from inspect import getsourcefile
 from os.path import abspath, join, dirname
@@ -22,11 +23,17 @@ class RobotVision:
         self.deck_roi = []
         # TODO: remove, for testing
         #frame = cv2.imread(join(self.absolute_dir_path,'../calibration/checkerboard_images/img21.jpg'))
-        frame = cv2.imread(join(self.absolute_dir_path, "../models/object_detection/TopViewPipeline/VOCdevkit_top/VOC2012/JPEGImages/96wellplate_enzo_D3_t-0.jpg"))
-        self.select_deck_roi(frame)
+        path = join(self.absolute_dir_path, "VisionTestingImages/checkerboardimg1")
+        print(path)
+        frame = cv2.imread(join(self.absolute_dir_path, "VisionTestingImages/checkerboardimg1.jpg"))
+        # self.select_deck_roi(frame)
         self.deck_dimensions = (5, 3)
         self.resize_width = 1000
-        # self.select_deck_roi()
+        # _, frame = self.camera.read()
+        # frame = imutils.resize(frame, width=self.resize_width)
+        self.select_deck_roi(frame)
+        self.fine_tune_calibrator = FineTuner.FineTuner(frame)
+
 
     def get_roi(self, event, x, y, flags, param):
         """
@@ -108,6 +115,7 @@ class RobotVision:
             _, frame = self.camera.read()
             frame = imutils.resize(frame, width=self.resize_width)
         if len(self.deck_roi) == 2:
+            print("Passing in crop {}".format(self.deck_roi))
             name_to_boxes_map = self.object_detector.detect(frame, self.deck_roi)
         else: 
             name_to_boxes_map = self.object_detector.detect(frame)
@@ -119,8 +127,9 @@ class RobotVision:
 
 if __name__ == "__main__":
     vis = RobotVision()
-    frame = cv2.imread(join(vis.absolute_dir_path, "../models/object_detection/TopViewPipeline/VOCdevkit_top/VOC2012/JPEGImages/96wellplate_enzo_D3_t-0.jpg"))
+    frame = cv2.imread(join(vis.absolute_dir_path, "VisionTestingImages/tiprackdeck1.jpg"))
     vis.evaluate_deck(frame)
+    #print(vis.fine_tune_calibrator.converter.obj_to_robot_mtx)
 
 
 

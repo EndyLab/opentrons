@@ -43,6 +43,7 @@ class RobotCoordinateConverter:
 
     def getRobotPoints(self):
         return ((40, 400), (202, 400), (40,292), -82)
+        # return ((46, 390), (47.5, 285), (204, 390), -46)
 
     def calibrateRobotTransformation(self, robot_points):
         '''
@@ -140,7 +141,7 @@ class RobotCoordinateConverter:
         if len(img_point) != 2:
             raise ValueError('Expects tuple (u,v) of length 2')
 
-        u, v = img_point
+        u, v = img_point 
         # 3x3 rotation matrix
         rtmtx, _ = cv2.Rodrigues(self.rvec)
         # 3 x 4 rotation transformation matrix
