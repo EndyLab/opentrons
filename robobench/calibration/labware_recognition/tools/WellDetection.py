@@ -46,7 +46,7 @@ def findWells(src):
 		x, y = well
 		# print(x)
 		# print(y)
-		#cv2.rectangle(img, (x-3, y-3), (x+3, y+3), (255, 0, 0), 2)	
+		cv2.rectangle(img, (x-3, y-3), (x+3, y+3), (255, 0, 0), 2)	
 	x1, y1 = well_list[11]
 	cv2.rectangle(img, (x1-3, y1-3), (x1+3, y1+3), (255, 255, 0), 3)	
 	cv2.namedWindow("predicted wells")
@@ -120,9 +120,11 @@ def validate_well_candidates(candidates, expected_num, c, center, x_axis):
 				for j in range(1, mult):
 					new_pos = candidates[i][0] - expected_delta * j
 					new_weight = candidates[i][1] - 1 # need to change
-					candidates.insert(i + 1, (new_pos, new_weight))
+					candidates.insert(i, (new_pos, new_weight))
 					print("inserted at {}".format(i))
 					i = i + 1
+					print(candidates)
+					cv2.waitKey(0)
 			else:
 				for j in range(1, mult):
 					new_pos = candidates[i-1][0] + expected_delta * j

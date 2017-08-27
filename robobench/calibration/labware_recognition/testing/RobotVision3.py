@@ -25,6 +25,7 @@ class RobotVision:
         frame = cv2.imread(join(self.absolute_dir_path, "../models/object_detection/TopViewPipeline/VOCdevkit_top/VOC2012/JPEGImages/96wellplate_enzo_D3_t-0.jpg"))
         self.select_deck_roi(frame)
         self.deck_dimensions = (5, 3)
+        self.resize_width = 1000
         # self.select_deck_roi()
 
     def get_roi(self, event, x, y, flags, param):
@@ -53,6 +54,7 @@ class RobotVision:
         if frame is None:
             # TODO: don't assume read works
             _, frame = self.camera.read()
+            frame = imutils.resize(frame, width=self.resize_width)
         cv2.namedWindow('Set crop')
         cv2.imshow('Set crop', frame)
         cv2.setMouseCallback('Set crop', self.get_roi, self.deck_roi)
@@ -102,7 +104,9 @@ class RobotVision:
         '''
 
         if frame is None:
+            # TODO: don't assume read is successful
             _, frame = self.camera.read()
+            frame = imutils.resize(frame, width=self.resize_width)
         if len(self.deck_roi) == 2:
             name_to_boxes_map = self.object_detector.detect(frame, self.deck_roi)
         else: 
