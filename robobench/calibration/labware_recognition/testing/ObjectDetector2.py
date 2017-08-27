@@ -96,16 +96,20 @@ class ObjectDetector:
             use_normalized_coordinates=True,
             line_thickness=8)
 
-        if deck_roi != None:
+        if deck_roi is not None:
             cropped_height, cropped_width, _ = cropped_image.shape
             full_height, full_width, _ = image.shape
+            print("Preadjustment boxes: {}".format(output))
             for item, boxes in output.items():
-                for box in boxes:
+                for i in range(len(boxes)):
+                    box = boxes[i]
                     # adjust normalized values to uncropped image
-                    box = ((box[0] * cropped_height + deck_roi[0][1]) / full_height, 
+                    boxes[i] = ((box[0] * cropped_height + deck_roi[0][1]) / full_height, 
                             (box[1] * cropped_width + deck_roi[0][0]) / full_width,
                             (box[2] * cropped_height + deck_roi[0][1]) / full_height, 
                             (box[3] * cropped_width + deck_roi[0][0]) / full_width)
+
+        print("Final output: {}".format(output))
 
         return output
 
