@@ -1,5 +1,5 @@
 # TODO: put everything in either row major or column major
-# TODO: figure out where slight error in conversions is coming from
+# TODO: figure out where slight error in conversions is coming from (float precision?)
 # TODO: make methods/attributes private
 # TODO: add error checking
 # TODO: create test harness
@@ -35,7 +35,7 @@ class RobotCoordinateConverter:
     def draw(self, img, corners, imgpts):
         corner = tuple(corners[0].ravel())
         print("corner for draw: {}".format(corner))
-        print("imgpts[0]: {}".format(imgpts[0]))
+        #print("imgpts[0]: {}".format(imgpts[0]))
         img = cv2.line(img, corner, tuple(imgpts[0].ravel()), (255,0,0), 5)
         img = cv2.line(img, corner, tuple(imgpts[1].ravel()), (0,255,0), 5)
         img = cv2.line(img, corner, tuple(imgpts[2].ravel()), (0,0,255), 5)
@@ -111,7 +111,7 @@ class RobotCoordinateConverter:
             # print("rvec: {}".format(self.rvec))
             # 1x2 points
             imgpts, jac = cv2.projectPoints(axis, self.rvec, self.tvec, self.cam_mtx, self.dist)
-            print("imgpts: {}".format(imgpts))
+            # print("imgpts: {}".format(imgpts))
             img = self.draw(img,corners2,imgpts)
             cv2.drawChessboardCorners(img, (7,5), corners2, ret)
             cv2.imshow('img',img)
@@ -124,14 +124,14 @@ class RobotCoordinateConverter:
         self.robot_to_obj_mtx, self.obj_to_robot_mtx = self.calibrateRobotTransformation(robot_points)
         return True
 
-    def pixelToRobot(self, img_point, z):
+    def pixelToRobot(self, img_point, robot_z):
         '''
         TODO: make sure z is handled correctly
         Returns robot coordinates of passed in pixel given z value in robot coordinates
 
         Args:
             img_point(tuple): pixel as (u,v)
-            z(float): z value pixel in robot coordinates
+            robot_z(float): z value pixel in robot coordinates
 
         Returns:
             tuple: robot coordinate (x, y, z) of pixel with given z value
@@ -141,34 +141,39 @@ class RobotCoordinateConverter:
             raise ValueError('Expects tuple (u,v) of length 2')
 
         u, v = img_point
-
         # 3x3 rotation matrix
         rtmtx, _ = cv2.Rodrigues(self.rvec)
         # 3 x 4 rotation transformation matrix
         rt_tr_mtx = np.concatenate((rtmtx, self.tvec), axis=1)
         # complete projection matrix
+        # print("rttr matrix: {}".format(rt_tr_mtx))
         transform_mtx = np.dot(self.cam_mtx, rt_tr_mtx)
+        # print("cam_mtx: {}".format(self.cam_mtx))
+        # print("transform mtx: {}".format(transform_mtx))
+        obj_z = (robot_z + 82) / -27
 
         # To solve for X,Y given Z, solves
         # desired_vec = desired_mat x [[X,Y]]
         # equation accounts for homogeneous coordinates
-        desired_vec = np.array([[transform_mtx[0][2] * z + transform_mtx[0][3] - u * transform_mtx[2][2] * z - u * transform_mtx[2][3]],
-                                [transform_mtx[1][2] * z + transform_mtx[1][3] - v * transform_mtx[2][2] * z - v * transform_mtx[2][3]]])
+        desired_vec = np.array([[transform_mtx[0][2] * obj_z + transform_mtx[0][3] - u * transform_mtx[2][2] * obj_z - u * transform_mtx[2][3]],
+                           [transform_mtx[1][2] * obj_z + transform_mtx[1][3] - v * transform_mtx[2][2] * obj_z - v * transform_mtx[2][3]]])
 
         desired_mat = np.array([[u * transform_mtx[2][0] - transform_mtx[0][0], u * transform_mtx[2][1] - transform_mtx[0][1]],
                                 [v * transform_mtx[2][0] - transform_mtx[1][0], v * transform_mtx[2][1] - transform_mtx[1][1]]])
+
+        # print("dvec: {}".format(desired_vec))
+        # print("dmat: {}".format(desired_mat))
         inv_dmat = np.linalg.inv(desired_mat)
         # print("dvec: {}".format(desired_vec))
         # print("dmat: {}".format(desired_mat))
         # print("inv_dmat: {}".format(inv_dmat))
         pred = np.dot(inv_dmat, desired_vec)
-        # TODO: Calculation of object prediction has a bug, check math
-        print("Object prediction: {}".format(pred))
+        # print("Object prediction: {}".format(pred))
         pred_homogeneous = cv2.convertPointsToHomogeneous(pred.transpose())[0].transpose()
         # print(self.obj_to_robot_mtx)
         pred_robot = np.dot(self.obj_to_robot_mtx, pred_homogeneous)
         # print("pred_robot: {}".format(pred_robot))
-        pred_robot[2] = z
+        pred_robot[2] = robot_z
         print("Prediction: {}".format(pred_robot))
         prediction_tuple = (pred_robot[0][0], pred_robot[1][0], pred_robot[2][0])
         return pred_robot
@@ -214,7 +219,6 @@ if __name__ == "__main__":
     print(converter.obj_to_robot_mtx)
     # for i in range(-5, 20):
     #     for j in range(-5, 20):
-    #         # TODO: make clear what z values are being passed into funcitons/be consisitent
     #         # Should be able to have one as the argument for the other
     #         p1 = converter.robotToPixel((40 + 27 * i, 400 - 27 * j, -82))
     #         p2 = converter.robotToPixel((40 + 27 * i, 400 - 27 * j, -55))
@@ -226,6 +230,6 @@ if __name__ == "__main__":
     #         cv2.line(img, p2, p4, ((5 * i + 100) % 255, 0, (5 * j + 150) % 255), 3)
     # cv2.imshow("img", img)
     # cv2.waitKey(0)
-    print(converter.pixelToRobot(converter.robotToPixel((40, 400, -82), False), -82))
+    print(converter.pixelToRobot(converter.robotToPixel((31, 314, 25), False), 25))
     #print(converter.pixelToRobot((308, 149.2), 0))
     #print(converter.pixelToRobot(converter.robotToPixel((40, 400, 0)), 82))
