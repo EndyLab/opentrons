@@ -24,6 +24,11 @@ class FineTuner:
         Returns:
         	tuple (x, y, z) robot calibration coordinates for object
         '''
+        height, width, _ = image.shape
+        cropped_image = image[int(box[0] * height):int(box[2] * height), int(width * box[1]):int(width * box[3])]
+        cv2.imshow("item", cropped_image)
+        cv2.waitKey(0)
+        return 'test'
 
 
 if __name__ == "__main__":

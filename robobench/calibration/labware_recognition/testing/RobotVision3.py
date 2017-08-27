@@ -77,6 +77,8 @@ class RobotVision:
         for name, boxes in name_to_boxes_map.items():
             slot_list = []
             for box in boxes:
+                height, width, _ = frame.shape
+                cv2.rectangle(frame, (int(width * box[1]), int(height * box[0])), (int(width * box[3]), int(height * box[2])), (0, 255, 0), 3)
                 midx = (box[1] + box[3]) / 2
                 midy = (box[0] + box[2]) /2
                 #A1 bottom left, E3 top right
@@ -87,6 +89,7 @@ class RobotVision:
                     midx = (midx * width - self.deck_roi[0][0]) / cropw
                     midy = (midy * height - self.deck_roi[0][1]) / croph
 
+                print("midx: {}".format(midx))
                 print(self.deck_dimensions[0] * midx)
                 letter = chr(ord('A') + int(self.deck_dimensions[0] * midx))
                 number = self.deck_dimensions[1] - int(self.deck_dimensions[1] * midy)
@@ -97,6 +100,22 @@ class RobotVision:
             name_to_slots_boxes_map[name] = slot_list
 
         return name_to_slots_boxes_map
+
+    def generate_coordinate_map(self, name_to_slots_boxes_map, frame):
+        '''
+        Generate names_to_slots_coordinates_map mapping {item type: [(slot, robot coordinates for calibration)]} from
+        names_to_slots_boxes_map
+        '''
+        name_to_slots_coordinates_map = {}
+        for name, slot_boxes in name_to_slots_boxes_map.items():
+            position_list = []
+            for slot_box in slot_boxes:
+                calibration_coordinates = self.fine_tune_calibrator.get_calibration_coordinates(name, slot_box[1], frame)
+                position_list.append((slot_box[1], calibration_coordinates))
+            name_to_slots_coordinates_map[name] = position_list
+
+        return name_to_slots_coordinates_map
+
 
 
     def evaluate_deck(self, frame=None):
@@ -120,14 +139,16 @@ class RobotVision:
         else: 
             name_to_boxes_map = self.object_detector.detect(frame)
         print(name_to_boxes_map)
-        name_to_slots_map = self.boxes_map_to_slots_map(name_to_boxes_map, frame)
-        print(name_to_slots_map)
+        name_to_slots_boxes_map = self.boxes_map_to_slots_map(name_to_boxes_map, frame)
+        name_to_slots_coordinates_map = self.generate_coordinate_map(name_to_slots_boxes_map, frame)
+        print(name_to_slots_boxes_map)
+        print(name_to_slots_coordinates_map)
         cv2.imshow("Detected", frame)
         cv2.waitKey(0)
 
 if __name__ == "__main__":
     vis = RobotVision()
-    frame = cv2.imread(join(vis.absolute_dir_path, "VisionTestingImages/tiprackdeck1.jpg"))
+    frame = cv2.imread(join(vis.absolute_dir_path, "VisionTestingImages/wellplateB2E1.jpg"))
     vis.evaluate_deck(frame)
     #print(vis.fine_tune_calibrator.converter.obj_to_robot_mtx)
 
