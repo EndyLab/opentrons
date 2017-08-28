@@ -5,6 +5,7 @@ import FineTuner
 import time
 from inspect import getsourcefile
 from os.path import abspath, join, dirname
+import numpy as np
 
 class RobotVision:
 
@@ -31,7 +32,8 @@ class RobotVision:
         self.resize_width = 1000
         # _, frame = self.camera.read()
         # frame = imutils.resize(frame, width=self.resize_width)
-        self.select_deck_roi(frame)
+        #self.select_deck_roi(frame)
+        self.deck_roi = [(207, 76), (795, 539)]
         self.fine_tune_calibrator = FineTuner.FineTuner(frame)
 
 
@@ -133,6 +135,7 @@ class RobotVision:
             # TODO: don't assume read is successful
             _, frame = self.camera.read()
             frame = imutils.resize(frame, width=self.resize_width)
+        clean_frame = np.copy(frame)
         if len(self.deck_roi) == 2:
             print("Passing in crop {}".format(self.deck_roi))
             name_to_boxes_map = self.object_detector.detect(frame, self.deck_roi)
@@ -140,7 +143,7 @@ class RobotVision:
             name_to_boxes_map = self.object_detector.detect(frame)
         print(name_to_boxes_map)
         name_to_slots_boxes_map = self.boxes_map_to_slots_map(name_to_boxes_map, frame)
-        name_to_slots_coordinates_map = self.generate_coordinate_map(name_to_slots_boxes_map, frame)
+        name_to_slots_coordinates_map = self.generate_coordinate_map(name_to_slots_boxes_map, clean_frame)
         print(name_to_slots_boxes_map)
         print(name_to_slots_coordinates_map)
         cv2.imshow("Detected", frame)
@@ -148,7 +151,7 @@ class RobotVision:
 
 if __name__ == "__main__":
     vis = RobotVision()
-    frame = cv2.imread(join(vis.absolute_dir_path, "VisionTestingImages/wellplateB2E1.jpg"))
+    frame = cv2.imread(join(vis.absolute_dir_path, "VisionTestingImages/tiprackB3.jpg"))
     vis.evaluate_deck(frame)
     #print(vis.fine_tune_calibrator.converter.obj_to_robot_mtx)
 

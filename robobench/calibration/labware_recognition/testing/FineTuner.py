@@ -5,6 +5,10 @@ from RobotCoordinateConverter import RobotCoordinateConverter
 
 class FineTuner:
 
+
+    # look in OT code to find measured offsets between wells
+    measurements = {'tiprack-200ul' : {'space' : 9, 'top_width' : 76, 'top_length' : 120, 'welloffset_x' : 6.5, 'welloffset_y' : 10, 'height' : 54}}
+
     def __init__(self, calibration_img):
         # Initialize coordinate converter
         # Assign classes to analysis functions
@@ -35,9 +39,30 @@ class FineTuner:
     def find_tiprack_a1(self, box, image):
         height, width, _ = image.shape
         cropped_image = image[int(box[0] * height - 10):int(box[2] * height + 10), int(width * box[1] - 10):int(width * box[3] + 10)]
+        cropped_height, cropped_width, _ = cropped_image.shape
         frame_to_thresh = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2HSV)
         thresh = cv2.inRange(frame_to_thresh, (58, 67, 0), (78, 255, 255))
+        _, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+        # cv2.drawContours(cropped_image, contours, -1, (0,255,0), 3)
+        for cnt in contours:
+            if cv2.contourArea(cnt) > cropped_height * cropped_width / 2:
+                x,y,w,h = cv2.boundingRect(cnt)
+                # A1 is bottom left
+                bottom_left = (x, y + h)
+                print("Bottom left: {}".format(bottom_left))
+                # Need to pass in pixel values in relation to the entire image
+                tiprack_vals = self.measurements['tiprack-200ul']
+                robot_bottom_left = self.converter.pixelToRobot(bottom_left, self.converter.checkerboard_z + tiprack_vals['height'])
+                print("Robot bottom left: {}".format(robot_bottom_left))
+                robot_a1 =  (robot_bottom_left[0] + tiprack_vals['welloffset_x'], robot_bottom_left[1] + tiprack_vals['welloffset_y'], robot_bottom_left[2])
+                print("Robot a1: {}".format(robot_a1))
+                a1 = self.converter.robotToPixel(robot_a1)
+                print("a1: {}".format(a1))
+                cv2.circle(cropped_image, a1, 3, (255, 0, 0), 2)
+                cv2.rectangle(cropped_image,(x,y),(x+w,y+h),(0,255,0),2)
+
         cv2.imshow("tiprack", thresh)
+        cv2.imshow("cropped image", cropped_image)
         cv2.waitKey(0)
         return None
 
