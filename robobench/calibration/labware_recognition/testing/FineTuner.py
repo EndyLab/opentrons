@@ -24,11 +24,22 @@ class FineTuner:
         Returns:
         	tuple (x, y, z) robot calibration coordinates for object
         '''
-        height, width, _ = image.shape
-        cropped_image = image[int(box[0] * height):int(box[2] * height), int(width * box[1]):int(width * box[3])]
-        cv2.imshow("item", cropped_image)
-        cv2.waitKey(0)
+        if object_type == "tiprack-200ul":
+            coordinates = self.find_tiprack_a1(box, image)
+        # height, width, _ = image.shape
+        # cropped_image = image[int(box[0] * height - 10):int(box[2] * height + 10), int(width * box[1] - 10):int(width * box[3] + 10)]
+        # cv2.imshow("item", cropped_image)
+        # cv2.waitKey(0)
         return 'test'
+
+    def find_tiprack_a1(self, box, image):
+        height, width, _ = image.shape
+        cropped_image = image[int(box[0] * height - 10):int(box[2] * height + 10), int(width * box[1] - 10):int(width * box[3] + 10)]
+        frame_to_thresh = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2HSV)
+        thresh = cv2.inRange(frame_to_thresh, (58, 67, 0), (78, 255, 255))
+        cv2.imshow("tiprack", thresh)
+        cv2.waitKey(0)
+        return None
 
 
 if __name__ == "__main__":
