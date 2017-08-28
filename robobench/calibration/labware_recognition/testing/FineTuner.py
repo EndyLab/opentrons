@@ -2,6 +2,7 @@ import cv2
 from inspect import getsourcefile
 from os.path import abspath, join, dirname
 from RobotCoordinateConverter import RobotCoordinateConverter
+import numpy as np
 
 class FineTuner:
 
@@ -10,7 +11,7 @@ class FineTuner:
     # TODO: remeasure values using robot? Currently assuming robot mm is accurate
     # TODO: measure point values properly
     measurements = {'tiprack-200ul' : {'space' : 9, 'top_width' : 76, 'top_length' : 120, 'welloffset_x' : 6.5, 'welloffset_y' : 11, 'height_green' : 54, 'height_tip' : 64.5},
-                    'WellPlate' : {},
+                    'WellPlate' : {'height' : 14, 'welloffset_x' : 10, 'welloffset_y' : 10, 'length' : 127.33, 'width' : 85},
                     'Trash' : {'height': 50},
                     'Scale' : {'height' : 22},
                     'Trough' : {'height': 20}
@@ -88,7 +89,38 @@ class FineTuner:
 
 
     def find_wellplate_a1(self, box, image):
-        return "Not yet implemented"
+        height, width, _ = image.shape
+        crop_top_left = (int(box[1] * width - 10), int(box[0] * height - 10))
+        cropped_image = image[int(box[0] * height - 10):int(box[2] * height + 10), int(width * box[1] - 10):int(width * box[3] + 10)]
+        cropped_height, cropped_width, _ = cropped_image.shape
+        frame_to_thresh = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2HSV)
+        thresh = cv2.inRange(frame_to_thresh, (0, 0, 165), (255, 255, 255))
+        _, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+        for cnt in contours:
+            if cv2.contourArea(cnt) > cropped_height * cropped_width / 2:
+                rect = cv2.minAreaRect(cnt)
+                print(rect)
+                # print(type(rect))
+                box = cv2.boxPoints(rect)
+                box = np.int0(box)
+                print(box)
+                cv2.drawContours(cropped_image,[box],0,(0,0,255),2)
+                wellplate_vals = self.measurements['WellPlate']
+                # TODO: not guaranteed same ordering, check manually
+                bottom_left = (box[0][0] + crop_top_left[0], box[0][1] + crop_top_left[1])
+                print("Bottom left: {}".format(bottom_left))
+                robot_bottom_left = self.converter.pixelToRobot(bottom_left, self.converter.checkerboard_z)
+                robot_top_right = (robot_bottom_left[0] + wellplate_vals['width'], robot_bottom_left[1] + wellplate_vals['length'], robot_bottom_left[2])
+                print("Robot bottom left: {}".format(robot_bottom_left))
+                print("Robot top right: {}".format(robot_top_right))
+                top_right = self.converter.robotToPixel(robot_top_right)
+                print("Top right: {}".format(top_right))
+                cv2.line(image, bottom_left, top_right, (0, 150, 150), 2)
+
+        cv2.imshow("thresh", thresh)
+        cv2.imshow("cropped image", cropped_image)
+        cv2.waitKey(0)
+        return "Not implemented yet"
 
     def find_point_coordinates(self, object_type, box, image):
         height, width, _ = image.shape
