@@ -38,6 +38,7 @@ class FineTuner:
 
     def find_tiprack_a1(self, box, image):
         height, width, _ = image.shape
+        crop_top_left = (int(box[1] * width - 10), int(box[0] * height - 10))
         cropped_image = image[int(box[0] * height - 10):int(box[2] * height + 10), int(width * box[1] - 10):int(width * box[3] + 10)]
         cropped_height, cropped_width, _ = cropped_image.shape
         frame_to_thresh = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2HSV)
@@ -48,18 +49,25 @@ class FineTuner:
             if cv2.contourArea(cnt) > cropped_height * cropped_width / 2:
                 x,y,w,h = cv2.boundingRect(cnt)
                 # A1 is bottom left
-                bottom_left = (x, y + h)
+                bottom_left = (x + crop_top_left[0], y + h + crop_top_left[1])
                 print("Bottom left: {}".format(bottom_left))
                 # Need to pass in pixel values in relation to the entire image
                 tiprack_vals = self.measurements['tiprack-200ul']
                 robot_bottom_left = self.converter.pixelToRobot(bottom_left, self.converter.checkerboard_z + tiprack_vals['height'])
+                print(robot_bottom_left.shape)
                 print("Robot bottom left: {}".format(robot_bottom_left))
-                robot_a1 =  (robot_bottom_left[0] + tiprack_vals['welloffset_x'], robot_bottom_left[1] + tiprack_vals['welloffset_y'], robot_bottom_left[2])
+                # TODO: make pixelToRobot return tuple
+                robot_a1 =  (robot_bottom_left[0][0] + tiprack_vals['welloffset_x'], robot_bottom_left[1][0] + tiprack_vals['welloffset_y'], robot_bottom_left[2][0])
+                robot_top_left = ((robot_bottom_left[0][0] + tiprack_vals['top_width'], robot_bottom_left[1][0] + tiprack_vals['top_length'], robot_bottom_left[2][0]))
                 print("Robot a1: {}".format(robot_a1))
+                print("Robot top left: {}".format(robot_top_left))
                 a1 = self.converter.robotToPixel(robot_a1)
+                topleft = self.converter.robotToPixel(robot_top_left)
                 print("a1: {}".format(a1))
-                cv2.circle(cropped_image, a1, 3, (255, 0, 0), 2)
-                cv2.rectangle(cropped_image,(x,y),(x+w,y+h),(0,255,0),2)
+                print("topleft: {}".format(topleft))
+                cv2.line(image, bottom_left, topleft, (0, 0, 255), 2)
+                cv2.circle(image, a1, 3, (255, 0, 0), 2)
+                #cv2.rectangle(cropped_image,(x,y),(x+w,y+h),(0,255,0),2)
 
         cv2.imshow("tiprack", thresh)
         cv2.imshow("cropped image", cropped_image)
