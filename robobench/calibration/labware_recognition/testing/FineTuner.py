@@ -7,7 +7,7 @@ class FineTuner:
 
 
     # look in OT code to find measured offsets between wells
-    measurements = {'tiprack-200ul' : {'space' : 9, 'top_width' : 76, 'top_length' : 120, 'welloffset_x' : 6.5, 'welloffset_y' : 10, 'height' : 54}}
+    measurements = {'tiprack-200ul' : {'space' : 9, 'top_width' : 76, 'top_length' : 120, 'welloffset_x' : 6.5, 'welloffset_y' : 11, 'height_green' : 54, 'height_tip' : 64.5}}
 
     def __init__(self, calibration_img):
         # Initialize coordinate converter
@@ -53,11 +53,11 @@ class FineTuner:
                 print("Bottom left: {}".format(bottom_left))
                 # Need to pass in pixel values in relation to the entire image
                 tiprack_vals = self.measurements['tiprack-200ul']
-                robot_bottom_left = self.converter.pixelToRobot(bottom_left, self.converter.checkerboard_z + tiprack_vals['height'])
+                robot_bottom_left = self.converter.pixelToRobot(bottom_left, self.converter.checkerboard_z + tiprack_vals['height_green'])
                 print(robot_bottom_left.shape)
                 print("Robot bottom left: {}".format(robot_bottom_left))
                 # TODO: make pixelToRobot return tuple
-                robot_a1 =  (robot_bottom_left[0][0] + tiprack_vals['welloffset_x'], robot_bottom_left[1][0] + tiprack_vals['welloffset_y'], robot_bottom_left[2][0])
+                robot_a1 =  (robot_bottom_left[0][0] + tiprack_vals['welloffset_x'], robot_bottom_left[1][0] + tiprack_vals['welloffset_y'], self.converter.checkerboard_z + tiprack_vals['height_tip'])
                 robot_top_left = ((robot_bottom_left[0][0] + tiprack_vals['top_width'], robot_bottom_left[1][0] + tiprack_vals['top_length'], robot_bottom_left[2][0]))
                 print("Robot a1: {}".format(robot_a1))
                 print("Robot top left: {}".format(robot_top_left))
