@@ -151,7 +151,7 @@ class RobotVision:
 
 if __name__ == "__main__":
     vis = RobotVision()
-    frame = cv2.imread(join(vis.absolute_dir_path, "VisionTestingImages/tiprackB3.jpg"))
+    frame = cv2.imread(join(vis.absolute_dir_path, "VisionTestingImages/tiprackE3.jpg"))
     vis.evaluate_deck(frame)
     #print(vis.fine_tune_calibrator.converter.obj_to_robot_mtx)
 

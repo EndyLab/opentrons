@@ -6,8 +6,15 @@ from RobotCoordinateConverter import RobotCoordinateConverter
 class FineTuner:
 
 
-    # look in OT code to find measured offsets between wells
-    measurements = {'tiprack-200ul' : {'space' : 9, 'top_width' : 76, 'top_length' : 120, 'welloffset_x' : 6.5, 'welloffset_y' : 11, 'height_green' : 54, 'height_tip' : 64.5}}
+    # TODO: look in OT code to find measured offsets between wells
+    # TODO: remeasure values using robot? Currently assuming robot mm is accurate
+    # TODO: measure point values properly
+    measurements = {'tiprack-200ul' : {'space' : 9, 'top_width' : 76, 'top_length' : 120, 'welloffset_x' : 6.5, 'welloffset_y' : 11, 'height_green' : 54, 'height_tip' : 64.5},
+                    'WellPlate' : {},
+                    'Trash' : {'height': 50},
+                    'Scale' : {'height' : 22},
+                    'Trough' : {'height': 20}
+                    }
 
     def __init__(self, calibration_img):
         # Initialize coordinate converter
@@ -30,11 +37,17 @@ class FineTuner:
         '''
         if object_type == "tiprack-200ul":
             coordinates = self.find_tiprack_a1(box, image)
+        elif object_type == "WellPlate":
+            coordinates = self.find_wellplate_a1(box, image)
+        elif object_type == "Trash" or object_type == "Trough" or object_type == "Scale":
+            coordinates = self.find_point_coordinates(object_type, box, image)
+        else:
+            coordinates = 'Unknown object'
         # height, width, _ = image.shape
         # cropped_image = image[int(box[0] * height - 10):int(box[2] * height + 10), int(width * box[1] - 10):int(width * box[3] + 10)]
         # cv2.imshow("item", cropped_image)
         # cv2.waitKey(0)
-        return 'test'
+        return coordinates
 
     def find_tiprack_a1(self, box, image):
         height, width, _ = image.shape
@@ -46,6 +59,7 @@ class FineTuner:
         _, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
         # cv2.drawContours(cropped_image, contours, -1, (0,255,0), 3)
         for cnt in contours:
+            # TODO: limit to largest contour? Though there should only be 1 this large
             if cv2.contourArea(cnt) > cropped_height * cropped_width / 2:
                 x,y,w,h = cv2.boundingRect(cnt)
                 # A1 is bottom left
@@ -54,11 +68,9 @@ class FineTuner:
                 # Need to pass in pixel values in relation to the entire image
                 tiprack_vals = self.measurements['tiprack-200ul']
                 robot_bottom_left = self.converter.pixelToRobot(bottom_left, self.converter.checkerboard_z + tiprack_vals['height_green'])
-                print(robot_bottom_left.shape)
                 print("Robot bottom left: {}".format(robot_bottom_left))
-                # TODO: make pixelToRobot return tuple
-                robot_a1 =  (robot_bottom_left[0][0] + tiprack_vals['welloffset_x'], robot_bottom_left[1][0] + tiprack_vals['welloffset_y'], self.converter.checkerboard_z + tiprack_vals['height_tip'])
-                robot_top_left = ((robot_bottom_left[0][0] + tiprack_vals['top_width'], robot_bottom_left[1][0] + tiprack_vals['top_length'], robot_bottom_left[2][0]))
+                robot_a1 =  (robot_bottom_left[0] + tiprack_vals['welloffset_x'], robot_bottom_left[1] + tiprack_vals['welloffset_y'], self.converter.checkerboard_z + tiprack_vals['height_tip'])
+                robot_top_left = ((robot_bottom_left[0] + tiprack_vals['top_width'], robot_bottom_left[1] + tiprack_vals['top_length'], robot_bottom_left[2]))
                 print("Robot a1: {}".format(robot_a1))
                 print("Robot top left: {}".format(robot_top_left))
                 a1 = self.converter.robotToPixel(robot_a1)
@@ -72,7 +84,22 @@ class FineTuner:
         cv2.imshow("tiprack", thresh)
         cv2.imshow("cropped image", cropped_image)
         cv2.waitKey(0)
-        return None
+        return robot_a1
+
+
+    def find_wellplate_a1(self, box, image):
+        return "Not yet implemented"
+
+    def find_point_coordinates(self, object_type, box, image):
+        height, width, _ = image.shape
+        midx = int((box[1] + box[3]) * width / 2)
+        midy = int((box[0] + box[2]) * height / 2)
+        robot_point = self.converter.pixelToRobot((midx, midy), self.converter.checkerboard_z + self.measurements[object_type]['height'])
+        print(robot_point)
+        cv2.circle(image, (midx, midy), 3, (120, 120, 0), 2)
+        cv2.imshow("image", image)
+        cv2.waitKey(0)
+        return robot_point
 
 
 if __name__ == "__main__":

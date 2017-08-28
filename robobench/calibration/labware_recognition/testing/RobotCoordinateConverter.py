@@ -181,7 +181,7 @@ class RobotCoordinateConverter:
         pred_robot[2] = robot_z
         print("Prediction: {}".format(pred_robot))
         prediction_tuple = (pred_robot[0][0], pred_robot[1][0], pred_robot[2][0])
-        return pred_robot
+        return prediction_tuple
 
     def robotToPixel(self, robot_coord, round_vals=True):
         '''
@@ -240,6 +240,7 @@ if __name__ == "__main__":
     print("Test inverse")
     #print(converter.object_to_robot_scale)
     print(converter.pixelToRobot(converter.robotToPixel((40, 400, 0), False), 0))
-    print("Test conversion: {}".format(converter.pixelToRobot((312, 158), -46)))
+    print("Test conversion: {}".format(converter.pixelToRobot((500, 495), 0)))
+
     #print(converter.pixelToRobot((308, 149.2), 0))
     #print(converter.pixelToRobot(converter.robotToPixel((40, 400, 0)), 82))
