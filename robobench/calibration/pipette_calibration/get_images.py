@@ -3,7 +3,7 @@ import imutils
 import glob, os
 from datetime import datetime
 
-# takes picture
+# takes picture automatically
 # ----------------
 # port: camera port
 # angle: angle you want screen to be rotated
@@ -23,7 +23,7 @@ def take_pic(port, angle, directory):
     os.chdir(directory)
     cv2.imwrite(name, frame)
 
-
+# takes pictures on key press
 def livestream(port, angle, directory):
     cap = cv2.VideoCapture(port)
     while True:

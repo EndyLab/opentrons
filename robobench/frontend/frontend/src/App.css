@@ -171,6 +171,7 @@ th:first-child {
  	/*background-color: red;*/
 	/*pointer-events: none;*/
 	padding: 0.5em;
+	color: white;
 }
 
 .protocol-card-active {

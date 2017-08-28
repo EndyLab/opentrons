@@ -34,7 +34,7 @@ def check_screen_extraction(dir):
         screen = cv2.imread(file)
 
         # test screen extraction
-        res = snapshot.extract_screen(screen, file)
+        res = screen_processing.extract_screen(screen, file)
         if res == 0:
             success = success + 1
 
@@ -120,7 +120,7 @@ def normalize_screens(dir, aspect_ratio):
         # cv2.waitKey(0)
 
         # write to new folder
-        cv2.imwrite(r"C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/norms/"+file, bradley_thresh)
+        cv2.imwrite(r"C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/flat_camera/norms/"+file, bradley_thresh)
 
 # optimize sliding window
 # once you find the first digit, offset to find the next
@@ -384,36 +384,37 @@ def read_scale(img):
     return to_vol_measurement(extract_digits(img), 3)
 
 if __name__ == '__main__':
-    img_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/screen" 
-    screen_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/crops"
-    normed_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/norms"
+    img_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/flat_camera/screen_train" 
+    screen_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/flat_camera/crops"
+    normed_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/flat_camera/norms"
     
     # load img digit key from json file
     os.chdir(img_dir)
     with open('key.json') as json_data:
         key = json.load(json_data)
   
-    # # check_screen_extraction(img_dir)
-    # w, h = get_screen_info(screen_dir)
-    # aspect = float(w/h)
+    check_screen_extraction(img_dir)
+    # # w, h = get_screen_info(screen_dir)
+    # # aspect = float(w/h)
     # # print(aspect)
+    # aspect = 2.627450980392157
 
     # normalize_screens(screen_dir, aspect)
-    os.chdir(normed_dir)
-    success = 0
-    total = 0
-    for file in glob.glob('*.jpg'):
-        img = cv2.imread(file)
-        # img = cv2.imread('screen2017-08-04_249038.jpg')
-        # cv2.imshow('orig', img)
-        # extract_digits(img)
-        results = read_scale(img)
-        print('expected:',key[file],'got:',results)
-        if key[file] == str(results):
-            success += 1
-        total += 1
+    # os.chdir(normed_dir)
+    # success = 0
+    # total = 0
+    # for file in glob.glob('*.jpg'):
+    #     img = cv2.imread(file)
+    #     # img = cv2.imread('screen2017-08-04_249038.jpg')
+    #     # cv2.imshow('orig', img)
+    #     # extract_digits(img)
+    #     results = read_scale(img)
+    #     print('expected:',key[file],'got:',results)
+    #     if key[file] == str(results):
+    #         success += 1
+    #     total += 1
         
-    print('success rate:', float(success/total))
+    # # print('success rate:', float(success/total))
 
 
 
