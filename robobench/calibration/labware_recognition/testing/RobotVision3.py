@@ -24,16 +24,16 @@ class RobotVision:
         self.deck_roi = []
         # TODO: remove, for testing
         #frame = cv2.imread(join(self.absolute_dir_path,'../calibration/checkerboard_images/img21.jpg'))
-        path = join(self.absolute_dir_path, "VisionTestingImages/checkerboardimg1")
+        path = join(self.absolute_dir_path, "VisionTestingImages/checkerboardimg4")
         print(path)
-        frame = cv2.imread(join(self.absolute_dir_path, "VisionTestingImages/checkerboardimg3.jpg"))
+        frame = cv2.imread(join(self.absolute_dir_path, "VisionTestingImages/checkerboardimg4.jpg"))
         # self.select_deck_roi(frame)
         self.deck_dimensions = (5, 3)
         self.resize_width = 1000
         # _, frame = self.camera.read()
         # frame = imutils.resize(frame, width=self.resize_width)
         self.select_deck_roi(frame)
-        #self.deck_roi = [(207, 76), (795, 539)]
+        # self.deck_roi = [(244, 102), (775, 512)] # [(207, 76), (795, 539)] checkerboard img 3
         self.fine_tune_calibrator = FineTuner.FineTuner(frame)
 
 
