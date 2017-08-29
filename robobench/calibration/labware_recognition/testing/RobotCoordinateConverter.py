@@ -43,7 +43,8 @@ class RobotCoordinateConverter:
 
     def getRobotPoints(self):
         # return ((40, 400), (202, 400), (40,292), -82)
-        return ((46, 390), (204, 390), (47.5, 285), -46)
+        # return ((46, 390), (204, 390), (47.5, 285), -46)
+        return ((40, 400), (199, 400), (40, 296), -43)
 
     def calibrateRobotTransformation(self, robot_points):
         '''
@@ -219,24 +220,24 @@ class RobotCoordinateConverter:
 if __name__ == "__main__":
     converter = RobotCoordinateConverter()
     # img = cv2.imread('../calibration/checkerboard_images/img21.jpg')
-    img = cv2.imread('VisionTestingImages/checkerboardimg1.jpg')
+    img = cv2.imread('VisionTestingImages/checkerboardimg3.jpg')
     converter.calibrate(img)
     print(converter.robot_to_obj_mtx)
     print(converter.obj_to_robot_mtx)
-    # for i in range(-5, 20):
-    #     for j in range(-5, 20):
-    #         # Should be able to have one as the argument for the other
-    #         space = converter.object_to_robot_scale
-    #         p1 = converter.robotToPixel((40 + space * i, 400 - space * j, converter.checkerboard_z))
-    #         p2 = converter.robotToPixel((40 + space * i, 400 - space * j, 8))
-    #         p3 = converter.robotToPixel((40 + space * (i + 1), 400 - space * j, 8))
-    #         p4 = converter.robotToPixel((40 + space * i, 400 - space * (j + 1), 8))
-    #         print("p1: {}".format(p1))
-    #         cv2.line(img, p1, p2, ((5 * i + 100) % 255, 0, (5 * j + 150) % 255), 3)
-    #         cv2.line(img, p2, p3, ((5 * i + 100) % 255, 0, (5 * j + 150) % 255), 3)
-    #         cv2.line(img, p2, p4, ((5 * i + 100) % 255, 0, (5 * j + 150) % 255), 3)
-    # cv2.imshow("img", img)
-    # cv2.waitKey(0)
+    for i in range(-5, 20):
+        for j in range(-5, 20):
+            # Should be able to have one as the argument for the other
+            space = converter.object_to_robot_scale
+            p1 = converter.robotToPixel((40 + space * i, 400 - space * j, converter.checkerboard_z))
+            p2 = converter.robotToPixel((40 + space * i, 400 - space * j, 8))
+            p3 = converter.robotToPixel((40 + space * (i + 1), 400 - space * j, 8))
+            p4 = converter.robotToPixel((40 + space * i, 400 - space * (j + 1), 8))
+            print("p1: {}".format(p1))
+            cv2.line(img, p1, p2, ((5 * i + 100) % 255, 0, (5 * j + 150) % 255), 3)
+            cv2.line(img, p2, p3, ((5 * i + 100) % 255, 0, (5 * j + 150) % 255), 3)
+            cv2.line(img, p2, p4, ((5 * i + 100) % 255, 0, (5 * j + 150) % 255), 3)
+    cv2.imshow("img", img)
+    cv2.waitKey(0)
     print("Test inverse")
     #print(converter.object_to_robot_scale)
     print(converter.pixelToRobot(converter.robotToPixel((40, 400, 0), False), 0))
