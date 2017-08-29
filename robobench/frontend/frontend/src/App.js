@@ -96,35 +96,35 @@ class Grid extends Component {
     var ret = {}
 
     var data = this.state.labware_data
-    console.log("labware data", data)
+    // console.log("labware data", data)
 
     var labwareList = Object.keys(data)
     labwareList.forEach((item) => {
-      console.log("item", item)
+      // console.log("item", item)
       var item_instances = data[item]
-      console.log("item instances:", item_instances)
+      // console.log("item instances:", item_instances)
 
       item_instances.forEach((instance) => {
         var slot = instance[0]
-        console.log("slot", slot)
-        ret[slot] = item
+        var coords = instance[1]
+        // console.log("slot", slot)
+        ret[slot] = [item, coords]
       })
     })
 
-    console.log("labware data", ret)
+    // console.log("labware data", ret)
     this.setState({ labware: ret})
   }
 
-  // integrates with vision code
+  // gets labware info in realtime
   refresh() {
     fetch(SERVER + '/grid')
       .then((response) => response.json())
       .then((json) => {
-        console.log("BACKEND RET:", json)
+        // console.log("BACKEND RET:", json)
         this.setState(json)
 
         this.extract_labware_slots()
-
       })
   }
 
@@ -202,7 +202,7 @@ class Grid extends Component {
     Object.keys(this.state.labware).forEach((key) => {
       // console.log(key + ": " + this.state.labware[key]);
 
-      if (this.state.labware[key] == 'WellPlate') {
+      if (this.state.labware[key][0] == 'WellPlate') {
         var mode = 'none'
         if (this.state.source == key) mode = 'source'
         else if (this.state.dest == key) mode = 'dest'
@@ -213,10 +213,10 @@ class Grid extends Component {
 
         grid[key] = <WellPlate callback={this.wellPlate_callback} key={key} mode={mode} model={model} updateModel={(model) => this.updateModel(key, model)}/>;
       }
-      else if (this.state.labware[key] == 'Trash') grid[key] = <img src="trash.svg" width="50px"/>;
-      else if (this.state.labware[key] == 'Scale') grid[key] = <img src="scale.svg" width="80px"/>;
-      else if (this.state.labware[key] == 'TipRack') grid[key] = <TipRack callback={this.tiprack_callback}/>;
-      else if (this.state.labware[key] == 'Water') grid[key] = <img src="water.svg" width="50px"/>;
+      else if (this.state.labware[key][0] == 'Trash') grid[key] = <img src="trash.svg" width="50px"/>;
+      else if (this.state.labware[key][0] == 'Scale') grid[key] = <img src="scale.svg" width="80px"/>;
+      else if (this.state.labware[key][0] == 'TipRack') grid[key] = <TipRack callback={this.tiprack_callback}/>;
+      else if (this.state.labware[key][0] == 'Water') grid[key] = <img src="water.svg" width="50px"/>;
     })
 
     return (
@@ -270,20 +270,20 @@ class ProtocolCard extends Component {
   constructor(props) {
     super(props);
 
-    this.hoverEvent = this.hoverEvent.bind(this);
+    // this.hoverEvent = this.hoverEvent.bind(this);
   }
 
-  hoverEvent() {
-    this.setState({hover_flag: !this.state.hover_flag})
-  }
+  // hoverEvent() {
+  //   this.setState({hover_flag: !this.state.hover_flag})
+  // }
 
   render() {
     var keys = Object.keys(this.props.protocol_data)
 
     // TODO: highlight selected wells/labware on hover in protocol card
-    if (this.state.hover_flag) {
+    // if (this.state.hover_flag) {
 
-    }
+    // }
 
     // dont display protocol field since the lit heading is already the protocol
     var index = keys.indexOf('protocol');
@@ -505,23 +505,28 @@ class App extends Component {
         source: {
           labware: 'WellPlate',
           slot: this.grid.state.source,
-          wells: sourceWells
+          wells: sourceWells,
+          coords: this.grid.state.labware[this.grid.state.source][1]
         },
         dest: {
           labware: 'WellPlate',
           slot: this.grid.state.dest,
-          wells: destWells
+          wells: destWells,
+          coords: this.grid.state.labware[this.grid.state.dest][1]
         }, 
         tiprack: {
           labware: 'TipRack',
           slot: this.grid.state.tiprack_selected,
+          coords: this.grid.state.labware[this.grid.state.tiprack_selected][1]
         }
       };
 
     return user_data;
   }
+
   runRobot() {
     var user_data = this.getData()
+    console.log("USER DATA", user_data)
     this.setState(
       { running: true },
     )

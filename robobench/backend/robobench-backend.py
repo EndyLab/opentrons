@@ -1,4 +1,4 @@
-from protocols import web_transfer
+from protocols import web_transfer1
 from flask import Flask, jsonify, request
 from flask_cors import CORS, cross_origin
 import sys
@@ -30,6 +30,7 @@ def hardcode():
 def hardcode_vision():
     return {
         'WellPlate' : [('A1', (30, 30, 20)), ('B2', (100, 20, 0))],
+        'TipRack' : [ ('A2', (23, 45, 10))],
     }
 def get_labware():
     # global get_labware_count, name_to_slot_coord_dict
@@ -40,14 +41,7 @@ def get_labware():
     # print(name_to_slot_coord_dict)
     # get_labware_count = get_labware_count + 1
     # return name_to_slot_coord_dict
-    # ret = {}
-    # objectDict = name_to_slot_coord_dict
-    # labwareList = objectDict.keys()
-    # for labware in labwareList:
-    #     for data in objectDict[labware]:
-    #         ret.update({data[0] : labware})
 
-    # return ret
 
     # TESTING 
     # return hardcode()
@@ -73,14 +67,16 @@ SAMPLE = {
     'source': {
         'labware': 'WellPlate', 
         'wells': ['E11'], 
-        'slot': 'A1'
+        'slot': 'A1',
+        'coords': [1,2,3]
     }, 
     'parameters': {'volume': '78'}, 
     'protocol': 'transfer', 
     'dest': {
         'labware': 'WellPlate', 
         'wells': ['C8'], 
-        'slot': 'C1'
+        'slot': 'C1',
+        'coords': [1,2,3]
     }, 
     'tiprack': {'labware': 'TipRack'}
 }
@@ -91,8 +87,8 @@ def run_lambda_protocol(data):
     volume = data['parameters']['volume']
 
     protocolDict = {
-        'transfer': lambda: web_transfer(data['source'], data['dest'], volume),
-        'dilution': lambda: web_transfer(data['source'], data['dest'], volume),
+        'transfer': lambda: web_transfer1(data),
+        'dilution': lambda: web_transfer1(data),
     }
     protocolDict[protocol_name]()
 
@@ -101,7 +97,7 @@ def run():
     print("Run pressed")
     # return response
     data = request.get_json()
-    print("DATA:", data)
+    # print("DATA:", data)
 
     # check that same number of wells are selected
     # if len(data['source']['wells']) != len(data['dest']['wells']):
@@ -116,7 +112,7 @@ def run():
     #     # temp = lambda: web_transfer(data['source'], data['dest'], data['volume'])
     #     LAMBDA_QUEUE.append(data)
 
-    print("protocol LIST: ", LAMBDA_QUEUE)
+    # print("protocol LIST: ", LAMBDA_QUEUE)
     run_lambda_protocol(data)
 
     response = jsonify({
@@ -131,7 +127,7 @@ def record():
     data = request.get_json()
     global RECORD
     RECORD = data['record']
-    print(data, RECORD)
+    # print(data, RECORD)
 
     response = jsonify({
         'status': 'ok'
@@ -151,7 +147,7 @@ def record_save():
 
     # gets protocol data from frontend
     data = request.get_json()
-    print(data)
+    # print(data)
     # global RECORD
     # if RECORD == True:
     # temp = lambda: web_transfer(data['source'], data['dest'], data['volume'])
@@ -182,7 +178,7 @@ def record_run():
 @app.route('/record/show')
 def record_show():
     print("hi showing recording functions")
-    print(LAMBDA_QUEUE)
+    # print(LAMBDA_QUEUE)
     
     response = jsonify({
         # 'status': 'ok',
@@ -211,7 +207,7 @@ def record_update():
     LAMBDA_QUEUE = data
 
     print("UPDATING LAMBDAS")
-    print(data)
+    # print(data)
     response = jsonify({
         # 'status': 'ok',
         'lambdas': LAMBDA_QUEUE

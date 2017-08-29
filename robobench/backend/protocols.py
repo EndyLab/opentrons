@@ -21,7 +21,7 @@ def get_coords():
     # print("robot coords are: x= ",pos.x, " y= ", pos.y, " z= ", pos.z, sep='')
     return pos
 
-def calibrateToSlot(item_type, name, slot, instrument):
+def calibrateToSlot(item_type, name, slot, coords, instrument):
 	# data for eppendorf pipette
 	pos_dict =	{	
 		'A1':{'96-flat':(23, 36, -50)},
@@ -48,7 +48,7 @@ def calibrateToSlot(item_type, name, slot, instrument):
 	rel_pos = curr_container[0].from_center(x=0, y=0, z=-1, reference=curr_container)
 	# print(rel_pos)
 	# print(pos_dict[slot][item_type])
-	instrument.calibrate_position((curr_container, rel_pos), pos_dict[slot][item_type])
+	instrument.calibrate_position((curr_container, rel_pos), coords)
 	return curr_container
 
 """
@@ -62,76 +62,102 @@ def calibrateToSlot(item_type, name, slot, instrument):
 	96-flate the pipette gets its tips from
 	water: where the water is 
 """
-labwareDict =	{
-	'WellPlate': '96-flat',
+
+#  example data from website
+SAMPLE = {
+    'source': {
+        'labware': 'WellPlate', 
+        'wells': ['E11'], 
+        'slot': 'A1',
+        'coords': [1,2,3]
+    }, 
+    'parameters': {'volume': '78'}, 
+    'protocol': 'transfer', 
+    'dest': {
+        'labware': 'WellPlate', 
+        'wells': ['C8'], 
+        'slot': 'C1',
+        'coords': [1,2,3]
+    }, 
+    'tiprack': {'labware': 'TipRack'}
 }
 
-def transfer(pipette, source_data, dest_data, wells, vol):
-	"""
-	source = calibrateToSlot(labwareDict[source_data['labware']], 'source', source_data['slot'], pipette)
-	dest = calibrateToSlot(labwareDict[dest_data['labware']], 'dest', dest_data['slot'], pipette)
 
-	# wells will be in form {source, dest}
-	# determine type of transfer
-	source_wells = wells.keys()
-	dest_wells = wells.values()
+#  data is a dict in the form of SAMPLE
+labwareDict =	{
+	'WellPlate': '96-flat',
+	'TipRack': 'tiprack-200ul',
+}
 
-	# 1:1 transfer
-	if len(source_wells) == len(dest_wells):
-		print("1 to 1 transfer")
-		for key, value in wells.items(): 
-			# aspirate from source
-			pipette.aspirate(vol, source.wells(key))
+def web_transfer1(data):
+	opentrons_connect()
+	robot.home('xyzab')
 
-			# dispense to dest
-			pipette.dispense(dest.wells(value))
+	#  calibrate pipette
+	p200 = instruments.Pipette(axis='b', max_volume=200)
+	p200.calibrate_plunger(top=3, bottom=18, blow_out=18, drop_tip=18)
+	p200.update_calibrations()
 
-	# 1:many aka distribute transfer
-	elif len(source) == 1 and len(dest) > 1:
-		print("1 to many transfer aka distribute")
-		tiprack = containers.load('tiprack-200ul', 'A1')
-		trash = containers.load('point', 'D2')
-		pipette.distribute(vol, source.wells(source_wells[0]), dest.wells(dest_wells))
+	# calibrate labware
+	tiprack = calibrateToSlot(labwareDict[data['tiprack']['labware']], 'tiprack', data['tiprack']['slot'], data['tiprack']['coords'], p200)
+	source = calibrateToSlot(labwareDict[data['source']['labware']], 'source', data['source']['slot'], data['source']['coords'], p200)
+	dest = calibrateToSlot(labwareDict[data['dest']['labware']], 'dest', data['dest']['slot'], data['dest']['coords'], p200)
+	print("type labware", type(source))
+	# the actual transfer
+	source_wells = data['source']['wells']
+	dest_wells = data['dest']['wells']
+	vol = data['parameters']['volume']
+	print("volume: ", vol)
+	print("source", source_wells)
+	print("dest", dest_wells)
 
-	# many:1 aka consolidate transfer
-	elif len(source) > 1 and len(dest) == 1:
-		print("many to 1 transfer aka consolidate")
-		tiprack = containers.load('tiprack-200ul', 'A1')
-		trash = containers.load('point', 'D2')
-		pipette.consolidate(vol,  source.wells(source_wells), dest.wells(dest_wells))
+	# make well dictionary
+	wells = {}
+	for source_well, dest_well in zip(source_wells, dest_wells):
+		wells.update({source_well: dest_well})
+	print("wells", wells)
 
-	# print("tranfer called")
-	# # source = calibrateToSlot(source_data['labware'], 'source', source_data['slot'], pipette)
-	# # dest = calibrateToSlot(dest_data['labware'], 'dest', dest_data['slot'], pipette)
-	# source = calibrateToSlot('96-flat', 'source', source_data['slot'], pipette)
-	# dest = calibrateToSlot('96-flat', 'dest', dest_data['slot'], pipette)
-	# print("source/dest processed")
-	# print(pipette)
-
-	# # wells will be in form {source, dest}
-	# for key, value in wells.items(): 
-	# 	# aspirate from source
-	# 	pipette.aspirate(vol, source.wells(key))
-	# 	print("aspirate")
-
-	# 	# dispense to dest
-	# 	pipette.dispense(dest.wells(value))
-	# 	print("dispense")
-	"""
-	print("transfer called")
-	source = calibrateToSlot(labwareDict[source_data['labware']], 'source', source_data['slot'], pipette)
-	dest = calibrateToSlot(labwareDict[dest_data['labware']], 'dest', dest_data['slot'], pipette)
-	print("source dest configured")
-
-	# wells will be in form {source, dest}
 	print("starting transfers")
 	for key, value in wells.items(): 
-		# aspirate from source
-		pipette.aspirate(vol, source.wells(key))
+		p200.aspirate(vol, source.wells(key))
+		p200.dispense(dest.wells(value))
 
-		# dispense to dest
-		pipette.dispense(dest.wells(value))
 	print("finished transfers")
+
+	# somehow the opentrons transfer functions calls an error???!!
+	# since demo is tomorrow, easier to make my own dumb transfer functionf or now
+	# p200.transfer(vol, source.wells(source_wells), dest.wells(dest_wells))
+
+	print("transfer done!")
+
+	robot.home('xyzab')
+	robot.disconnect()
+
+# def transfer(pipette, source, dest, wells, vol, tiprack):
+# 	print("starting transfers")
+# 	for key, value in wells.items(): 
+# 		# aspirate from source
+# 		pipette.aspirate(vol, source.wells(key))
+
+# 		# dispense to dest
+# 		pipette.dispense(dest.wells(value))
+# 	print("finished transfers")
+
+# def transfer(pipette, source_data, dest_data, wells, vol):
+# 	print("transfer called")
+# 	source = calibrateToSlot(labwareDict[source_data['labware']], 'source', source_data['slot'], pipette)
+# 	dest = calibrateToSlot(labwareDict[dest_data['labware']], 'dest', dest_data['slot'], pipette)
+# 	print("source dest configured")
+
+# 	# wells will be in form {source, dest}
+# 	print("starting transfers")
+# 	for key, value in wells.items(): 
+# 		# aspirate from source
+# 		pipette.aspirate(vol, source.wells(key))
+
+# 		# dispense to dest
+# 		pipette.dispense(dest.wells(value))
+# 	print("finished transfers")
 
 
 # connects to robot automatrically and homes it and instantiates pipette
