@@ -70,6 +70,7 @@ class Grid extends Component {
     super(props);
 
     this.state = {
+      labware_data: {},
       labware: {},
       models: {},
       tiprack_selected: null,
@@ -80,6 +81,7 @@ class Grid extends Component {
     this.tiprack_callback = this.tiprack_callback.bind(this)
     this.wellPlate_callback = this.wellPlate_callback.bind(this)
     this.handle_wellplates = this.handle_wellplates.bind(this)
+    this.extract_labware_slots = this.extract_labware_slots.bind(this)
   }
 
   componentDidMount() {
@@ -89,10 +91,41 @@ class Grid extends Component {
     )
   }
 
+  // get slot: labware dict from labware_data 
+  extract_labware_slots() {
+    var ret = {}
+
+    var data = this.state.labware_data
+    console.log("labware data", data)
+
+    var labwareList = Object.keys(data)
+    labwareList.forEach((item) => {
+      console.log("item", item)
+      var item_instances = data[item]
+      console.log("item instances:", item_instances)
+
+      item_instances.forEach((instance) => {
+        var slot = instance[0]
+        console.log("slot", slot)
+        ret[slot] = item
+      })
+    })
+
+    console.log("labware data", ret)
+    this.setState({ labware: ret})
+  }
+
+  // integrates with vision code
   refresh() {
     fetch(SERVER + '/grid')
       .then((response) => response.json())
-      .then((json) => this.setState(json))
+      .then((json) => {
+        console.log("BACKEND RET:", json)
+        this.setState(json)
+
+        this.extract_labware_slots()
+
+      })
   }
 
   componentWillUnmount() {
