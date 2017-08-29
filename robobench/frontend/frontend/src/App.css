@@ -44,6 +44,7 @@ th:first-child {
 #grid td {
 	width: 15%;
   text-align: center;
+  
 }
 
 .labware-tiprack-96 {
@@ -74,6 +75,7 @@ th:first-child {
 	display: inline-block;
 	border: 1px solid #C4C4C4;
 	padding: 2px;
+	z-index: 2;
 }
 
 .labware-well-96 .well {
@@ -111,6 +113,10 @@ th:first-child {
 }
 
 .circle:hover {
+	background-color: lime;
+}
+
+.circle-selected {
 	background-color: lime;
 }
 

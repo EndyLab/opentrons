@@ -236,10 +236,21 @@ class Grid extends Component {
 class ProtocolCard extends Component {
   constructor(props) {
     super(props);
+
+    this.hoverEvent = this.hoverEvent.bind(this);
+  }
+
+  hoverEvent() {
+    this.setState({hover_flag: !this.state.hover_flag})
   }
 
   render() {
     var keys = Object.keys(this.props.protocol_data)
+
+    // TODO: highlight selected wells/labware on hover in protocol card
+    if (this.state.hover_flag) {
+
+    }
 
     // dont display protocol field since the lit heading is already the protocol
     var index = keys.indexOf('protocol');
@@ -251,7 +262,15 @@ class ProtocolCard extends Component {
     //   keys.splice(index, 1);
     // }
 
-    var paramsList = keys.map((key, id) => <li className={key} key={id}><b>{key}:</b> {JSON.stringify(this.props.protocol_data[key])}</li>);
+    var paramsList = keys.map((key, id) => <li 
+                                              className={key} 
+                                              key={id} 
+                                              onMouseEnter={this.hoverEvent} 
+                                              onMouseLeave={this.hoverEvent} 
+                                            >
+                                              <b>{key}:</b> {JSON.stringify(this.props.protocol_data[key])}
+                                            </li>
+                                );
     
     console.log("keys of protocol data")
     console.log(keys)
@@ -288,9 +307,9 @@ class ProtocolItem extends Component {
           'background': '#90A4AE'
           // 'background' : '#78909C'
       };
-      if (this.props.isSelected || this.state.hover_flag) {
-          protocol_list_style['background'] = '#546E7A';
-      }
+    if (this.props.isSelected || this.state.hover_flag) {
+        protocol_list_style['background'] = '#546E7A';
+    }
     return (
       <li  className={this.props.isSelected == true ? "protocol-card-active" : ""}>
         <div 
