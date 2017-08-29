@@ -118,6 +118,7 @@ def web_transfer1(data):
 	print("wells", wells)
 
 	print("starting transfers")
+	p200.pick_up_tip(tiprack.wells('A1'))
 	for key, value in wells.items(): 
 		p200.aspirate(vol, source.wells(key))
 		p200.dispense(dest.wells(value))
