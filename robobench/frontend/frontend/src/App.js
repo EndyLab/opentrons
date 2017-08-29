@@ -21,11 +21,11 @@ class TipRack extends Labware {
   }
 
   render() {
-    const wells = ["A","B","C","D","E","F","G","H"].map((id) => <td key={id} onClick={this.props.tiprackCallback} className='tip'><div className='circle'></div></td>);
+    const wells = ["A","B","C","D","E","F","G","H"].map((id) => <td key={id} onClick={this.props.callback} className='tip'><div className='circle'></div></td>);
     const rows = [12,11,10,9,8,7,6,5,4,3,2,1].map((id) => <tr key={id}>{wells}</tr>);
 
     return (
-      <div className="labware-tiprack-96" id={this.props.id_string}>
+      <div className="labware-tiprack-96">
         <table>
           <tbody>
             {rows}
@@ -46,7 +46,7 @@ class WellPlate extends Labware {
   }
 
   render() {
-    const wells = ["A","B","C","D","E","F","G","H"].map((id) => <td key={id} className='well'><div className='circle'></div></td>);
+    const wells = ["A","B","C","D","E","F","G","H"].map((id) => <td key={id} onClick={this.props.callback} className='well'><div className='circle'></div></td>);
     const rows = [12,11,10,9,8,7,6,5,4,3,2,1].map((id) => <tr key={id}>{wells}</tr>);
 
     return (
@@ -66,7 +66,11 @@ class Grid extends Component {
     this.state = {
       labware: {},
       models: {},
+      tiprack_selected: null,
     }
+
+    this.tiprack_callback = this.tiprack_callback.bind(this)
+    this.wellPlate_callback = this.wellPlate_callback.bind(this)
   }
 
   componentDidMount() {
@@ -102,6 +106,21 @@ class Grid extends Component {
     }
   }
 
+  // triggered by user clicking on tiprack
+  tiprack_callback(event) {
+    // gets the slot of the tiprack
+    var tiprack_slot = event.target.parentNode.parentNode.parentNode.parentNode.parentNode.id
+    console.log("TIPRACK CLICKED!!!", tiprack_slot)
+    this.setState({ tiprack_selected: tiprack_slot})
+  }
+
+  //  arbitrarty selection of srouce and dest wellplates
+  wellPlate_callback(event) {
+    // get the slot of the wellplate clicked
+    var wellPlate_slot = event.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.id
+    console.log("WELLPLATE CLICKED!!", wellPlate_slot)
+  }
+
   render() {
     var grid = {
         'A1': '',
@@ -133,12 +152,12 @@ class Grid extends Component {
         if (key in this.state.models) model = this.state.models[key];
         else model = new TableDragSelect.Model(12, 8);
 
-        grid[key] = <WellPlate id={key} key={key} mode={mode} model={model} updateModel={(model) => this.updateModel(key, model)}/>;
+        grid[key] = <WellPlate callback={this.wellPlate_callback} key={key} mode={mode} model={model} updateModel={(model) => this.updateModel(key, model)}/>;
       }
-      else if (this.state.labware[key] == 'Trash') grid[key] = <img src="trash.svg" width="50px" id={key}/>;
-      else if (this.state.labware[key] == 'Scale') grid[key] = <img src="scale.svg" width="80px" id={key}/>;
-      else if (this.state.labware[key] == 'TipRack') grid[key] = <TipRack tiprackCallback={this.props.tiprackCallback} id_string={key}/>;
-      else if (this.state.labware[key] == 'Water') grid[key] = <img src="water.svg" width="50px" id={key}/>;
+      else if (this.state.labware[key] == 'Trash') grid[key] = <img src="trash.svg" width="50px"/>;
+      else if (this.state.labware[key] == 'Scale') grid[key] = <img src="scale.svg" width="80px"/>;
+      else if (this.state.labware[key] == 'TipRack') grid[key] = <TipRack callback={this.tiprack_callback}/>;
+      else if (this.state.labware[key] == 'Water') grid[key] = <img src="water.svg" width="50px"/>;
     })
 
     return (
@@ -156,27 +175,27 @@ class Grid extends Component {
           <tbody>
             <tr>
               <th scope="row">3</th>
-              <td>{grid['A3']}</td>
-              <td>{grid['B3']}</td>
-              <td>{grid['C3']}</td>
-              <td>{grid['D3']}</td>
-              <td>{grid['E3']}</td>
+              <td id='A3'>{grid['A3']}</td>
+              <td id='B3'>{grid['B3']}</td>
+              <td id='C3'>{grid['C3']}</td>
+              <td id='D3'>{grid['D3']}</td>
+              <td id='E3'>{grid['E3']}</td>
             </tr>
             <tr>
               <th scope="row">2</th>
-              <td>{grid['A2']}</td>
-              <td>{grid['B2']}</td>
-              <td>{grid['C2']}</td>
-              <td>{grid['D2']}</td>
-              <td>{grid['E2']}</td>
+              <td id='A2'>{grid['A2']}</td>
+              <td id='B2'>{grid['B2']}</td>
+              <td id='C2'>{grid['C2']}</td>
+              <td id='D2'>{grid['D2']}</td>
+              <td id='E2'>{grid['E2']}</td>
             </tr>
             <tr>
               <th scope="row">1</th>
-              <td>{grid['A1']}</td>
-              <td>{grid['B1']}</td>
-              <td>{grid['C1']}</td>
-              <td>{grid['D1']}</td>
-              <td>{grid['E1']}</td>
+              <td id='A1'>{grid['A1']}</td>
+              <td id='B1'>{grid['B1']}</td>
+              <td id='C1'>{grid['C1']}</td>
+              <td id='D1'>{grid['D1']}</td>
+              <td id='E1'>{grid['E1']}</td>
             </tr>
           </tbody>
         </table>
@@ -348,17 +367,7 @@ class App extends Component {
     this.getData = this.getData.bind(this);
     this.deleteProtocol = this.deleteProtocol.bind(this);
     this.updateLambdas = this.updateLambdas.bind(this);
-    this.tiprackCallback = this.tiprackCallback.bind(this);
     this.protocolButtonClick = this.protocolButtonClick.bind(this);
-  }
-
-  // triggered by user clicking on tiprack
-  tiprackCallback(event) {
-    // gets the slot of the tiprack
-    console.log("TIPRACK CLICKED!!!", event.target.parentNode.parentNode.parentNode.parentNode.id)
-
-    // sets this as the tiprack for the protocol
-
   }
 
   deleteProtocol(event) {
@@ -427,7 +436,7 @@ class App extends Component {
         }, 
         tiprack: {
           labware: 'TipRack',
-          slot: this.grid.state.tiprack,
+          slot: this.grid.state.tiprack_selected,
         }
       };
 
@@ -474,6 +483,7 @@ class App extends Component {
 
   // handles when protocol button
   protocolButtonClick(event) {
+    console.log("lambdas",this.state.lambdas)
     console.log("protocol BUTTON boolean:", this.state.protocol_button_clicked)
     var ret = event.target.id
     console.log(ret)
@@ -501,6 +511,7 @@ class App extends Component {
     this.setState({ source: null });
     this.setState({ dest: null });
     this.setState({ protocol: null });
+    this.grid.setState({ tiprack_selected: null})
   }
 
   //  clears the protocol list
@@ -510,7 +521,7 @@ class App extends Component {
       .then((response) => response.json())
       .then((json) => this.setState(json))
     console.log("clear button hit")
-    console.log(this.state.lambdas)
+    // console.log(this.state.lambdas)
   }
 
 
@@ -541,7 +552,7 @@ class App extends Component {
       .then((response) => response.json())
       .then((json) => this.setState(json))
     console.log("show button hit")
-    console.log(this.state.lambdas)
+    // console.log(this.state.lambdas)
   }
 
   recordHide() {
@@ -657,7 +668,7 @@ class App extends Component {
 
         {/* deck grid */}
           <div className="col-sm-10 fill">
-            <Grid tiprackCallback={this.tiprackCallback} ref={(grid) => { this.grid = grid }} />
+            <Grid ref={(grid) => { this.grid = grid }} />
           </div>
         </div>
     );
