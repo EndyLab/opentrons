@@ -113,7 +113,7 @@ class RobotVision:
             position_list = []
             for slot_box in slot_boxes:
                 calibration_coordinates = self.fine_tune_calibrator.get_calibration_coordinates(name, slot_box[1], frame)
-                position_list.append((slot_box[1], calibration_coordinates))
+                position_list.append((slot_box[0], calibration_coordinates))
             name_to_slots_coordinates_map[name] = position_list
 
         return name_to_slots_coordinates_map
@@ -145,9 +145,10 @@ class RobotVision:
         name_to_slots_boxes_map = self.boxes_map_to_slots_map(name_to_boxes_map, frame)
         name_to_slots_coordinates_map = self.generate_coordinate_map(name_to_slots_boxes_map, clean_frame)
         print(name_to_slots_boxes_map)
-        print(name_to_slots_coordinates_map)
+        print("Name to slots coordinates map: {}".format(name_to_slots_coordinates_map))
         cv2.imshow("Detected", frame)
         cv2.waitKey(0)
+        return name_to_slots_coordinates_map
 
 if __name__ == "__main__":
     vis = RobotVision()
