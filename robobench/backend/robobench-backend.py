@@ -18,6 +18,13 @@ slot_to_name_dict = {}
 LAMBDA_QUEUE = []
 RECORD = False
 
+def hardcode():
+    return {
+        'A1':'WellPlate',
+        'C1':'WellPlate',
+        'C3': 'TipRack',
+    }
+
 def get_labware():
     # global get_labware_count, slot_to_name_dict
     # if get_labware_count % 30 == 0:
@@ -27,12 +34,15 @@ def get_labware():
     # print(slot_to_name_dict)
     # get_labware_count = get_labware_count + 1
     # return slot_to_name_dict
+    # ret = {}
+    # objectDict = "*insert michaels code*"
+    # labwareList = objectDict.keys()
+    # for labware in labwareList:
+    #     for data in labwareList[labware]:
+    #         ret.update({data[0] : labware})
 
-    return {
-        'A1':'WellPlate',
-        'C1':'WellPlate',
-        'C3': 'TipRack',
-    }
+    # return ret
+    return hardcode()
 
 
 @app.route('/')

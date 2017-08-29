@@ -16,14 +16,20 @@ class Labware extends Component {
 }
 
 class TipRack extends Labware {
+  constructor(props) {
+    super(props);
+  }
+
   render() {
-    const wells = ["A","B","C","D","E","F","G","H"].map((id) => <td key={id} className='tip'><div className='circle'></div></td>);
+    const wells = ["A","B","C","D","E","F","G","H"].map((id) => <td key={id} onClick={this.props.tiprackCallback} className='tip'><div className='circle'></div></td>);
     const rows = [12,11,10,9,8,7,6,5,4,3,2,1].map((id) => <tr key={id}>{wells}</tr>);
 
     return (
-      <div className="labware-tiprack-96">
+      <div className="labware-tiprack-96" id={this.props.id_string}>
         <table>
+          <tbody>
             {rows}
+          </tbody>
         </table>
       </div>
     )
@@ -127,12 +133,12 @@ class Grid extends Component {
         if (key in this.state.models) model = this.state.models[key];
         else model = new TableDragSelect.Model(12, 8);
 
-        grid[key] = <WellPlate key={key} mode={mode} model={model} updateModel={(model) => this.updateModel(key, model)}/>;
+        grid[key] = <WellPlate id={key} key={key} mode={mode} model={model} updateModel={(model) => this.updateModel(key, model)}/>;
       }
-      else if (this.state.labware[key] == 'Trash') grid[key] = <img src="trash.svg" width="50px"/>;
-      else if (this.state.labware[key] == 'Scale') grid[key] = <img src="scale.svg" width="80px"/>;
-      else if (this.state.labware[key] == 'TipRack') grid[key] = <TipRack />;
-      else if (this.state.labware[key] == 'Water') grid[key] = <img src="water.svg" width="50px"/>;
+      else if (this.state.labware[key] == 'Trash') grid[key] = <img src="trash.svg" width="50px" id={key}/>;
+      else if (this.state.labware[key] == 'Scale') grid[key] = <img src="scale.svg" width="80px" id={key}/>;
+      else if (this.state.labware[key] == 'TipRack') grid[key] = <TipRack tiprackCallback={this.props.tiprackCallback} id_string={key}/>;
+      else if (this.state.labware[key] == 'Water') grid[key] = <img src="water.svg" width="50px" id={key}/>;
     })
 
     return (
@@ -185,7 +191,6 @@ class Grid extends Component {
 class ProtocolCard extends Component {
   constructor(props) {
     super(props);
-
   }
 
   render() {
@@ -196,10 +201,10 @@ class ProtocolCard extends Component {
     if (index > -1) {
       keys.splice(index, 1);
     }
-    var index = keys.indexOf('tiprack');
-    if (index > -1) {
-      keys.splice(index, 1);
-    }
+    // var index = keys.indexOf('tiprack');
+    // if (index > -1) {
+    //   keys.splice(index, 1);
+    // }
 
     var paramsList = keys.map((key, id) => <li className={key} key={id}><b>{key}:</b> {JSON.stringify(this.props.protocol_data[key])}</li>);
     
@@ -327,10 +332,10 @@ class App extends Component {
       record: false,
       curr_user_data: {},
       delete_item: -1,
+      protocol_button_clicked: false,
     }
 
     this.handleChange = this.handleChange.bind(this);
-    this.selectProtocol = this.selectProtocol.bind(this);
     this.runRobot = this.runRobot.bind(this);
     this.resetGrid = this.resetGrid.bind(this);
     this.recordStart = this.recordStart.bind(this);
@@ -343,6 +348,17 @@ class App extends Component {
     this.getData = this.getData.bind(this);
     this.deleteProtocol = this.deleteProtocol.bind(this);
     this.updateLambdas = this.updateLambdas.bind(this);
+    this.tiprackCallback = this.tiprackCallback.bind(this);
+    this.protocolButtonClick = this.protocolButtonClick.bind(this);
+  }
+
+  // triggered by user clicking on tiprack
+  tiprackCallback(event) {
+    // gets the slot of the tiprack
+    console.log("TIPRACK CLICKED!!!", event.target.parentNode.parentNode.parentNode.parentNode.id)
+
+    // sets this as the tiprack for the protocol
+
   }
 
   deleteProtocol(event) {
@@ -456,11 +472,22 @@ class App extends Component {
     this.setState({ parameters: this.state.parameters });
   }
 
-  selectProtocol(event) {
-    this.setState({ protocol: event.target.id })
+  // handles when protocol button
+  protocolButtonClick(event) {
+    console.log("protocol BUTTON boolean:", this.state.protocol_button_clicked)
+    var ret = event.target.id
+    console.log(ret)
+
+    this.setState({ protocol_button_clicked: !this.state.protocol_button_clicked }, () => 
+      {
+        if (this.state.protocol_button_clicked) this.setState({ protocol: ret })
+        else this.setState({ protocol: ""})
+
+      });
     console.log("this is protocol button PRESSED")
     console.log(event)
     console.log(event.target.id)
+
   }
 
   resetGrid() {
@@ -590,7 +617,7 @@ class App extends Component {
             <ul id="protocols">
               {/* dilution */}
               <li className={this.state.protocol == "dilution" ? "active-protocol" : ""}>
-                <button type="button" id="dilution" className="btn" onClick={this.selectProtocol}>Dilution</button>
+                <button type="button" id="dilution" className="btn" onClick={this.protocolButtonClick}>Dilution</button>
                 <div className="protocol-parameters">
                   <div className="form-group row">
                     <label className="col-sm-2 col-form-label ratio-label">1:</label>
@@ -601,7 +628,7 @@ class App extends Component {
 
               {/* transfer */}
               <li className={this.state.protocol == "transfer" ? "active-protocol" : ""}>
-                <button type="button" id="transfer" className="btn" onClick={this.selectProtocol}>Transfer</button>
+                <button type="button" id="transfer" className="btn" onClick={this.protocolButtonClick}>Transfer <i className="fa fa-info-circle" aria-hidden="true"></i></button>
                 <div className="protocol-parameters">
                   <div className="input-group">
                     <input type="text" id="volume" className="form-control" placeholder="Volume..." onChange={this.handleChange} value={this.state.parameters['volume']} />
@@ -630,7 +657,7 @@ class App extends Component {
 
         {/* deck grid */}
           <div className="col-sm-10 fill">
-            <Grid ref={(grid) => { this.grid = grid }} />
+            <Grid tiprackCallback={this.tiprackCallback} ref={(grid) => { this.grid = grid }} />
           </div>
         </div>
     );
