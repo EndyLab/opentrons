@@ -57,30 +57,54 @@ class FineTuner:
         cropped_height, cropped_width, _ = cropped_image.shape
         frame_to_thresh = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2HSV)
         thresh = cv2.inRange(frame_to_thresh, (58, 67, 0), (78, 255, 255))
+        cv2.imshow("thresh", thresh)
+        cv2.waitKey(0)
         _, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-        # cv2.drawContours(cropped_image, contours, -1, (0,255,0), 3)
-        for cnt in contours:
-            # TODO: limit to largest contour? Though there should only be 1 this large
-            if cv2.contourArea(cnt) > cropped_height * cropped_width / 2:
-                x,y,w,h = cv2.boundingRect(cnt)
-                # A1 is bottom left
-                bottom_left = (x + crop_top_left[0], y + h + crop_top_left[1])
-                print("Bottom left: {}".format(bottom_left))
-                # Need to pass in pixel values in relation to the entire image
-                tiprack_vals = self.measurements['tiprack-200ul']
-                robot_bottom_left = self.converter.pixelToRobot(bottom_left, self.converter.checkerboard_z + tiprack_vals['height_green'])
-                print("Robot bottom left: {}".format(robot_bottom_left))
-                robot_a1 =  (robot_bottom_left[0] + tiprack_vals['welloffset_x'], robot_bottom_left[1] + tiprack_vals['welloffset_y'], self.converter.checkerboard_z + tiprack_vals['height_tip'])
-                robot_top_left = ((robot_bottom_left[0] + tiprack_vals['top_width'], robot_bottom_left[1] + tiprack_vals['top_length'], robot_bottom_left[2]))
-                print("Robot a1: {}".format(robot_a1))
-                print("Robot top left: {}".format(robot_top_left))
-                a1 = self.converter.robotToPixel(robot_a1)
-                topleft = self.converter.robotToPixel(robot_top_left)
-                print("a1: {}".format(a1))
-                print("topleft: {}".format(topleft))
-                cv2.line(image, bottom_left, topleft, (0, 0, 255), 2)
-                cv2.circle(image, a1, 3, (255, 0, 0), 2)
-                #cv2.rectangle(cropped_image,(x,y),(x+w,y+h),(0,255,0),2)
+        max_contour = max(contours, key=lambda x: cv2.contourArea(x))
+        cv2.drawContours(cropped_image, [max_contour], -1, (0,255,0), 3)
+        cv2.imshow("Contours", cropped_image)
+        x,y,w,h = cv2.boundingRect(max_contour)
+        # A1 is bottom left
+        bottom_left = (x + crop_top_left[0], y + h + crop_top_left[1])
+        print("Bottom left: {}".format(bottom_left))
+        # Need to pass in pixel values in relation to the entire image
+        tiprack_vals = self.measurements['tiprack-200ul']
+        robot_bottom_left = self.converter.pixelToRobot(bottom_left, self.converter.checkerboard_z + tiprack_vals['height_green'])
+        print("Robot bottom left: {}".format(robot_bottom_left))
+        robot_a1 =  (robot_bottom_left[0] + tiprack_vals['welloffset_x'], robot_bottom_left[1] + tiprack_vals['welloffset_y'], self.converter.checkerboard_z + tiprack_vals['height_tip'])
+        robot_top_left = ((robot_bottom_left[0] + tiprack_vals['top_width'], robot_bottom_left[1] + tiprack_vals['top_length'], robot_bottom_left[2]))
+        print("Robot a1: {}".format(robot_a1))
+        print("Robot top left: {}".format(robot_top_left))
+        a1 = self.converter.robotToPixel(robot_a1)
+        topleft = self.converter.robotToPixel(robot_top_left)
+        print("a1: {}".format(a1))
+        print("topleft: {}".format(topleft))
+        cv2.line(image, bottom_left, topleft, (0, 0, 255), 2)
+        cv2.circle(image, a1, 3, (255, 0, 0), 2)
+        #cv2.rectangle(cropped_image,(x,y),(x+w,y+h),(0,255,0),2)
+
+        # for cnt in contours:
+        #     # TODO: limit to largest contour? Though there should only be 1 this large
+        #     if cv2.contourArea(cnt) > cropped_height * cropped_width / 2:
+                # x,y,w,h = cv2.boundingRect(cnt)
+                # # A1 is bottom left
+                # bottom_left = (x + crop_top_left[0], y + h + crop_top_left[1])
+                # print("Bottom left: {}".format(bottom_left))
+                # # Need to pass in pixel values in relation to the entire image
+                # tiprack_vals = self.measurements['tiprack-200ul']
+                # robot_bottom_left = self.converter.pixelToRobot(bottom_left, self.converter.checkerboard_z + tiprack_vals['height_green'])
+                # print("Robot bottom left: {}".format(robot_bottom_left))
+                # robot_a1 =  (robot_bottom_left[0] + tiprack_vals['welloffset_x'], robot_bottom_left[1] + tiprack_vals['welloffset_y'], self.converter.checkerboard_z + tiprack_vals['height_tip'])
+                # robot_top_left = ((robot_bottom_left[0] + tiprack_vals['top_width'], robot_bottom_left[1] + tiprack_vals['top_length'], robot_bottom_left[2]))
+                # print("Robot a1: {}".format(robot_a1))
+                # print("Robot top left: {}".format(robot_top_left))
+                # a1 = self.converter.robotToPixel(robot_a1)
+                # topleft = self.converter.robotToPixel(robot_top_left)
+                # print("a1: {}".format(a1))
+                # print("topleft: {}".format(topleft))
+                # cv2.line(image, bottom_left, topleft, (0, 0, 255), 2)
+                # cv2.circle(image, a1, 3, (255, 0, 0), 2)
+                # #cv2.rectangle(cropped_image,(x,y),(x+w,y+h),(0,255,0),2)
 
         cv2.imshow("tiprack", thresh)
         cv2.imshow("cropped image", cropped_image)
@@ -98,24 +122,42 @@ class FineTuner:
         _, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
         for cnt in contours:
             if cv2.contourArea(cnt) > cropped_height * cropped_width / 2:
-                rect = cv2.minAreaRect(cnt)
-                print(rect)
-                # print(type(rect))
-                box = cv2.boxPoints(rect)
-                box = np.int0(box)
-                print(box)
-                cv2.drawContours(cropped_image,[box],0,(0,0,255),2)
-                wellplate_vals = self.measurements['WellPlate']
-                # TODO: not guaranteed same ordering, check manually
-                bottom_left = (box[0][0] + crop_top_left[0], box[0][1] + crop_top_left[1])
+                x,y,w,h = cv2.boundingRect(cnt)
+                # A1 is bottom left
+                bottom_left = (x + crop_top_left[0], y + h + crop_top_left[1])
                 print("Bottom left: {}".format(bottom_left))
+                # Need to pass in pixel values in relation to the entire image
+                wellplate_vals = self.measurements['WellPlate']
                 robot_bottom_left = self.converter.pixelToRobot(bottom_left, self.converter.checkerboard_z)
-                robot_top_right = (robot_bottom_left[0] + wellplate_vals['width'], robot_bottom_left[1] + wellplate_vals['length'], robot_bottom_left[2])
                 print("Robot bottom left: {}".format(robot_bottom_left))
-                print("Robot top right: {}".format(robot_top_right))
-                top_right = self.converter.robotToPixel(robot_top_right)
-                print("Top right: {}".format(top_right))
-                cv2.line(image, bottom_left, top_right, (0, 150, 150), 2)
+                robot_a1 =  (robot_bottom_left[0] + wellplate_vals['welloffset_x'], robot_bottom_left[1] + wellplate_vals['welloffset_y'], self.converter.checkerboard_z + wellplate_vals['height'])
+                robot_top_left = ((robot_bottom_left[0] + wellplate_vals['width'], robot_bottom_left[1] + wellplate_vals['length'], robot_bottom_left[2]))
+                print("Robot a1: {}".format(robot_a1))
+                print("Robot top left: {}".format(robot_top_left))
+                a1 = self.converter.robotToPixel(robot_a1)
+                topleft = self.converter.robotToPixel(robot_top_left)
+                print("a1: {}".format(a1))
+                print("topleft: {}".format(topleft))
+                cv2.line(image, bottom_left, topleft, (0, 0, 255), 2)
+                cv2.circle(image, a1, 3, (255, 0, 0), 2)
+                # rect = cv2.minAreaRect(cnt)
+                # print(rect)
+                # # print(type(rect))
+                # box = cv2.boxPoints(rect)
+                # box = np.int0(box)
+                # print(box)
+                # cv2.drawContours(cropped_image,[box],0,(0,0,255),2)
+                # wellplate_vals = self.measurements['WellPlate']
+                # # TODO: not guaranteed same ordering, check manually
+                # bottom_left = (box[0][0] + crop_top_left[0], box[0][1] + crop_top_left[1])
+                # print("Bottom left: {}".format(bottom_left))
+                # robot_bottom_left = self.converter.pixelToRobot(bottom_left, self.converter.checkerboard_z)
+                # robot_top_right = (robot_bottom_left[0] + wellplate_vals['width'], robot_bottom_left[1] + wellplate_vals['length'], robot_bottom_left[2])
+                # print("Robot bottom left: {}".format(robot_bottom_left))
+                # print("Robot top right: {}".format(robot_top_right))
+                # top_right = self.converter.robotToPixel(robot_top_right)
+                # print("Top right: {}".format(top_right))
+                # cv2.line(image, bottom_left, top_right, (0, 150, 150), 2)
 
         cv2.imshow("thresh", thresh)
         cv2.imshow("cropped image", cropped_image)

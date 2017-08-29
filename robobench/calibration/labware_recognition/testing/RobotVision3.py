@@ -26,14 +26,14 @@ class RobotVision:
         #frame = cv2.imread(join(self.absolute_dir_path,'../calibration/checkerboard_images/img21.jpg'))
         path = join(self.absolute_dir_path, "VisionTestingImages/checkerboardimg1")
         print(path)
-        frame = cv2.imread(join(self.absolute_dir_path, "VisionTestingImages/checkerboardimg1.jpg"))
+        frame = cv2.imread(join(self.absolute_dir_path, "VisionTestingImages/checkerboardimg3.jpg"))
         # self.select_deck_roi(frame)
         self.deck_dimensions = (5, 3)
         self.resize_width = 1000
         # _, frame = self.camera.read()
         # frame = imutils.resize(frame, width=self.resize_width)
-        #self.select_deck_roi(frame)
-        self.deck_roi = [(207, 76), (795, 539)]
+        self.select_deck_roi(frame)
+        #self.deck_roi = [(207, 76), (795, 539)]
         self.fine_tune_calibrator = FineTuner.FineTuner(frame)
 
 
@@ -151,8 +151,8 @@ class RobotVision:
 
 if __name__ == "__main__":
     vis = RobotVision()
-    frame = cv2.imread(join(vis.absolute_dir_path, "VisionTestingImages/wellplatedeck2.jpg"))
-    vis.evaluate_deck(frame)
+    frame = cv2.imread(join(vis.absolute_dir_path, "VisionTestingImages/deck7.jpg"))
+    vis.evaluate_deck()
     #print(vis.fine_tune_calibrator.converter.obj_to_robot_mtx)
 
 
