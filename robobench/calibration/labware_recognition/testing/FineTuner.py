@@ -10,7 +10,7 @@ class FineTuner:
     # TODO: look in OT code to find measured offsets between wells
     # TODO: remeasure values using robot? Currently assuming robot mm is accurate
     # TODO: measure point values properly
-    measurements = {'tiprack-200ul' : {'space' : 9, 'top_width' : 76, 'top_length' : 120, 'welloffset_x' : 6.5, 'welloffset_y' : 11, 'height_green' : 54, 'height_tip' : 64.5, 'tip_offset' : 38},
+    measurements = {'tiprack-200ul' : {'space' : 9, 'top_width' : 76, 'top_length' : 120, 'welloffset_x' : 10, 'welloffset_y' : 14, 'height_green' : 54, 'height_tip' : 64.5, 'tip_offset' : 54.5},
                     'WellPlate' : {'height' : 14, 'welloffset_x' : 10, 'welloffset_y' : 10, 'length' : 127.33, 'width' : 85},
                     'Trash' : {'height': 50},
                     'Scale' : {'height' : 22},
@@ -69,9 +69,9 @@ class FineTuner:
         print("Bottom left: {}".format(bottom_left))
         # Need to pass in pixel values in relation to the entire image
         tiprack_vals = self.measurements['tiprack-200ul']
-        robot_bottom_left = self.converter.pixelToRobot(bottom_left, self.converter.checkerboard_z + tiprack_vals['height_green'] - tiprack_vals['tip_offset'])
+        robot_bottom_left = self.converter.pixelToRobot(bottom_left, self.converter.checkerboard_z + tiprack_vals['height_green'])
         print("Robot bottom left: {}".format(robot_bottom_left))
-        robot_a1 =  (robot_bottom_left[0] + tiprack_vals['welloffset_x'], robot_bottom_left[1] + tiprack_vals['welloffset_y'], self.converter.checkerboard_z + tiprack_vals['height_tip'] - tiprack_vals['tip_offset'])
+        robot_a1 =  (robot_bottom_left[0] + tiprack_vals['welloffset_x'], robot_bottom_left[1] + tiprack_vals['welloffset_y'], self.converter.checkerboard_z + tiprack_vals['height_tip'])
         robot_top_left = ((robot_bottom_left[0] + tiprack_vals['top_width'], robot_bottom_left[1] + tiprack_vals['top_length'], robot_bottom_left[2]))
         print("Robot a1: {}".format(robot_a1))
         print("Robot top left: {}".format(robot_top_left))
@@ -109,6 +109,7 @@ class FineTuner:
         cv2.imshow("tiprack", thresh)
         cv2.imshow("cropped image", cropped_image)
         cv2.waitKey(0)
+        robot_a1 = (robot_a1[0], robot_a1[1], robot_a1[2] - tiprack_vals['tip_offset'])
         return robot_a1
 
 
@@ -130,7 +131,6 @@ class FineTuner:
                 wellplate_vals = self.measurements['WellPlate']
                 robot_bottom_left = self.converter.pixelToRobot(bottom_left, self.converter.checkerboard_z)
                 print("Robot bottom left: {}".format(robot_bottom_left))
-                # TODO: don't think accounting for tip properly
                 robot_a1 =  (robot_bottom_left[0] + wellplate_vals['welloffset_x'], robot_bottom_left[1] + wellplate_vals['welloffset_y'], self.converter.checkerboard_z + wellplate_vals['height'])
                 robot_top_left = ((robot_bottom_left[0] + wellplate_vals['width'], robot_bottom_left[1] + wellplate_vals['length'], robot_bottom_left[2]))
                 print("Robot a1: {}".format(robot_a1))
