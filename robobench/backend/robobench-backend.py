@@ -5,18 +5,19 @@ import sys
 
 sys.path.append("../calibration/labware_recognition/testing")
 
-# import RobotVision
+import RobotVision3
 
 app = Flask(__name__)
 CORS(app)
 
 # janky way of reducing refreshes for get_labware
 get_labware_count = 0
-slot_to_name_dict = {}
+name_to_slot_coord_dict = {}
 
 # janky way to "record procedures"
 LAMBDA_QUEUE = []
 RECORD = False
+vision = RobotVision3.RobotVision()
 
 def hardcode():
     return {
@@ -27,23 +28,23 @@ def hardcode():
     }
 
 def get_labware():
-    # global get_labware_count, slot_to_name_dict
-    # if get_labware_count % 30 == 0:
-    #     print("Vision")
-    #     slot_to_name_dict = RobotVision.evaluateDeckSlots()
-    # print("Get labware")
-    # print(slot_to_name_dict)
-    # get_labware_count = get_labware_count + 1
-    # return slot_to_name_dict
+    global get_labware_count, name_to_slot_coord_dict
+    if get_labware_count % 30 == 0:
+        print("Vision")
+        name_to_slot_coord_dict = vision.evaluate_deck()
+    print("Get labware")
+    print(name_to_slot_coord_dict)
+    get_labware_count = get_labware_count + 1
+    return name_to_slot_coord_dict
     # ret = {}
-    # objectDict = "*insert michaels code*"
+    # objectDict = name_to_slot_coord_dict
     # labwareList = objectDict.keys()
     # for labware in labwareList:
-    #     for data in labwareList[labware]:
+    #     for data in objectDict[labware]:
     #         ret.update({data[0] : labware})
 
     # return ret
-    return hardcode()
+    # return hardcode()
 
 
 @app.route('/')
