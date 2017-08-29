@@ -36,7 +36,7 @@ class FineTuner:
         Returns:
         	tuple (x, y, z) robot calibration coordinates for object
         '''
-        if object_type == "tiprack-200ul":
+        if object_type == "TipRack":
             coordinates = self.find_tiprack_a1(box, image)
         elif object_type == "WellPlate":
             coordinates = self.find_wellplate_a1(box, image)
@@ -58,7 +58,7 @@ class FineTuner:
         frame_to_thresh = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2HSV)
         thresh = cv2.inRange(frame_to_thresh, (58, 67, 0), (78, 255, 255))
         cv2.imshow("thresh", thresh)
-        cv2.waitKey(0)
+        #cv2.waitKey(0)
         _, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
         max_contour = max(contours, key=lambda x: cv2.contourArea(x))
         cv2.drawContours(cropped_image, [max_contour], -1, (0,255,0), 3)
@@ -108,7 +108,7 @@ class FineTuner:
 
         cv2.imshow("tiprack", thresh)
         cv2.imshow("cropped image", cropped_image)
-        cv2.waitKey(0)
+        #cv2.waitKey(0)
         robot_a1 = (robot_a1[0], robot_a1[1], robot_a1[2] - tiprack_vals['tip_offset'])
         return robot_a1
 
@@ -162,7 +162,7 @@ class FineTuner:
 
         cv2.imshow("thresh", thresh)
         cv2.imshow("cropped image", cropped_image)
-        cv2.waitKey(0)
+        #cv2.waitKey(0)
         return "Not implemented yet"
 
     def find_point_coordinates(self, object_type, box, image):
@@ -173,7 +173,7 @@ class FineTuner:
         print(robot_point)
         cv2.circle(image, (midx, midy), 3, (120, 120, 0), 2)
         cv2.imshow("image", image)
-        cv2.waitKey(0)
+        #cv2.waitKey(0)
         return robot_point
 
 

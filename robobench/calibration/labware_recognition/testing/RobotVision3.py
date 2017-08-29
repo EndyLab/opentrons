@@ -26,7 +26,7 @@ class RobotVision:
         #frame = cv2.imread(join(self.absolute_dir_path,'../calibration/checkerboard_images/img21.jpg'))
         path = join(self.absolute_dir_path, "VisionTestingImages/checkerboardimg1")
         print(path)
-        frame = cv2.imread(join(self.absolute_dir_path, "VisionTestingImages/checkerboardimg3.jpg"))
+        frame = cv2.imread(join(self.absolute_dir_path, "VisionTestingImages/checkerboardimg4.jpg"))
         # self.select_deck_roi(frame)
         self.deck_dimensions = (5, 3)
         self.resize_width = 1000
@@ -147,7 +147,7 @@ class RobotVision:
         print(name_to_slots_boxes_map)
         print("Name to slots coordinates map: {}".format(name_to_slots_coordinates_map))
         cv2.imshow("Detected", frame)
-        cv2.waitKey(0)
+        #cv2.waitKey(0)
         return name_to_slots_coordinates_map
 
 if __name__ == "__main__":

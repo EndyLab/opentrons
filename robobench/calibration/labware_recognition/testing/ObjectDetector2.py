@@ -70,7 +70,7 @@ class ObjectDetector:
             cropped_image = image
         print(deck_roi)
         cv2.imshow("img to detect", cropped_image)
-        cv2.waitKey(0)
+        #cv2.waitKey(0)
 
         # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
         image_np_expanded = np.expand_dims(cropped_image, axis=0)
