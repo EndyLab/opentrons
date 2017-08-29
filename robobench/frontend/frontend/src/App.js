@@ -43,14 +43,20 @@ class WellPlate extends Labware {
     this.state = {
       model: new TableDragSelect.Model(12, 8) // Specify rows and columns
     };
+
+    this.hoverEvent = this.hoverEvent.bind(this)
+  }
+
+  hoverEvent(event) {
+
   }
 
   render() {
-    const wells = ["A","B","C","D","E","F","G","H"].map((id) => <td key={id} onClick={this.props.callback} className='well'><div className='circle'></div></td>);
+    const wells = ["A","B","C","D","E","F","G","H"].map((id) => <td key={id} className='well'><div className='circle'></div></td>);
     const rows = [12,11,10,9,8,7,6,5,4,3,2,1].map((id) => <tr key={id}>{wells}</tr>);
 
     return (
-      <div className="labware-well-96">
+      <div className="labware-well-96" onClick={this.props.callback} onMouseEnter={this.hoverEvent} onMouseLeave={this.hoverEvent}>
         <TableDragSelect className={this.props.mode} model={this.props.model} onModelChange={this.props.updateModel}>
             {rows}
         </TableDragSelect>
@@ -67,10 +73,13 @@ class Grid extends Component {
       labware: {},
       models: {},
       tiprack_selected: null,
+      // sets up 1st click to register as 0 for wellplate_order and 2nd click as 1
+      wellplate_order: ["", 1], 
     }
 
     this.tiprack_callback = this.tiprack_callback.bind(this)
     this.wellPlate_callback = this.wellPlate_callback.bind(this)
+    this.handle_wellplates = this.handle_wellplates.bind(this)
   }
 
   componentDidMount() {
@@ -99,9 +108,11 @@ class Grid extends Component {
     this.state.models[key] = model
     this.setState({ models: this.state.models })
 
-    if (!this.state.source) {
+    var click_order = this.state.wellplate_order[1]
+
+    if (click_order == 0) {
       this.setState({ source: key });
-    } else if (!this.state.dest && this.state.source != key) {
+    } else if (click_order ==1) {
       this.setState({ dest: key });
     }
   }
@@ -118,7 +129,22 @@ class Grid extends Component {
   wellPlate_callback(event) {
     // get the slot of the wellplate clicked
     var wellPlate_slot = event.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.id
+    // var wellPlate_slot = event.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.id
     console.log("WELLPLATE CLICKED!!", wellPlate_slot)
+    this.setState({ wellplate_order: [wellPlate_slot, (this.state.wellplate_order[1] + 1) % 2]}, () => {this.handle_wellplates()})
+  }
+
+  handle_wellplates() {
+    console.log("wellplate clicks", this.state.wellplate_order)
+    var click_order = this.state.wellplate_order[1]
+
+    // // first wellplate clicked
+    // if (click_order == 0) {
+    //   this.setState({ source: this.state.wellplate_order[0]})
+    // } 
+    // else if (click_order == 1) {
+    //   this.setState({ dest: this.state.wellplate_order[0]})
+    // }
   }
 
   render() {

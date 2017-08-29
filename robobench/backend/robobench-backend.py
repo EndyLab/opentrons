@@ -22,7 +22,8 @@ def hardcode():
     return {
         'A1':'WellPlate',
         'C1':'WellPlate',
-        'C3': 'TipRack',
+        'C3':'TipRack',
+        'B2':'WellPlate',
     }
 
 def get_labware():
