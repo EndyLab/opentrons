@@ -123,7 +123,7 @@ def web_transfer1(data):
 		p200.aspirate(vol, source.wells(key))
 		p200.dispense(dest.wells(value))
 
-	# robot.run()
+	robot.run()
 	print("finished transfers")
 
 	# somehow the opentrons transfer functions calls an error???!!

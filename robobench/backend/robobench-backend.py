@@ -18,7 +18,7 @@ name_to_slot_coord_dict = {}
 LAMBDA_QUEUE = []
 RECORD = False
 
-# vision = RobotVision3.RobotVision()
+vision = RobotVision3.RobotVision()
 
 
 def hardcode():
@@ -36,7 +36,7 @@ def hardcode_vision():
     }
 def get_labware():
     global get_labware_count, name_to_slot_coord_dict
-    if get_labware_count % 30 == 0:
+    if get_labware_count % 2 == 0:
         print("Vision")
         name_to_slot_coord_dict = vision.evaluate_deck()
     print("Get labware")
@@ -48,22 +48,6 @@ def get_labware():
     # TESTING 
     # return hardcode()
     #return hardcode_vision()
-
-
-def get_labware():
-    # global get_labware_count, name_to_slot_coord_dict
-    # if get_labware_count % 30 == 0:
-    #     print("Vision")
-    #     name_to_slot_coord_dict = vision.evaluate_deck()
-    # print("Get labware")
-    # print(name_to_slot_coord_dict)
-    # get_labware_count = get_labware_count + 1
-    # return name_to_slot_coord_dict
-
-
-    # TESTING 
-    # return hardcode()
-    return hardcode_vision()
 
 
 

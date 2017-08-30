@@ -340,7 +340,7 @@ class FineTuner:
                 # print("Top right: {}".format(top_right))
                 # cv2.line(image, bottom_left, top_right, (0, 150, 150), 2)
 
-    def find_point_coordinates(self, object_type, box, image):
+    def find_point_coordinates(self, object_type, box, image, debug=False):
         height, width, _ = image.shape
         midx = int((box[1] + box[3]) * width / 2)
         midy = int((box[0] + box[2]) * height / 2)
