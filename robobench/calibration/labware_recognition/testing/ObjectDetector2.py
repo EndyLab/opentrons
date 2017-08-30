@@ -68,6 +68,7 @@ class ObjectDetector:
             cropped_image = image[deck_roi[0][1]:deck_roi[1][1], deck_roi[0][0]:deck_roi[1][0]]
         else:
             cropped_image = image
+            
         if debug:
             print(deck_roi)
             cv2.imshow("img to detect", cropped_image)

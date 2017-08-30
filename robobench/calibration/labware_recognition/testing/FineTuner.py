@@ -59,6 +59,7 @@ class FineTuner:
         cropped_height, cropped_width, _ = cropped_image.shape
         frame_to_thresh = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2HSV)
         thresh = cv2.inRange(frame_to_thresh, (58, 67, 0), (78, 255, 255))
+
         if debug:
             cv2.imshow("thresh", thresh)
             cv2.waitKey(0)
@@ -121,7 +122,6 @@ class FineTuner:
                 # cv2.line(image, bottom_left, topleft, (0, 0, 255), 2)
                 # cv2.circle(image, a1, 3, (255, 0, 0), 2)
                 # #cv2.rectangle(cropped_image,(x,y),(x+w,y+h),(0,255,0),2)
-
 
     def find_wellplate_a1(self, box, image, debug=False):
         height, width, _ = image.shape
@@ -350,6 +350,7 @@ class FineTuner:
             cv2.circle(image, (midx, midy), 3, (120, 120, 0), 2)
             cv2.imshow("image", image)
             cv2.waitKey(0)
+
         return robot_point
 
 

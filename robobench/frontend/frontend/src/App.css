@@ -13,6 +13,7 @@ th:first-child {
 
 .protocol-parameters {
   display: none;
+  padding-top: 1em;
 }
 
 .active-protocol {
@@ -43,12 +44,18 @@ th:first-child {
 #grid td {
 	width: 15%;
   text-align: center;
+  
 }
 
+/* whent he user clicks on a tiprack */
+.labware-selected {
+	background-color: rgba(0, 0, 0, 0.3);
+} 
+
 .labware-tiprack-96 {
-	background-color: #ffffff;
+  	background-color: #3AE840;
 	display: inline-block;
-	border: 2px solid #C4C4C4;
+	border: 4px solid #13C2EB;
 	padding: 2px;
 }
 
@@ -63,9 +70,9 @@ th:first-child {
   height: 14px;
   weight: 14px;
 
-  background-color: #EEEEEE;
+  background-color: #E2E2E2;
   border-radius: 50%;
-	border: 4px solid #C4C4C4;
+  border: 2px solid white;
 }
 
 .labware-well-96 {
@@ -73,6 +80,7 @@ th:first-child {
 	display: inline-block;
 	border: 1px solid #C4C4C4;
 	padding: 2px;
+	z-index: 2;
 }
 
 .labware-well-96 .well {
@@ -106,9 +114,14 @@ th:first-child {
 	width: 14px;
 	height: 14px;
 	margin: 1px;
+	pointer-events: none;
 }
 
 .circle:hover {
+	background-color: lime;
+}
+
+.circle-selected {
 	background-color: lime;
 }
 
@@ -130,4 +143,64 @@ th:first-child {
 
 .row {
 	height: 100%;
+}
+
+.show-protocols {
+  padding: 0;
+  margin: 15px 0;
+  /*background-color: #eeeeee;*/
+  /*border-radius: 5%;*/
+}
+
+/* delete protocol button */
+.delete-protocol {
+	float: right;
+	display: inline;
+	background-color: transparent;
+	color: white;
+	padding: 0;
+	border: none;
+}
+
+.delete-protocol:hover > i{
+	color: black;
+}
+
+/* protocol cards*/
+.protocol-card {
+	display: none;
+	list-style-type: none;
+    margin: 0;
+    padding: 0;
+    padding-left: 1em;
+    background-color: #CFD8DC;
+    word-wrap: break-word;
+
+}
+
+.protocol-card-title {
+ 	/*background-color: red;*/
+	/*pointer-events: none;*/
+	padding: 0.5em;
+	color: white;
+}
+
+.protocol-card-active {
+	padding: 0;
+ 	background-color: #eeeeee;
+}
+
+.protocol-card-active > .protocol-card {
+  	display: block;
+}
+
+#protocol-list {
+	list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#protocol-list > li {
+	/*padding: 0.5em;*/
+	/*padding-bottom: 0;*/
 }

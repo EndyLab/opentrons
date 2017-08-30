@@ -34,7 +34,7 @@ def check_screen_extraction(dir):
         screen = cv2.imread(file)
 
         # test screen extraction
-        res = snapshot.extract_screen(screen, file)
+        res = screen_processing.extract_screen(screen, file)
         if res == 0:
             success = success + 1
 
@@ -106,13 +106,13 @@ def normalize_screens(dir, aspect_ratio):
         # cv2.imshow("resized", resized)
 
         # threshold using h channel of img
-        reduced_glare = reduce_glare(resized)
+        reduced_glare = reduce_glare(img)
         hsv_img = cv2.cvtColor(reduced_glare,cv2.COLOR_BGR2HSV)
         # cv2.imshow('glare less', hsv_img[:,:,0])
 
         # bradley thresholding for binarization
         pil_im = Image.fromarray(reduced_glare)
-        bradley_thresh = faster_bradley_threshold(pil_im, 92, 20)
+        bradley_thresh = faster_bradley_threshold(pil_im, 92, 10)
         open_cv_image = np.array(bradley_thresh)
         bradley_thresh = cv2.bitwise_not(open_cv_image)
 
@@ -120,7 +120,7 @@ def normalize_screens(dir, aspect_ratio):
         # cv2.waitKey(0)
 
         # write to new folder
-        cv2.imwrite(r"C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/norms/"+file, bradley_thresh)
+        cv2.imwrite(r"C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/flat_camera/norms/"+file, bradley_thresh)
 
 # optimize sliding window
 # once you find the first digit, offset to find the next
@@ -348,27 +348,39 @@ def condense_list(x):
     return np.asarray(res)
 
 # find the first digit
-def find_peaks(x, y):
+def find_peaks(x, y, img):
     # curve fitting
-    spl = UnivariateSpline(x,y,s=0,k=4)
-    plt.plot(x,y,'ro',label = 'data')
-    xs = np.linspace(x[0], x[-1], 1000)
-    spl.set_smoothing_factor(0.001)
-    plt.plot(xs,spl(xs), 'g', lw=3)
+    # spl = UnivariateSpline(x,y,s=0,k=4)
+    # # plt.plot(x,y,'ro',label = 'data')
+    # xs = np.linspace(x[0], x[-1], 1000)
+    # spl.set_smoothing_factor(0.001)
+    # # plt.plot(xs,spl(xs), 'g', lw=3)
 
-    # 1st derivative
-    spl_d = spl.derivative(n=1)
-    deriv = spl_d(xs)
-    plt.plot(xs,deriv, 'y', lw=3)
+    # # 1st derivative
+    # spl_d = spl.derivative(n=1)
+    # deriv = spl_d(xs)
+    # # plt.plot(xs,deriv, 'y', lw=3)
     # plt.show()
 
-    # find peak indices
-    peak_indices = signal.find_peaks_cwt(y, np.arange(1,10))
-    # print(peak_indices)
+    # bar chart
+    # fig, ax = plt.subplots()
+    # ax.imshow(img)
+    plt.bar(x, y, align='center', alpha=0.5)
+    # plt.xticks(y, y)
+    plt.ylabel('% white pixels')
+    plt.title('cross sections')
+     
+    plt.show()
 
-    # the 2nd index is the first peak aka first digit
-    # return peak_indices[1:]
-    return condense_list(peak_indices[1:])[0]
+
+
+    # # find peak indices
+    # peak_indices = signal.find_peaks_cwt(y, np.arange(1,10))
+    # # print(peak_indices)
+
+    # # the 2nd index is the first peak aka first digit
+    # # return peak_indices[1:]
+    # return condense_list(peak_indices[1:])[0]
 
 def to_vol_measurement(scale_reading, decimal_pos):
     # this particular scale has a decimal after the 3rd digit from the right
@@ -383,20 +395,74 @@ def to_vol_measurement(scale_reading, decimal_pos):
 def read_scale(img):
     return to_vol_measurement(extract_digits(img), 3)
 
+def vertical_cross_proj(img):
+    # count number of white pixels per column
+    h, w = img.shape[:2]
+    total_pixels = h*w
+    col = []
+    white_pixels = []
+    cv2.namedWindow('screen',cv2.WINDOW_NORMAL)
+    cv2.resizeWindow('screen', 600,250)
+    cv2.imshow("screen", img)
+    cv2.waitKey(0)
+    for x in range(w-1):
+        roi = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)[0:h, x:x+1]
+        # cv2.imshow("crop", roi)
+        # cv2.waitKey(0)
+
+        num_white = cv2.countNonZero(roi)
+        val = float(num_white/h)*100
+        print("x: ", x)
+        print("% of white pixels:", float(num_white/h)*100)
+
+        col.append(x)
+        white_pixels.append(val)
+    # col.append(w)
+    print("x", len(col), "y", len(white_pixels), "len", w)
+    peak = find_peaks(col, white_pixels, img)
+
+def horizontal_cross_proj(img):
+    # count number of white pixels per row
+    h, w = img.shape[:2]
+    total_pixels = h*w
+    row = []
+    white_pixels = []
+    cv2.namedWindow('screen',cv2.WINDOW_NORMAL)
+    cv2.resizeWindow('screen', 600,250)
+    cv2.imshow("screen", img)
+    cv2.waitKey(0)
+    for y in range(h-1):
+        roi = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)[y:y+1, 0:w]
+        # cv2.imshow("crop", roi)
+        # cv2.waitKey(0)
+
+        num_white = cv2.countNonZero(roi)
+        val = float(num_white/w)*100
+        print("y: ", y)
+        print("% of white pixels:", float(num_white/w)*100)
+
+        row.append(y) 
+        white_pixels.append(val)
+ 
+    print("x", len(row), "y", len(white_pixels), "len", w)
+    peak = find_peaks(row, white_pixels, img)
+
+
 if __name__ == '__main__':
-    img_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/screen" 
-    screen_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/crops"
-    normed_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/norms"
+    img_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/flat_camera/screen_train" 
+    screen_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/flat_camera/crops"
+    normed_dir = "C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/flat_camera/norms"
     
     # load img digit key from json file
     os.chdir(img_dir)
     with open('key.json') as json_data:
         key = json.load(json_data)
   
-    # # check_screen_extraction(img_dir)
+    # check_screen_extraction(img_dir)
     # w, h = get_screen_info(screen_dir)
     # aspect = float(w/h)
-    # # print(aspect)
+    # print(aspect)
+    aspect = 2.627450980392157
 
     # normalize_screens(screen_dir, aspect)
     os.chdir(normed_dir)
@@ -404,16 +470,20 @@ if __name__ == '__main__':
     total = 0
     for file in glob.glob('*.jpg'):
         img = cv2.imread(file)
-        # img = cv2.imread('screen2017-08-04_249038.jpg')
-        # cv2.imshow('orig', img)
-        # extract_digits(img)
-        results = read_scale(img)
-        print('expected:',key[file],'got:',results)
-        if key[file] == str(results):
-            success += 1
-        total += 1
+        vertical_cross_proj(img)
+        # horizontal_cross_proj(img)
+
+        # OLD SLIDING WINDOW METHOD
+        # # img = cv2.imread('screen2017-08-04_249038.jpg')
+        # # cv2.imshow('orig', img)
+        # # extract_digits(img)
+        # results = read_scale(img)
+        # print('expected:',key[file],'got:',results)
+        # if key[file] == str(results):
+        #     success += 1
+        # total += 1
         
-    print('success rate:', float(success/total))
+    # print('success rate:', float(success/total))
 
 
 
