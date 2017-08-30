@@ -3,6 +3,7 @@
 # TODO: make methods/attributes private
 # TODO: add error checking
 # TODO: create test harness
+# TODO: checkerboard printout issue - last two squares in x direction slightly larger
 
 
 
@@ -44,7 +45,10 @@ class RobotCoordinateConverter:
     def getRobotPoints(self):
         # return ((40, 400), (202, 400), (40,292), -82)
         # return ((46, 390), (204, 390), (47.5, 285), -46)
-        return ((40, 400), (199, 400), (40, 296), -43)
+        # checkerboard image 3
+        # return ((40, 400), (199, 400), (40, 296), -43)
+        # checkerboard image 4
+        return ((60, 365), (218, 365), (60, 261), -41)
 
     def calibrateRobotTransformation(self, robot_points):
         '''
@@ -117,7 +121,7 @@ class RobotCoordinateConverter:
             img = self.draw(img,corners2,imgpts)
             cv2.drawChessboardCorners(img, (7,5), corners2, ret)
             cv2.imshow('img',img)
-            k = cv2.waitKey(0) & 0xff
+            #k = cv2.waitKey(0) & 0xff
             cv2.destroyWindow('img')
         else:
             return False
@@ -198,20 +202,20 @@ class RobotCoordinateConverter:
         # converts to object coords from robot coordinates (units are checkerboard squares)
         robot_xy = np.array([[robot_coord[0], robot_coord[1], 1]])
         obj_xy = np.dot(self.robot_to_obj_mtx, robot_xy.transpose())
-        print(obj_xy)
+        #print(obj_xy)
         # -z for checkerboard comes out to camera, squares so scaling should be same x axis
         # obj_z = (robot_coord[2] + 82) / -27
         # print("obj_z 1: {}".format(obj_z))
         obj_z = (robot_coord[2] - self.checkerboard_z) / -abs(self.object_to_robot_scale)
-        print(self.checkerboard_z)
-        print(self.object_to_robot_scale)
-        print("obj_z 2: {}".format(obj_z))
+        #print(self.checkerboard_z)
+        #print(self.object_to_robot_scale)
+        #print("obj_z 2: {}".format(obj_z))
 
         obj_point = np.array([[obj_xy[0][0], obj_xy[1][0], obj_z]]).transpose()
-        print("Object point: {}".format(obj_point))
+        #print("Object point: {}".format(obj_point))
 
         img_pts, _ = cv2.projectPoints(np.array([obj_point]), self.rvec, self.tvec, self.cam_mtx, self.dist)
-        print(img_pts)
+        #print(img_pts)
         pixel = (img_pts[0][0][0], img_pts[0][0][1])
         if round_vals:
             pixel = (int(round(pixel[0])), int(round(pixel[1])))
@@ -220,23 +224,42 @@ class RobotCoordinateConverter:
 if __name__ == "__main__":
     converter = RobotCoordinateConverter()
     # img = cv2.imread('../calibration/checkerboard_images/img21.jpg')
-    img = cv2.imread('VisionTestingImages/checkerboardimg3.jpg')
+    img = cv2.imread('VisionTestingImages/checkerboardimg4.jpg')
     converter.calibrate(img)
+    cam = cv2.VideoCapture(0)
+    while True:
+        _, img = cam.read()
+        img = imutils.resize(img, width=1000)
+        for i in range(-2, 6):
+            for j in range(-2, 6):
+                # Should be able to have one as the argument for the other
+                space = converter.object_to_robot_scale
+                p1 = converter.robotToPixel((60 + 85 * i, 365 - 127.33 * j, converter.checkerboard_z))
+                #p2 = converter.robotToPixel((60 + space * i, 365 - space * j, 8))
+                p3 = converter.robotToPixel((60 + 85 * (i + 1), 365 - 127.33 * j, converter.checkerboard_z))
+                p4 = converter.robotToPixel((60 + 85 * i, 365 - 127.33 * (j + 1), converter.checkerboard_z))
+                # a1
+                p5 = converter.robotToPixel((60 + 85 * i + 11, 365 - 127.33 * j + 14, converter.checkerboard_z + 14))
+                p6 = converter.robotToPixel((60 + 85 * i, 365 - 127.33 * j, converter.checkerboard_z + 14))
+                p7 = converter.robotToPixel((60 + 85 * (i + 1), 365 - 127.33 * j, converter.checkerboard_z + 14))
+                p8 = converter.robotToPixel((60 + 85 * i, 365 - 127.33 * (j + 1), converter.checkerboard_z + 14))
+
+                print("p1: {}".format(p1))
+                cv2.line(img, p1, p3, ((5 * i + 100) % 255, 0, (5 * j + 150) % 255), 1)
+                cv2.line(img, p1, p4, ((5 * i + 100) % 255, 0, (5 * j + 150) % 255), 1)
+                cv2.line(img, p1, p6, ((5 * i + 100) % 255, 0, (5 * j + 150) % 255), 1)
+                cv2.line(img, p6, p7, ((5 * i + 200) % 255, 0, (5 * j + 210) % 255), 1)
+                cv2.line(img, p6, p8, ((5 * i + 200) % 255, 0, (5 * j + 210) % 255), 1)
+                cv2.line
+                cv2.circle(img, p5, 3, (255, 100, 100), 1)
+                #cv2.line(img, p2, p4, ((5 * i + 100) % 255, 0, (5 * j + 150) % 255), 3)
+        cv2.imshow("img", img)
+        key = cv2.waitKey(1) & 0xff
+        if key == ord('q'):
+            break
+
     print(converter.robot_to_obj_mtx)
     print(converter.obj_to_robot_mtx)
-    for i in range(-5, 20):
-        for j in range(-5, 20):
-            # Should be able to have one as the argument for the other
-            space = converter.object_to_robot_scale
-            p1 = converter.robotToPixel((40 + space * i, 400 - space * j, converter.checkerboard_z))
-            p2 = converter.robotToPixel((40 + space * i, 400 - space * j, 8))
-            p3 = converter.robotToPixel((40 + space * (i + 1), 400 - space * j, 8))
-            p4 = converter.robotToPixel((40 + space * i, 400 - space * (j + 1), 8))
-            print("p1: {}".format(p1))
-            cv2.line(img, p1, p2, ((5 * i + 100) % 255, 0, (5 * j + 150) % 255), 3)
-            cv2.line(img, p2, p3, ((5 * i + 100) % 255, 0, (5 * j + 150) % 255), 3)
-            cv2.line(img, p2, p4, ((5 * i + 100) % 255, 0, (5 * j + 150) % 255), 3)
-    cv2.imshow("img", img)
     cv2.waitKey(0)
     print("Test inverse")
     #print(converter.object_to_robot_scale)
