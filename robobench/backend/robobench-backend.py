@@ -5,7 +5,7 @@ import sys
 
 sys.path.append("../calibration/labware_recognition/testing")
 
-# import RobotVision3
+import RobotVision3
 
 app = Flask(__name__)
 CORS(app)
@@ -17,7 +17,9 @@ name_to_slot_coord_dict = {}
 # janky way to "record procedures"
 LAMBDA_QUEUE = []
 RECORD = False
+
 # vision = RobotVision3.RobotVision()
+
 
 def hardcode():
     return {
@@ -30,8 +32,24 @@ def hardcode():
 def hardcode_vision():
     return {
         'WellPlate' : [('A1', (30, 30, 20)), ('B2', (100, 20, 0))],
-        'TipRack' : [ ('A2', (23, 45, 10)), ('E3', (0,0,0))],
+        'TipRack' : [ ('A2', (23, 45, 10))],
     }
+def get_labware():
+    global get_labware_count, name_to_slot_coord_dict
+    if get_labware_count % 30 == 0:
+        print("Vision")
+        name_to_slot_coord_dict = vision.evaluate_deck()
+    print("Get labware")
+    print(name_to_slot_coord_dict)
+    get_labware_count = get_labware_count + 1
+    return name_to_slot_coord_dict
+
+
+    # TESTING 
+    # return hardcode()
+    #return hardcode_vision()
+
+
 def get_labware():
     # global get_labware_count, name_to_slot_coord_dict
     # if get_labware_count % 30 == 0:
