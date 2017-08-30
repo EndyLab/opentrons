@@ -121,7 +121,7 @@ class RobotCoordinateConverter:
             img = self.draw(img,corners2,imgpts)
             cv2.drawChessboardCorners(img, (7,5), corners2, ret)
             cv2.imshow('img',img)
-            #k = cv2.waitKey(0) & 0xff
+            k = cv2.waitKey(0) & 0xff
             cv2.destroyWindow('img')
         else:
             return False

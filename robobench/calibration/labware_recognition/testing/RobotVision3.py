@@ -147,7 +147,7 @@ class RobotVision:
         print(name_to_slots_boxes_map)
         print("Name to slots coordinates map: {}".format(name_to_slots_coordinates_map))
         cv2.imshow("Detected", frame)
-        #cv2.waitKey(0)
+        cv2.waitKey(0)
         return name_to_slots_coordinates_map
 
 if __name__ == "__main__":
