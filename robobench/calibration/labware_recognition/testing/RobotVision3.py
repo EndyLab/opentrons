@@ -32,8 +32,8 @@ class RobotVision:
         self.resize_width = 1000
         # _, frame = self.camera.read()
         # frame = imutils.resize(frame, width=self.resize_width)
-        self.select_deck_roi(frame)
-        # self.deck_roi = [(244, 102), (775, 512)] # [(207, 76), (795, 539)] checkerboard img 3
+        # self.select_deck_roi(frame)
+        self.deck_roi = [(244, 102), (775, 512)] # [(207, 76), (795, 539)] checkerboard img 3
         self.fine_tune_calibrator = FineTuner.FineTuner(frame, debug)
 
 
