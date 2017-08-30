@@ -33,10 +33,11 @@ class RobotCoordinateConverter:
             self.robot_to_obj_mtx = None
             self.checkerboard_z = None
 
-    def draw(self, img, corners, imgpts):
+    def draw(self, img, corners, imgpts, debug=False):
         corner = tuple(corners[0].ravel())
-        print("corner for draw: {}".format(corner))
-        #print("imgpts[0]: {}".format(imgpts[0]))
+        if debug:
+            print("corner for draw: {}".format(corner))
+            #print("imgpts[0]: {}".format(imgpts[0]))
         img = cv2.line(img, corner, tuple(imgpts[0].ravel()), (255,0,0), 5)
         img = cv2.line(img, corner, tuple(imgpts[1].ravel()), (0,255,0), 5)
         img = cv2.line(img, corner, tuple(imgpts[2].ravel()), (0,0,255), 5)
@@ -50,7 +51,7 @@ class RobotCoordinateConverter:
         # checkerboard image 4
         return ((60, 365), (218, 365), (60, 261), -41)
 
-    def calibrateRobotTransformation(self, robot_points):
+    def calibrateRobotTransformation(self, robot_points, debug=False):
         '''
         Calibrates transformations between robot and object (checkerboard) coordinates
 
@@ -89,7 +90,7 @@ class RobotCoordinateConverter:
 
         return (robot_to_obj_mtx, obj_to_robot_mtx)
 
-    def calibrate(self, img):
+    def calibrate(self, img, debug=False):
         '''
         Calibrates coordinate converter
 
@@ -100,7 +101,8 @@ class RobotCoordinateConverter:
             boolean: whether successful or not
         '''
 
-        print("In calibrate")
+        if debug:
+            print("In calibrate")
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
         objp = np.zeros((7*5, 1, 3), np.float32)
         objp[:,:,:2] = np.mgrid[0:7,  0:5].T.reshape(-1,1,2)
@@ -118,11 +120,12 @@ class RobotCoordinateConverter:
             # 1x2 points
             imgpts, jac = cv2.projectPoints(axis, self.rvec, self.tvec, self.cam_mtx, self.dist)
             # print("imgpts: {}".format(imgpts))
-            img = self.draw(img,corners2,imgpts)
+            img = self.draw(img,corners2,imgpts, debug)
             cv2.drawChessboardCorners(img, (7,5), corners2, ret)
-            cv2.imshow('img',img)
-            k = cv2.waitKey(0) & 0xff
-            cv2.destroyWindow('img')
+            if debug:
+                cv2.imshow('img',img)
+                k = cv2.waitKey(0) & 0xff
+                cv2.destroyWindow('img')
         else:
             return False
 
@@ -130,7 +133,7 @@ class RobotCoordinateConverter:
         self.robot_to_obj_mtx, self.obj_to_robot_mtx = self.calibrateRobotTransformation(robot_points)
         return True
 
-    def pixelToRobot(self, img_point, robot_z):
+    def pixelToRobot(self, img_point, robot_z, debug=False):
         '''
         TODO: make sure z is handled correctly
         Returns robot coordinates of passed in pixel given z value in robot coordinates
@@ -152,15 +155,17 @@ class RobotCoordinateConverter:
         # 3 x 4 rotation transformation matrix
         rt_tr_mtx = np.concatenate((rtmtx, self.tvec), axis=1)
         # complete projection matrix
-        # print("rttr matrix: {}".format(rt_tr_mtx))
         transform_mtx = np.dot(self.cam_mtx, rt_tr_mtx)
-        # print("cam_mtx: {}".format(self.cam_mtx))
-        # print("transform mtx: {}".format(transform_mtx))
+
         # obj_z = (robot_z + 82) / -27
         obj_z = (robot_z - self.checkerboard_z) / -abs(self.object_to_robot_scale)
-        print("checkerboard_z: {}".format(self.checkerboard_z))
-        print("object_to_robot_scale: {}".format(self.object_to_robot_scale))
-        print("obj_z: {}".format(obj_z))
+        if debug:
+            print("checkerboard_z: {}".format(self.checkerboard_z))
+            print("object_to_robot_scale: {}".format(self.object_to_robot_scale))
+            print("obj_z: {}".format(obj_z))
+            # print("cam_mtx: {}".format(self.cam_mtx))
+            # print("rttr matrix: {}".format(rt_tr_mtx))
+            # print("transform mtx: {}".format(transform_mtx))
 
         # To solve for X,Y given Z, solves
         # desired_vec = desired_mat x [[X,Y]]
@@ -184,11 +189,12 @@ class RobotCoordinateConverter:
         pred_robot = np.dot(self.obj_to_robot_mtx, pred_homogeneous)
         # print("pred_robot: {}".format(pred_robot))
         pred_robot[2] = robot_z
-        print("Prediction: {}".format(pred_robot))
+        if debug:
+            print("Prediction: {}".format(pred_robot))
         prediction_tuple = (pred_robot[0][0], pred_robot[1][0], pred_robot[2][0])
         return prediction_tuple
 
-    def robotToPixel(self, robot_coord, round_vals=True):
+    def robotToPixel(self, robot_coord, round_vals=True, debug=False):
         '''
         Converts from robot coordinate to image coordinate
 
@@ -251,7 +257,7 @@ if __name__ == "__main__":
                 cv2.line(img, p6, p7, ((5 * i + 200) % 255, 0, (5 * j + 210) % 255), 1)
                 cv2.line(img, p6, p8, ((5 * i + 200) % 255, 0, (5 * j + 210) % 255), 1)
                 cv2.line
-                cv2.circle(img, p5, 3, (255, 100, 100), 1)
+                cv2.circle(img, p5, 3, (255, 100, 100), -1)
                 #cv2.line(img, p2, p4, ((5 * i + 100) % 255, 0, (5 * j + 150) % 255), 3)
         cv2.imshow("img", img)
         key = cv2.waitKey(1) & 0xff

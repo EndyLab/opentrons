@@ -25,6 +25,7 @@ def camera():
     livestream(2, 0, 'C:/Users/gohna/Documents/bioe reu/opentrons/robobench/calibration/pipette_calibration/screen')
 
 def gui():
+    print("in gui")
     def opentrons_connect():
         try:
             # physical robot
@@ -197,6 +198,7 @@ def gui():
 
     #Create & Configure root 
     win = Tk()
+    print(win)
 
     ####################
     # INIT GLOBAL VARS #
@@ -468,5 +470,7 @@ def gui():
 
 
 if __name__ == '__main__':
-    Process(target=gui).start()
-    Process(target=camera).start()
+    print("in main")
+    gui()
+    #Process(target=gui).start()
+    #Process(target=camera).start()
