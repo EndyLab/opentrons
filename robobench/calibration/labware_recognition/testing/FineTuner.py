@@ -12,7 +12,7 @@ class FineTuner:
     # TODO: measure point values properly
     # tiprack offset x 10, y 14 initially
     measurements = {'tiprack-200ul' : {'space' : 9, 'top_width' : 76, 'top_length' : 120, 'welloffset_x' : 8, 'welloffset_y' : 11, 'height_green' : 54, 'height_tip' : 64.5, 'tip_offset' : 54.5},
-                    'WellPlate' : {'height' : 3, 'welloffset_x' : 11, 'welloffset_y' : 14, 'length' : 127.33, 'width' : 85},
+                    'WellPlate' : {'height_well' : 3, 'height_top': 14, 'welloffset_x' : 12, 'welloffset_y' : 12, 'length' : 127.33, 'width' : 85},
                     'Trash' : {'height': 50},
                     'Scale' : {'height' : 22},
                     'Trough' : {'height': 20}
@@ -48,7 +48,7 @@ class FineTuner:
         # height, width, _ = image.shape
         # cropped_image = image[int(box[0] * height - 10):int(box[2] * height + 10), int(width * box[1] - 10):int(width * box[3] + 10)]
         # cv2.imshow("item", cropped_image)
-        cv2.waitKey(0)
+        # cv2.waitKey(0)
         return coordinates
 
     def find_tiprack_a1(self, box, image):
@@ -120,38 +120,92 @@ class FineTuner:
         cropped_image = image[int(box[0] * height - 10):int(box[2] * height + 10), int(width * box[1] - 10):int(width * box[3] + 10)]
         cropped_height, cropped_width, _ = cropped_image.shape
         frame_to_thresh = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2HSV)
-        thresh = cv2.inRange(frame_to_thresh, (0, 0, 165), (255, 255, 255))
+        #thresh = cv2.inRange(frame_to_thresh, (0, 0, 165), (255, 255, 255))
+        # night time, need to generalize to work in different conditions
+        thresh = cv2.inRange(frame_to_thresh, (0, 0, 100), (255, 255, 255))
         cv2.imshow("thresh", thresh)
         cv2.waitKey(0)
         _, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
         max_contour = max(contours, key=lambda x: cv2.contourArea(x))
+        rect = cv2.minAreaRect(max_contour)
+        print(rect)
         x,y,w,h = cv2.boundingRect(max_contour)
         wellplate_vals = self.measurements['WellPlate']
-        if crop_top_left[0] > width / 2:
-            right = 1
-        else:
-            right = 0
-        if crop_top_left[1] > height / 2:
-            bottom = 1
-            top = 0
-        else:
-            bottom = 0
-            top = 1
+        # bottom left of bounding box relative to uncropped image
+        ref_point = (x + crop_top_left[0], y + h + crop_top_left[1])
+        # naive attempt
+        a1_pixel2 = (int(ref_point[0] + 11 / 85 * w), int(ref_point[1] - 14 / 127.33 * h))
+        a1_robot2 = self.converter.pixelToRobot(a1_pixel2, self.converter.checkerboard_z + wellplate_vals['height_well'])
+        print("a1 robot naive: {}".format(a1_robot2))
 
-        ref_point = (x + crop_top_left[0] + right * w, y + crop_top_left[1] + bottom * h)
         robot_ref_point = self.converter.pixelToRobot(ref_point, self.converter.checkerboard_z)
-        robot_a1 = (robot_ref_point[0] - right * wellplate_vals['width'] + wellplate_vals['welloffset_x'],
-                    robot_ref_point[1] - top * wellplate_vals['length'] + wellplate_vals['welloffset_y'],
-                    robot_ref_point[2] + wellplate_vals['height'])
+        if crop_top_left[0] >= width / 2 and crop_top_left[1] <= height / 2:
+            print("Top right")
+            # top right, means bottom left of bounding box is actually base level of bottom left of 96 wellplate
+            robot_a1 = (robot_ref_point[0] + wellplate_vals['welloffset_x'],
+                        robot_ref_point[1] + wellplate_vals['welloffset_y'],
+                        robot_ref_point[2] + wellplate_vals['height_well'])
+        elif crop_top_left[0] <= width / 2 and crop_top_left[1] >= height / 2:
+            print("Bottom left")
+            # bottom left --> bottom left of bounding box is defined by raised edges of wellplate
+            robot_a1 = (robot_ref_point[0] + wellplate_vals['welloffset_x'],
+                        robot_ref_point[1] + wellplate_vals['welloffset_y'],
+                        robot_ref_point[2] +  - wellplate_vals['height_top'] + wellplate_vals['height_well'])
+        elif crop_top_left[0] > width / 2 and crop_top_left[1] > height / 2:
+            print("Bottom right")
+            # bottom right --> bottom left of bounding box is defined by raised bottom and lower left
+            robot_ref_point2 = (robot_ref_point[0], robot_ref_point[1], robot_ref_point[2] - wellplate_vals['height_top'])
+            ref_point2 = self.converter.robotToPixel(robot_ref_point2)
+            bottom_left = (ref_point[0], ref_point2[1])
+            robot_bottom_left = self.converter.pixelToRobot(bottom_left, self.converter.checkerboard_z)
+            robot_a1 = (robot_bottom_left[0] + wellplate_vals['welloffset_x'],
+                        robot_bottom_left[1] + wellplate_vals['welloffset_y'],
+                        robot_bottom_left[2] + wellplate_vals['height_well'])
+        elif crop_top_left[0] < width / 2 and crop_top_left[1] < height / 2:
+            print("Top left")
+            # top left --> bottom left of bounding box is defined by lower bottom and raised left
+            robot_ref_point2 = (robot_ref_point[0], robot_ref_point[1], robot_ref_point[2] - wellplate_vals['height_top'])
+            ref_point2 = self.converter.robotToPixel(robot_ref_point2)
+            bottom_left = (ref_point2[0], ref_point[1])
+            robot_bottom_left = self.converter.pixelToRobot(bottom_left, self.converter.checkerboard_z)
+            robot_a1 = (robot_bottom_left[0] + wellplate_vals['welloffset_x'],
+                        robot_bottom_left[1] + wellplate_vals['welloffset_y'],
+                        robot_bottom_left[2] + wellplate_vals['height_well'])
+
         a1_pixel = self.converter.robotToPixel(robot_a1)
-        print("right: {}".format(right))
-        print("bottom: {}".format(bottom))
-        print("ref point: {}".format(ref_point))
-        print("robot_ref_point: {}".format(robot_ref_point))
+        print("robot ref point: {}".format(robot_ref_point))
         print("robot a1: {}".format(robot_a1))
         print("a1 pixel: {}".format(a1_pixel))
-        cv2.circle(image, a1_pixel, 3, (255, 0, 0), 1)
+        cv2.circle(image, a1_pixel, 3, (255, 255, 0), -1)
+        cv2.circle(image, a1_pixel2, 3, (0, 255, 255), -1)
+
         cv2.rectangle(cropped_image,(x,y),(x+w,y+h),(0,255,0),1)
+
+        # if crop_top_left[0] > width / 2:
+        #     right = 1
+        # else:
+        #     right = 0
+        # if crop_top_left[1] > height / 2:
+        #     bottom = 1
+        #     top = 0
+        # else:
+        #     bottom = 0
+        #     top = 1
+
+        # ref_point = (x + crop_top_left[0] + right * w, y + crop_top_left[1] + bottom * h)
+        # robot_ref_point = self.converter.pixelToRobot(ref_point, self.converter.checkerboard_z)
+        # robot_a1 = (robot_ref_point[0] - right * wellplate_vals['width'] + wellplate_vals['welloffset_x'],
+        #             robot_ref_point[1] - top * wellplate_vals['length'] + wellplate_vals['welloffset_y'],
+        #             robot_ref_point[2] + wellplate_vals['height'])
+        # a1_pixel = self.converter.robotToPixel(robot_a1)
+        # print("right: {}".format(right))
+        # print("bottom: {}".format(bottom))
+        # print("ref point: {}".format(ref_point))
+        # print("robot_ref_point: {}".format(robot_ref_point))
+        # print("robot a1: {}".format(robot_a1))
+        # print("a1 pixel: {}".format(a1_pixel))
+        # cv2.circle(image, a1_pixel, 3, (255, 0, 0), 1)
+        # cv2.rectangle(cropped_image,(x,y),(x+w,y+h),(0,255,0),1)
 
         # if crop_top_left[0] > width / 2:
         #     if crop_top_left[1] > height / 2:

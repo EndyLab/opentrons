@@ -251,7 +251,7 @@ if __name__ == "__main__":
                 cv2.line(img, p6, p7, ((5 * i + 200) % 255, 0, (5 * j + 210) % 255), 1)
                 cv2.line(img, p6, p8, ((5 * i + 200) % 255, 0, (5 * j + 210) % 255), 1)
                 cv2.line
-                cv2.circle(img, p5, 3, (255, 100, 100), 1)
+                cv2.circle(img, p5, 3, (255, 100, 100), -1)
                 #cv2.line(img, p2, p4, ((5 * i + 100) % 255, 0, (5 * j + 150) % 255), 3)
         cv2.imshow("img", img)
         key = cv2.waitKey(1) & 0xff
