@@ -219,6 +219,56 @@ class Grid extends Component {
       else if (this.state.labware[key][0] == 'Water') grid[key] = <img src="water.svg" width="50px"/>;
     })
 
+    // iteratively create the grid
+    // TODO
+    // var slots = ["A","B","C","D","E"].map((id) => <td key={id}></td>);
+    // var rows = [3,2,1].map((id) => <tr key={id}>{slots}</tr>);
+
+    // var slots = [];
+    // var rows = 3
+    // var cols = 5
+    // for (var i = 0; i < rows; i++) {
+    //   for (var j=0; j<cols; j++) {
+        
+    //   }
+    //   var base = 'protocol-item-'
+    //   var id_string = base.concat(i.toString())
+
+    //   var curr_protocol = this.props.protocols[i]
+    //   var is_selected = this.state.selectedItem === id_string
+    //   console.log(this.state)
+    //   console.log("IS SELECTED PROP")
+    //   console.log(i)
+    //   console.log(is_selected)
+      
+    //   slots.push(<ProtocolItem 
+    //                     key={i} 
+    //                     id_string={id_string}
+    //                     protocol_data={curr_protocol}
+    //                     protocol_name={curr_protocol['protocol']} 
+    //                     isSelected={is_selected}
+    //                     clickMethod={this.handleClick}
+    //                     deleteMethod={this.props.deleteMethod}
+    //                   />);
+    // }
+
+    // <table>
+    // <thead>
+    //   <tr>
+    //     <th></th>
+    //     <th>A</th>
+    //     <th>B</th>
+    //     <th>C</th>
+    //     <th>D</th>
+    //     <th>E</th>
+    //   </tr>
+    // </thead>
+    //      <tbody>
+    //        {rows}
+    //      </tbody>
+    //    </table>
+
+
     return (
         <table id="grid">
           <thead>
@@ -234,27 +284,27 @@ class Grid extends Component {
           <tbody>
             <tr>
               <th scope="row">3</th>
-              <td id='A3'>{grid['A3']}</td>
-              <td id='B3'>{grid['B3']}</td>
-              <td id='C3'>{grid['C3']}</td>
-              <td id='D3'>{grid['D3']}</td>
-              <td id='E3'>{grid['E3']}</td>
+              <td id='A3' className={(this.state.tiprack_selected == 'A3') ? 'labware-selected' : ''}>{grid['A3']}</td>
+              <td id='B3' className={(this.state.tiprack_selected == 'B3') ? 'labware-selected' : ''}>{grid['B3']}</td>
+              <td id='C3' className={(this.state.tiprack_selected == 'C3') ? 'labware-selected' : ''}>{grid['C3']}</td>
+              <td id='D3' className={(this.state.tiprack_selected == 'D3') ? 'labware-selected' : ''}>{grid['D3']}</td>
+              <td id='E3' className={(this.state.tiprack_selected == 'E3') ? 'labware-selected' : ''}>{grid['E3']}</td>
             </tr>
             <tr>
               <th scope="row">2</th>
-              <td id='A2'>{grid['A2']}</td>
-              <td id='B2'>{grid['B2']}</td>
-              <td id='C2'>{grid['C2']}</td>
-              <td id='D2'>{grid['D2']}</td>
-              <td id='E2'>{grid['E2']}</td>
+              <td id='A2' className={(this.state.tiprack_selected == 'A2') ? 'labware-selected' : ''}>{grid['A2']}</td>
+              <td id='B2' className={(this.state.tiprack_selected == 'B2') ? 'labware-selected' : ''}>{grid['B2']}</td>
+              <td id='C2' className={(this.state.tiprack_selected == 'C2') ? 'labware-selected' : ''}>{grid['C2']}</td>
+              <td id='D2' className={(this.state.tiprack_selected == 'D2') ? 'labware-selected' : ''}>{grid['D2']}</td>
+              <td id='E2' className={(this.state.tiprack_selected == 'E2') ? 'labware-selected' : ''}>{grid['E2']}</td>
             </tr>
             <tr>
               <th scope="row">1</th>
-              <td id='A1'>{grid['A1']}</td>
-              <td id='B1'>{grid['B1']}</td>
-              <td id='C1'>{grid['C1']}</td>
-              <td id='D1'>{grid['D1']}</td>
-              <td id='E1'>{grid['E1']}</td>
+              <td id='A1' className={(this.state.tiprack_selected == 'A1') ? 'labware-selected' : ''}>{grid['A1']}</td>
+              <td id='B1' className={(this.state.tiprack_selected == 'B1') ? 'labware-selected' : ''}>{grid['B1']}</td>
+              <td id='C1' className={(this.state.tiprack_selected == 'C1') ? 'labware-selected' : ''}>{grid['C1']}</td>
+              <td id='D1' className={(this.state.tiprack_selected == 'D1') ? 'labware-selected' : ''}>{grid['D1']}</td>
+              <td id='E1' className={(this.state.tiprack_selected == 'E1') ? 'labware-selected' : ''}>{grid['E1']}</td>
             </tr>
           </tbody>
         </table>
@@ -386,7 +436,6 @@ class ProtocolList extends Component {
 
   render() {
     // delete list items as needed
-    // TODO: fix so that the parent this.props.protocols is changed not the child's version
     var list_items = [];
     for (var i = 0; i < this.props.protocols.length; i++) {
       var base = 'protocol-item-'

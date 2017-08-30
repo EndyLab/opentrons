@@ -30,7 +30,7 @@ def hardcode():
 def hardcode_vision():
     return {
         'WellPlate' : [('A1', (30, 30, 20)), ('B2', (100, 20, 0))],
-        'TipRack' : [ ('A2', (23, 45, 10))],
+        'TipRack' : [ ('A2', (23, 45, 10)), ('E3', (0,0,0))],
     }
 def get_labware():
     # global get_labware_count, name_to_slot_coord_dict

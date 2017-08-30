@@ -47,6 +47,11 @@ th:first-child {
   
 }
 
+/* whent he user clicks on a tiprack */
+.labware-selected {
+	background-color: rgba(0, 0, 0, 0.3);
+} 
+
 .labware-tiprack-96 {
   	background-color: #3AE840;
 	display: inline-block;
