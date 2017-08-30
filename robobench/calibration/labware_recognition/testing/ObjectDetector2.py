@@ -49,7 +49,7 @@ class ObjectDetector:
                 self.category_index = label_map_util.create_category_index(self.categories)
                 self.sess = tf.Session(graph=self.detection_graph)
 
-    def detect(self, image, deck_roi=None):
+    def detect(self, image, deck_roi=None, debug=False):
         '''
         Detects objects in image and returns dictionary mapping 
         {object type:list of bounding boxes (ymin, xmin, ymax, xmax)}
@@ -68,9 +68,10 @@ class ObjectDetector:
             cropped_image = image[deck_roi[0][1]:deck_roi[1][1], deck_roi[0][0]:deck_roi[1][0]]
         else:
             cropped_image = image
-        print(deck_roi)
-        cv2.imshow("img to detect", cropped_image)
-        cv2.waitKey(0)
+        if debug:
+            print(deck_roi)
+            cv2.imshow("img to detect", cropped_image)
+            cv2.waitKey(0)
 
         # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
         image_np_expanded = np.expand_dims(cropped_image, axis=0)
@@ -99,7 +100,7 @@ class ObjectDetector:
         if deck_roi is not None:
             cropped_height, cropped_width, _ = cropped_image.shape
             full_height, full_width, _ = image.shape
-            print("Preadjustment boxes: {}".format(output))
+            #print("Preadjustment boxes: {}".format(output))
             for item, boxes in output.items():
                 for i in range(len(boxes)):
                     box = boxes[i]
@@ -109,7 +110,7 @@ class ObjectDetector:
                             (box[2] * cropped_height + deck_roi[0][1]) / full_height, 
                             (box[3] * cropped_width + deck_roi[0][0]) / full_width)
 
-        print("Final output: {}".format(output))
+        #print("Final output: {}".format(output))
 
         return output
 
