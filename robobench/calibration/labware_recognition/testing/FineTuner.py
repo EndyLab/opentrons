@@ -3,6 +3,7 @@ from inspect import getsourcefile
 from os.path import abspath, join, dirname
 from RobotCoordinateConverter import RobotCoordinateConverter
 import numpy as np
+import math
 
 class FineTuner:
 
@@ -12,7 +13,8 @@ class FineTuner:
     # TODO: measure point values properly
     # tiprack offset x 10, y 14 initially
     # (51, 315) --> (40.5, 301)
-    measurements = {'tiprack-200ul' : {'space' : 9, 'top_width' : 76, 'top_length' : 120, 'welloffset_x' : 8, 'welloffset_y' : 11, 'height_green' : 54, 'height_tip' : 64.5, 'tip_offset' : 54.5},
+    measurements = {# 'tiprack-200ul' : {'space' : 9, 'top_width' : 76, 'top_length' : 120, 'welloffset_x' : 8, 'welloffset_y' : 7, 'height_green' : 54, 'height_tip' : 64.5, 'tip_offset' : 54.5},
+                    'tiprack-200ul' : {'space' : 9, 'top_width' : 76, 'top_length' : 120, 'welloffset_x' : 7, 'welloffset_y' : 5, 'height_green' : 54, 'height_tip' : 64.5, 'tip_offset' : 54.5},
                     'WellPlate' : {'height_well' : 0, 'height_top': 11, 'welloffset_x' : 10.5, 'welloffset_y' : 10, 'length' : 127.33, 'width' : 85},
                     'Trash' : {'height': 50},
                     'Scale' : {'height' : 22},
@@ -65,40 +67,84 @@ class FineTuner:
             cv2.waitKey(0)
         _, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
         max_contour = max(contours, key=lambda x: cv2.contourArea(x))
-        cv2.drawContours(cropped_image, [max_contour], -1, (0,255,0), 3)
+        #cv2.drawContours(cropped_image, [max_contour], -1, (0,255,0), 3)
         if debug:
             cv2.imshow("Contours", cropped_image)
-        x,y,w,h = cv2.boundingRect(max_contour)
-        # A1 is bottom left
-        bottom_left = (x + crop_top_left[0], y + h + crop_top_left[1])
-        
-        # Need to pass in pixel values in relation to the entire image
+
         tiprack_vals = self.measurements['tiprack-200ul']
+        rect = cv2.minAreaRect(max_contour)
+        box = cv2.boxPoints(rect)
+        box = np.int0(box)
+        print(box)
+        left_to_right = sorted(box, key=lambda x: x[0])
+        print(left_to_right)
+        if left_to_right[0][1] > left_to_right[1][1]:
+            bottom_left = (left_to_right[0][0] + crop_top_left[0], left_to_right[0][1] + crop_top_left[1])
+            top_left = (left_to_right[1][0] + crop_top_left[0], left_to_right[1][1] + crop_top_left[1])
+        else:
+            bottom_left = (left_to_right[1][0] + crop_top_left[0], left_to_right[1][1] + crop_top_left[1])
+            top_left = (left_to_right[0][0] + crop_top_left[0], left_to_right[0][1] + crop_top_left[1])
+
+        if left_to_right[2][1] > left_to_right[3][1]:
+            bottom_right = (left_to_right[2][0] + crop_top_left[0], left_to_right[2][1] + crop_top_left[1])
+        else:
+            bottom_right = (left_to_right[3][0] + crop_top_left[0], left_to_right[3][1] + crop_top_left[1])
+
         robot_bottom_left = self.converter.pixelToRobot(bottom_left, self.converter.checkerboard_z + tiprack_vals['height_green'])
-        
-        robot_a1 =  (robot_bottom_left[0] + tiprack_vals['welloffset_x'], robot_bottom_left[1] + tiprack_vals['welloffset_y'], self.converter.checkerboard_z + tiprack_vals['height_tip'])
-        robot_top_left = ((robot_bottom_left[0] + tiprack_vals['top_width'], robot_bottom_left[1] + tiprack_vals['top_length'], robot_bottom_left[2]))
-        
-        a1 = self.converter.robotToPixel(robot_a1)
-        topleft = self.converter.robotToPixel(robot_top_left)
-        
-        if debug:
-            print("Bottom left: {}".format(bottom_left))
-            print("Robot bottom left: {}".format(robot_bottom_left))
-            print("Robot a1: {}".format(robot_a1))
-            print("Robot top left: {}".format(robot_top_left))
-            print("a1: {}".format(a1))
-            print("topleft: {}".format(topleft))
+        robot_bottom_right = self.converter.pixelToRobot(bottom_right, self.converter.checkerboard_z + tiprack_vals['height_green'])
+        robot_top_left = self.converter.pixelToRobot(top_left, self.converter.checkerboard_z + tiprack_vals['height_green'])
+        bottom_offset = (robot_bottom_right[0] - robot_bottom_left[0], robot_bottom_right[1] - robot_bottom_left[1])
+        bottom_dist = math.sqrt(bottom_offset[0] ** 2 + bottom_offset[1] ** 2)
+        left_offset = (robot_top_left[0] - robot_bottom_left[0], robot_top_left[1] - robot_bottom_left[1])
+        left_dist = math.sqrt(left_offset[0] ** 2 + left_offset[1] ** 2)
+        # print("robot_bottom_left: {}".format(robot_bottom_left))
+        # print("robot_bottom_right: {}".format(robot_bottom_right))
+        # print("robot_top_left: {}".format(robot_top_left))
+        # print("left_offset: {}".format(left_offset))
+        # print("bottom offset: {}".format(bottom_offset))
+        # print("bottom dist: {}".format(bottom_dist))
+        # print("left_dist: {}".format(left_dist))
 
-            cv2.line(image, bottom_left, topleft, (0, 0, 255), 2)
-            cv2.circle(image, a1, 3, (255, 0, 0), 2)
-            #cv2.rectangle(cropped_image,(x,y),(x+w,y+h),(0,255,0),2)
+        displace_x = left_offset[0]  / left_dist * tiprack_vals['welloffset_y'] + bottom_offset[0] / bottom_dist * tiprack_vals['welloffset_x']
+        displace_y = left_offset[1]  / left_dist * tiprack_vals['welloffset_y'] + bottom_offset[1] / bottom_dist * tiprack_vals['welloffset_x']
+        # print("disp x: {}".format(displace_x))
+        # print("disp y: {}".format(displace_y))
 
-            cv2.imshow("tiprack", thresh)
-            cv2.imshow("cropped image", cropped_image)
-            cv2.waitKey(0)
-        robot_a1 = (robot_a1[0], robot_a1[1], robot_a1[2] - tiprack_vals['tip_offset'])
+        robot_a1 = (robot_bottom_left[0] + displace_x, robot_bottom_left[1] + displace_y, -31)
         return robot_a1
+
+
+        # x,y,w,h = cv2.boundingRect(max_contour)
+        # # A1 is bottom left
+        # bottom_left = (x + crop_top_left[0], y + h + crop_top_left[1])
+        
+        # # Need to pass in pixel values in relation to the entire image
+        # tiprack_vals = self.measurements['tiprack-200ul']
+        # robot_bottom_left = self.converter.pixelToRobot(bottom_left, self.converter.checkerboard_z + tiprack_vals['height_green'])
+        
+        # robot_a1 =  (robot_bottom_left[0] + tiprack_vals['welloffset_x'], robot_bottom_left[1] + tiprack_vals['welloffset_y'], self.converter.checkerboard_z + tiprack_vals['height_tip'])
+        # robot_top_left = ((robot_bottom_left[0] + tiprack_vals['top_width'], robot_bottom_left[1] + tiprack_vals['top_length'], robot_bottom_left[2]))
+        
+        # a1 = self.converter.robotToPixel(robot_a1)
+        # topleft = self.converter.robotToPixel(robot_top_left)
+        
+        # if debug:
+        #     print("Bottom left: {}".format(bottom_left))
+        #     print("Robot bottom left: {}".format(robot_bottom_left))
+        #     print("Robot a1: {}".format(robot_a1))
+        #     print("Robot top left: {}".format(robot_top_left))
+        #     print("a1: {}".format(a1))
+        #     print("topleft: {}".format(topleft))
+
+        #     cv2.line(image, bottom_left, topleft, (0, 0, 255), 2)
+        #     cv2.circle(image, a1, 3, (255, 0, 0), 2)
+        #     cv2.rectangle(cropped_image,(x,y),(x+w,y+h),(0,255,0),2)
+
+        #     cv2.imshow("tiprack", thresh)
+        #     cv2.imshow("cropped image", cropped_image)
+        #     cv2.waitKey(0)
+        # robot_a1 = (robot_a1[0], robot_a1[1], robot_a1[2] - tiprack_vals['tip_offset'])
+        # return robot_a1
 
         # for cnt in contours:
         #     # TODO: limit to largest contour? Though there should only be 1 this large
