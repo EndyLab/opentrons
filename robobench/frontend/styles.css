@@ -1,0 +1,72 @@
+#grid table th {
+	width: 18%;
+	margin: 2%;
+	text-align: center;
+}
+
+#grid table td {
+	width: 18%;
+	margin: 2%;
+}
+
+.slot-grid {
+}
+
+.slot-grid > td {
+	height: 200px;
+	width: 100px;
+}
+
+.slot-grid > th {
+	width: 20%;
+}
+
+.well-96 {
+	display: block;
+	border: 1px solid grey;
+	padding: 2px;
+}
+
+.well-96 .well {
+	border: 0;
+	padding: 0;
+	outline: none;
+}
+
+.circle {
+	background-color: white;
+	border-radius: 50%;
+	border: 1px solid grey;
+	width: 14px;
+	height: 14px;
+	margin: 1px;
+}
+
+.circle:hover {
+	background-color: lime;
+}
+
+#dashboard {
+	background-color: #F8F9FA;
+	border-right: 1px solid #EEEEEE;
+	padding: 10px;
+}
+
+#protocols {
+	list-style-type:none;
+	padding-left: 0;
+}
+
+/* all children of protocol will have these properties*/
+#protocols > * {
+    margin: 10px;
+}
+
+.deck-labels {
+	padding: 0;
+}
+
+.table {
+	margin:0;
+	table-layout: fixed;
+}

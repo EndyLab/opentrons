@@ -1,0 +1,34 @@
+item {
+  id: 1
+  name: '96wellplate'
+}
+
+item {
+  id: 2
+  name: 'scale'
+}
+
+item {
+  id: 3
+  name: 'tiprack'
+}
+
+item {
+  id: 4
+  name: 'trough'
+}
+
+item {
+  id: 5
+  name: 'arm'
+}
+
+item {
+  id: 6
+  name: 'pipette'
+}
+
+item {
+  id: 7
+  name: 'trash'
+}

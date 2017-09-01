@@ -1,0 +1,28 @@
+<annotation verified="no">
+	<!-- Used to find images, with our file structure and described adjustment from README to the tfrs script not important -->
+	<folder>training</folder>
+	<filename>96wellplate_enzo_A3_t-0.jpg</filename>
+	<!-- Path needs to be the absolute path to the image file -->
+	<path>/Users/.../labware_recognition/models/object_detection/VOCdevkit/VOC2012/JPEGImages/96wellplate_enzo_A3_t-0.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>447</width>
+		<height>358</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>96wellplate</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>46</xmin>
+			<ymin>39</ymin>
+			<xmax>106</xmax>
+			<ymax>135</ymax>
+		</bndbox>
+	</object>
+	</annotation>
