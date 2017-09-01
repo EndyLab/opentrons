@@ -2,8 +2,8 @@ FisherBrand Tip Rack Holder
 ============================
 
 This tip rack holder snaps into the grid of the
-robot and holds any size FisherBrand Pipette Tip
-Rack steady in the grid slot to reduce error due
+robot and holds any size FisherBrand SureOne Pipette
+Tip Rack steady in the grid slot to reduce error due
 to movement of the tip rack and hold calibration.
 
 Directions:

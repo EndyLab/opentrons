@@ -1,6 +1,6 @@
 Camera Holder
 ==============
-The camera holder bottom holds an ELP USB camera
+The camera holder bottom holds an ELP USB camera PCB
 
 http://www.elpcctv.com/usb-cameras-c-85.html?page=3&sort=20a
 
