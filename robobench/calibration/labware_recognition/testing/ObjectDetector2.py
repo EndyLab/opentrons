@@ -16,6 +16,10 @@ from io import StringIO
 from matplotlib import pyplot as plt
 from PIL import Image
 
+import glob
+import time
+import imutils
+
 # This is needed since the notebook is stored in the object_detection folder.
 absolute_dir_path = abspath(dirname(getsourcefile(lambda:0)))
 sys.path.append(join(absolute_dir_path, "../models"))
@@ -118,12 +122,29 @@ class ObjectDetector:
 
 if __name__ == "__main__":
     detector = ObjectDetector(5, "../models/object_detection/TopViewPipeline/outputs/17806/frozen_inference_graph.pb", "../models/object_detection/TopViewPipeline/data/pascal_label_map_top.pbtxt")
-    img = cv2.imread("../models/object_detection/TopViewPipeline/VOCdevkit_top/VOC2012/JPEGImages/96wellplate_enzo_D3_t-0.jpg")
-    img2 = cv2.imread("../models/object_detection/TopViewPipeline/VOCdevkit_top/VOC2012/JPEGImages/96wellplate_enzo_D3_t-0.jpg")
-    print(detector.detect(img, ((50, 10), (1000, 1000))))
-    print(detector.detect(img2))
-    cv2.imshow("img", img)
-    cv2.imshow("img2", img2)
-    cv2.waitKey(0)
+    # img = cv2.imread("../models/object_detection/TopViewPipeline/VOCdevkit_top/VOC2012/JPEGImages/96wellplate_enzo_D3_t-0.jpg")
+    # img2 = cv2.imread("../models/object_detection/TopViewPipeline/VOCdevkit_top/VOC2012/JPEGImages/96wellplate_enzo_D3_t-0.jpg")
+    # print(detector.detect(img, ((50, 10), (1000, 1000))))
+    # print(detector.detect(img2))
+    # cv2.imshow("img", img)
+    # cv2.imshow("img2", img2)
+    # cv2.waitKey(0)
+    # index = 0
+    # images = glob.glob('../models/object_detection/TopViewPipeline/VOCdevkit_top/VOC2012/JPEGImages/*.jpg')
+    # for file in images:
+    #     img = cv2.imread(file)
+    #     cv2.imshow("image", img)
+    #     result = detector.detect(img)
+    #     cv2.imwrite("DetectorTest2/" + str(index) + ".jpg", img)
+    #     index = index + 1
+    cam = cv2.VideoCapture(0)
+    time.sleep(.25)
+
+    _, frame = cam.read()
+    detector.detect(frame)
+    cv2.imshow("frame", frame)
+    k = cv2.waitKey(0) & 0xFF
+    if k == 's':
+        cv2.imwrite("/Users/michaelbereket/Desktop/PosterFigures/detect.jpg", frame)
 
 

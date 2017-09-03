@@ -14,8 +14,10 @@ class FineTuner:
     # tiprack offset x 10, y 14 initially
     # (51, 315) --> (40.5, 301)
     measurements = {# 'tiprack-200ul' : {'space' : 9, 'top_width' : 76, 'top_length' : 120, 'welloffset_x' : 8, 'welloffset_y' : 7, 'height_green' : 54, 'height_tip' : 64.5, 'tip_offset' : 54.5},
-                    'tiprack-200ul' : {'space' : 9, 'top_width' : 76, 'top_length' : 120, 'welloffset_x' : 7, 'welloffset_y' : 5, 'height_green' : 54, 'height_tip' : 64.5, 'tip_offset' : 54.5},
-                    'WellPlate' : {'height_well' : 0, 'height_top': 11, 'welloffset_x' : 10.5, 'welloffset_y' : 10, 'length' : 127.33, 'width' : 85},
+                    #'tiprack-200ul' : {'space' : 9, 'top_width' : 76, 'top_length' : 120, 'welloffset_x' : 7, 'welloffset_y' : 5.5, 'height_green' : 54, 'height_tip' : 64.5, 'tip_offset' : 54.5},
+                    'tiprack-200ul' : {'space' : 9, 'top_width' : 76, 'top_length' : 120, 'welloffset_x' : 5, 'welloffset_y' : 7, 'height_green' : 54, 'height_tip' : 64.5, 'tip_offset' : 54.5},
+                    #'WellPlate' : {'height_well' : 0, 'height_top': 11, 'welloffset_x' : 10.5, 'welloffset_y' : 10, 'length' : 127.33, 'width' : 85},
+                    'WellPlate' : {'height_well' : 0, 'height_top': 11, 'welloffset_x' : 12.5, 'welloffset_y' : 15, 'length' : 127.33, 'width' : 85},
                     'Trash' : {'height': 50},
                     'Scale' : {'height' : 22},
                     'Trough' : {'height': 20}
@@ -175,7 +177,7 @@ class FineTuner:
         cropped_image = image[int(box[0] * height - 10):int(box[2] * height + 10), int(width * box[1] - 10):int(width * box[3] + 10)]
         cropped_height, cropped_width, _ = cropped_image.shape
         frame_to_thresh = cv2.cvtColor(cropped_image, cv2.COLOR_BGR2HSV)
-        thresh = cv2.inRange(frame_to_thresh, (0, 0, 165), (255, 255, 255))
+        thresh = cv2.inRange(frame_to_thresh, (0, 0, 140), (255, 255, 255))
         # night time, need to generalize to work in different conditions
         # thresh = cv2.inRange(frame_to_thresh, (0, 0, 100), (255, 255, 255))
         if debug:
@@ -402,6 +404,6 @@ class FineTuner:
 
 if __name__ == "__main__":
     img = cv2.imread('../calibration/checkerboard_images/img21.jpg')
-    ft = FineTuner(img)
+    ft = FineTuner(img, debug=True)
     print(ft.converter.robot_to_obj_mtx)
     print(ft.converter.obj_to_robot_mtx)

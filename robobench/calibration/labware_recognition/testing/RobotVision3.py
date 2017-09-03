@@ -24,9 +24,9 @@ class RobotVision:
         self.deck_roi = []
         # TODO: remove, for testing
         #frame = cv2.imread(join(self.absolute_dir_path,'../calibration/checkerboard_images/img21.jpg'))
-        path = join(self.absolute_dir_path, "VisionTestingImages/checkerboardimg4")
+        path = join(self.absolute_dir_path, "VisionTestingImages/checkerboardimg7")
         print(path)
-        frame = cv2.imread(join(self.absolute_dir_path, "VisionTestingImages/checkerboardimg4.jpg"))
+        frame = cv2.imread(join(self.absolute_dir_path, "VisionTestingImages/checkerboardimg7.jpg"))
         # self.select_deck_roi(frame)
         self.deck_dimensions = (5, 3)
         self.resize_width = 1000
@@ -150,13 +150,15 @@ class RobotVision:
             print(name_to_slots_boxes_map)
             print("Name to slots coordinates map: {}".format(name_to_slots_coordinates_map))
             cv2.imshow("Detected", frame)
-            cv2.waitKey(0)
+            k = cv2.waitKey(0) & 0xFF
+            if k == ord('s'):
+                cv2.imwrite("/Users/michaelbereket/Desktop/PosterFigures/detect.jpg", frame)
         return name_to_slots_coordinates_map
 
 if __name__ == "__main__":
-    vis = RobotVision()
-    frame = cv2.imread(join(vis.absolute_dir_path, "VisionTestingImages/deck7.jpg"))
-    print(vis.evaluate_deck())
+    vis = RobotVision(debug=True)
+    #frame = cv2.imread(join(vis.absolute_dir_path, "VisionTestingImages/tiptest2.jpg"))
+    print(vis.evaluate_deck(debug=True))
     #print(vis.fine_tune_calibrator.converter.obj_to_robot_mtx)
 
 

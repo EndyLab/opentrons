@@ -49,7 +49,15 @@ class RobotCoordinateConverter:
         # checkerboard image 3
         # return ((40, 400), (199, 400), (40, 296), -43)
         # checkerboard image 4
-        return ((60, 365), (218, 365), (60, 261), -41)
+       return ((60, 365), (218, 365), (60, 261), -41)
+       # checkerboard image 5
+       #return ((70, 370), (228, 370), (70, 292), -41.5)
+       #return ((59, 366), (217, 367), (59, 262), -41)
+       # checkerboard image 6
+       #return ((32, 390), (190, 390), (32, 285), -41.5)
+       #return ((34, 392), (192, 392), (34, 287), -41.5)
+       # checkerboard image 7
+       #return ((125, 215), (284, 215), (125, 109), -41)
 
     def calibrateRobotTransformation(self, robot_points, debug=False):
         '''
@@ -106,7 +114,7 @@ class RobotCoordinateConverter:
         criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
         objp = np.zeros((7*5, 1, 3), np.float32)
         objp[:,:,:2] = np.mgrid[0:7,  0:5].T.reshape(-1,1,2)
-        axis = np.float32([[3,0,0], [0,3,0], [0,0,-3]]).reshape(-1,3)
+        axis = np.float32([[15,0,0], [0,15,0], [0,0,-15]]).reshape(-1,3)
 
         gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
         #corners are 1x2 points
@@ -208,6 +216,7 @@ class RobotCoordinateConverter:
         # converts to object coords from robot coordinates (units are checkerboard squares)
         robot_xy = np.array([[robot_coord[0], robot_coord[1], 1]])
         obj_xy = np.dot(self.robot_to_obj_mtx, robot_xy.transpose())
+        print(obj_xy)
         #print(obj_xy)
         # -z for checkerboard comes out to camera, squares so scaling should be same x axis
         # obj_z = (robot_coord[2] + 82) / -27
@@ -231,38 +240,40 @@ if __name__ == "__main__":
     converter = RobotCoordinateConverter()
     # img = cv2.imread('../calibration/checkerboard_images/img21.jpg')
     img = cv2.imread('VisionTestingImages/checkerboardimg4.jpg')
-    converter.calibrate(img)
-    cam = cv2.VideoCapture(0)
-    while True:
-        _, img = cam.read()
-        img = imutils.resize(img, width=1000)
-        for i in range(-2, 6):
-            for j in range(-2, 6):
+    converter.calibrate(img, debug=True)
+    #cam = cv2.VideoCapture(0)
+    # while True:
+    #     _, img = cam.read()
+    #     img = imutils.resize(img, width=1000)
+    for i in range(-3, 15):
+        for j in range(-3, 15):
+            for k in range(2):
                 # Should be able to have one as the argument for the other
                 space = converter.object_to_robot_scale
-                p1 = converter.robotToPixel((60 + 85 * i, 365 - 127.33 * j, converter.checkerboard_z))
+                p1 = converter.robotToPixel((60 + space * i, 365 - space * j, converter.checkerboard_z + k * space))
                 #p2 = converter.robotToPixel((60 + space * i, 365 - space * j, 8))
-                p3 = converter.robotToPixel((60 + 85 * (i + 1), 365 - 127.33 * j, converter.checkerboard_z))
-                p4 = converter.robotToPixel((60 + 85 * i, 365 - 127.33 * (j + 1), converter.checkerboard_z))
+                p3 = converter.robotToPixel((60 + space * (i + 1), 365 - space * j, converter.checkerboard_z + k * space))
+                p4 = converter.robotToPixel((60 + space * i, 365 - space * (j + 1), converter.checkerboard_z + k * space))
                 # a1
-                p5 = converter.robotToPixel((60 + 85 * i + 11, 365 - 127.33 * j + 14, converter.checkerboard_z + 14))
-                p6 = converter.robotToPixel((60 + 85 * i, 365 - 127.33 * j, converter.checkerboard_z + 14))
-                p7 = converter.robotToPixel((60 + 85 * (i + 1), 365 - 127.33 * j, converter.checkerboard_z + 14))
-                p8 = converter.robotToPixel((60 + 85 * i, 365 - 127.33 * (j + 1), converter.checkerboard_z + 14))
+                # p5 = converter.robotToPixel((60 + space * i + 11, 365 - space * j + 14, converter.checkerboard_z + space))
+                p6 = converter.robotToPixel((60 + space * i, 365 - space * j, converter.checkerboard_z + space * (k+1)))
+                p7 = converter.robotToPixel((60 + space * (i + 1), 365 - space * j, converter.checkerboard_z + space * (k+1)))
+                p8 = converter.robotToPixel((60 + space * i, 365 - space * (j + 1), converter.checkerboard_z + space * (k+1)))
 
                 print("p1: {}".format(p1))
-                cv2.line(img, p1, p3, ((5 * i + 100) % 255, 0, (5 * j + 150) % 255), 1)
-                cv2.line(img, p1, p4, ((5 * i + 100) % 255, 0, (5 * j + 150) % 255), 1)
-                cv2.line(img, p1, p6, ((5 * i + 100) % 255, 0, (5 * j + 150) % 255), 1)
-                cv2.line(img, p6, p7, ((5 * i + 200) % 255, 0, (5 * j + 210) % 255), 1)
-                cv2.line(img, p6, p8, ((5 * i + 200) % 255, 0, (5 * j + 210) % 255), 1)
-                cv2.line
-                cv2.circle(img, p5, 3, (255, 100, 100), -1)
-                #cv2.line(img, p2, p4, ((5 * i + 100) % 255, 0, (5 * j + 150) % 255), 3)
-        cv2.imshow("img", img)
-        key = cv2.waitKey(1) & 0xff
-        if key == ord('q'):
-            break
+                cv2.line(img, p1, p3, (0, 255, 0), 1)
+                cv2.line(img, p1, p4, (0, 255, 0), 1)
+                cv2.line(img, p1, p6, (0, 255, 0), 1)
+                cv2.line(img, p6, p7, (0, 255, 0), 1)
+                cv2.line(img, p6, p8, (0, 255, 0), 1)
+            # cv2.line
+            # cv2.circle(img, p5, 3, (255, 100, 100), -1)
+            #cv2.line(img, p2, p4, ((5 * i + 100) % 255, 0, (5 * j + 150) % 255), 3)
+    cv2.imshow("img", img)
+    cv2.imwrite("/Users/michaelbereket/Desktop/PosterFigures/grid.jpg", img)
+        # key = cv2.waitKey(1) & 0xff
+        # if key == ord('q'):
+        #     break
 
     print(converter.robot_to_obj_mtx)
     print(converter.obj_to_robot_mtx)
