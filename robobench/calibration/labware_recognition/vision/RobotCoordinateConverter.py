@@ -47,7 +47,9 @@ class RobotCoordinateConverter:
 
     def getRobotPoints(self):
         # testset1
-        return ((146, 227), (304, 227), (146, 121.6666666), -41.5)
+        #return ((146, 227), (304, 227), (146, 121.6666666), -41.5)
+        # why would this change? bc I bumped the camera :(
+        return ((146, 230), (304, 230), (146, 124.6666666), -41.5)
 
     def calibrateRobotTransformation(self, robot_points, debug=False):
         '''

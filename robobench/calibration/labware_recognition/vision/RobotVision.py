@@ -142,7 +142,7 @@ class RobotVision:
             # TODO: don't assume read is successful
             _, frame = self.camera.read()
             frame = imutils.resize(frame, width=self.resize_width)
-            frame = self.undistort(frame, debug)
+            frame = self.converter.undistort(frame, debug)
         clean_frame = np.copy(frame)
         if len(self.deck_roi) == 2:
             # print("Passing in crop {}".format(self.deck_roi))
