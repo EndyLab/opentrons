@@ -1,0 +1,28 @@
+2018-01-26T02:05:12.124Z - info: Starting App
+2018-01-26T02:05:12.408Z - info: Initializing Audo Updater
+2018-01-26T02:05:12.409Z - info: Setting AUTO UPDATE URL to http://ot-app-releases-2.herokuapp.com?version=2.5.2
+2018-01-26T02:05:12.409Z - info: Auto updating is enabled, checking for updates
+2018-01-26T02:05:13.348Z - info: Uncaught Exception:  Error: Command failed: /tmp/.org.chromium.Chromium.7PH81b /opt/Opentrons 2.0/resources/app.asar.unpacked/ui
+Failed to execute script main
+Traceback (most recent call last):
+  File "opentrons/server/main.py", line 933, in <module>
+  File "opentrons/server/main.py", line 928, in start
+  File "site-packages/flask_socketio/__init__.py", line 466, in run
+  File "site-packages/gevent/baseserver.py", line 360, in serve_forever
+  File "site-packages/gevent/baseserver.py", line 304, in start
+  File "site-packages/gevent/pywsgi.py", line 1450, in init_socket
+  File "site-packages/gevent/server.py", line 127, in init_socket
+  File "site-packages/gevent/server.py", line 138, in get_listener
+  File "site-packages/gevent/server.py", line 229, in _tcp_listener
+OSError: [Errno 98] Address already in use: ('127.0.0.1', 31950)
+
+    at ChildProcess.exithandler (child_process.js:223:12)
+    at emitTwo (events.js:106:13)
+    at ChildProcess.emit (events.js:191:7)
+    at maybeClose (internal/child_process.js:885:16)
+    at Socket.<anonymous> (internal/child_process.js:334:11)
+    at emitOne (events.js:96:13)
+    at Socket.emit (events.js:188:7)
+    at Pipe._handle.close [as _onclose] (net.js:501:12)
+2018-01-26T02:05:13.491Z - info: Loading App UI at http://127.0.0.1:31950/
+2018-01-26T02:05:13.500Z - info: Dispatched .loadURL call

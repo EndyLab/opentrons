@@ -1,0 +1,203 @@
+2018-01-24 16:55:52,108 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,110 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M114.4 command w/timeout = 3
+2018-01-24 16:55:52,110 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M114.4  
+
+2018-01-24 16:55:52,110 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,112 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok MP: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0006
+2018-01-24 16:55:52,112 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,113 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,113 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending G0 command w/timeout = 300
+2018-01-24 16:55:52,113 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: G0 X0.0 B0.0 Z0.0 F12000 Y0.0 M400
+
+2018-01-24 16:55:52,114 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=300
+2018-01-24 16:55:52,118 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,118 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,118 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,118 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M114.2 command w/timeout = 3
+2018-01-24 16:55:52,119 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M114.2  
+
+2018-01-24 16:55:52,119 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,120 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok MCS: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000
+2018-01-24 16:55:52,120 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,120 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,121 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M114.4 command w/timeout = 3
+2018-01-24 16:55:52,121 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M114.4  
+
+2018-01-24 16:55:52,121 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,122 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok MP: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000
+2018-01-24 16:55:52,122 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,123 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,123 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M114.2 command w/timeout = 3
+2018-01-24 16:55:52,123 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M114.2  
+
+2018-01-24 16:55:52,123 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,124 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok MCS: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000
+2018-01-24 16:55:52,125 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,125 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,125 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M114.4 command w/timeout = 3
+2018-01-24 16:55:52,125 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M114.4  
+
+2018-01-24 16:55:52,125 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,127 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok MP: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000
+2018-01-24 16:55:52,127 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,127 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,127 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending G90 command w/timeout = 3
+2018-01-24 16:55:52,127 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: G90  
+
+2018-01-24 16:55:52,128 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,128 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,128 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,128 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,128 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M203.1 command w/timeout = 3
+2018-01-24 16:55:52,129 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M203.1 Z50 B11 Y200 A11 X200 
+
+2018-01-24 16:55:52,129 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,129 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,130 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,130 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,130 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M114.2 command w/timeout = 3
+2018-01-24 16:55:52,130 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M114.2  
+
+2018-01-24 16:55:52,130 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,132 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok MCS: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000
+2018-01-24 16:55:52,132 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,132 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,132 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M114.4 command w/timeout = 3
+2018-01-24 16:55:52,132 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M114.4  
+
+2018-01-24 16:55:52,132 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,134 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok MP: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000
+2018-01-24 16:55:52,134 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,134 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,134 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending G0 command w/timeout = 300
+2018-01-24 16:55:52,134 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: G0 X0.0 Z0.0 A0.000625 F12000 Y0.0 M400
+
+2018-01-24 16:55:52,135 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=300
+2018-01-24 16:55:52,139 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,139 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,139 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,140 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M114.2 command w/timeout = 3
+2018-01-24 16:55:52,140 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M114.2  
+
+2018-01-24 16:55:52,140 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,141 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok MCS: X:0.0000 Y:0.0000 Z:0.0000 A:0.0006 B:0.0000
+2018-01-24 16:55:52,141 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,142 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,142 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M114.4 command w/timeout = 3
+2018-01-24 16:55:52,142 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M114.4  
+
+2018-01-24 16:55:52,142 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,143 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok MP: X:0.0000 Y:0.0000 Z:0.0000 A:0.0006 B:0.0000
+2018-01-24 16:55:52,143 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,144 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,144 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M114.2 command w/timeout = 3
+2018-01-24 16:55:52,144 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M114.2  
+
+2018-01-24 16:55:52,144 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,145 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok MCS: X:0.0000 Y:0.0000 Z:0.0000 A:0.0006 B:0.0000
+2018-01-24 16:55:52,146 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,146 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,146 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M114.4 command w/timeout = 3
+2018-01-24 16:55:52,146 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M114.4  
+
+2018-01-24 16:55:52,146 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,148 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok MP: X:0.0000 Y:0.0000 Z:0.0000 A:0.0006 B:0.0000
+2018-01-24 16:55:52,148 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,148 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,148 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending G90 command w/timeout = 3
+2018-01-24 16:55:52,148 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: G90  
+
+2018-01-24 16:55:52,149 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,149 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,149 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,149 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,149 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M203.1 command w/timeout = 3
+2018-01-24 16:55:52,149 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M203.1 Z50 B11 Y200 A11 X200 
+
+2018-01-24 16:55:52,150 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,150 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,150 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,151 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,151 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M114.2 command w/timeout = 3
+2018-01-24 16:55:52,151 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M114.2  
+
+2018-01-24 16:55:52,151 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,152 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok MCS: X:0.0000 Y:0.0000 Z:0.0000 A:0.0006 B:0.0000
+2018-01-24 16:55:52,153 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,153 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,153 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M114.4 command w/timeout = 3
+2018-01-24 16:55:52,153 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M114.4  
+
+2018-01-24 16:55:52,153 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,155 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok MP: X:0.0000 Y:0.0000 Z:0.0000 A:0.0006 B:0.0000
+2018-01-24 16:55:52,155 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,155 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,155 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending G0 command w/timeout = 300
+2018-01-24 16:55:52,155 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: G0 X0.0 Z0.0 A0.0 F12000 Y0.0 M400
+
+2018-01-24 16:55:52,156 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=300
+2018-01-24 16:55:52,160 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,160 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,160 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,160 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M114.2 command w/timeout = 3
+2018-01-24 16:55:52,160 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M114.2  
+
+2018-01-24 16:55:52,161 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,162 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok MCS: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000
+2018-01-24 16:55:52,162 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,162 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,162 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M114.4 command w/timeout = 3
+2018-01-24 16:55:52,163 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M114.4  
+
+2018-01-24 16:55:52,163 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,164 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok MP: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000
+2018-01-24 16:55:52,164 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,165 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,165 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M114.2 command w/timeout = 3
+2018-01-24 16:55:52,165 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M114.2  
+
+2018-01-24 16:55:52,165 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,166 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok MCS: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000
+2018-01-24 16:55:52,167 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,167 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,167 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M114.4 command w/timeout = 3
+2018-01-24 16:55:52,167 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M114.4  
+
+2018-01-24 16:55:52,168 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,169 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok MP: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000
+2018-01-24 16:55:52,169 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,169 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,169 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M114.2 command w/timeout = 3
+2018-01-24 16:55:52,169 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M114.2  
+
+2018-01-24 16:55:52,170 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,171 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok MCS: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000
+2018-01-24 16:55:52,171 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,171 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,171 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M114.4 command w/timeout = 3
+2018-01-24 16:55:52,171 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M114.4  
+
+2018-01-24 16:55:52,172 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,173 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok MP: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000
+2018-01-24 16:55:52,173 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,173 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,173 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M114.2 command w/timeout = 3
+2018-01-24 16:55:52,173 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M114.2  
+
+2018-01-24 16:55:52,174 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,175 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok MCS: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000
+2018-01-24 16:55:52,175 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,175 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,175 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 263]     sending M114.4 command w/timeout = 3
+2018-01-24 16:55:52,176 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 271]     Write: M114.4  
+
+2018-01-24 16:55:52,176 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,177 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok MP: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000
+2018-01-24 16:55:52,177 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 175]     Reading line from serial with timeout=3
+2018-01-24 16:55:52,177 opentrons.drivers.smoothie_drivers.v2_0_0.driver DEBUG [Line 179]     Read: ok
+2018-01-24 16:55:52,178 opentrons-app INFO [Line 904]     [AR] b'{\n  "data": null,\n  "status": "success"\n}'
+2018-01-24 16:55:52,178 opentrons-app INFO [Line 904]     [AR] b'{\n  "data": null,\n  "status": "success"\n}'
+2018-01-24 16:55:52,181 opentrons-app INFO [Line 894]     [BR] GET http://localhost:31950/robot/versions | b''
+2018-01-24 16:55:52,181 opentrons-app INFO [Line 894]     [BR] GET http://localhost:31950/robot/versions | b''
+2018-01-24 16:55:52,181 opentrons-app INFO [Line 904]     [AR] b'{\n  "versions": {\n    "config": {\n      "compatible": true,\n      "version": "v2.0.0"\n    },\n    "firmware": {\n      "compatible": true,\n      "version": "edge-1c222d9NOMSD"\n    },\n    "ot_version": {\n      "compatible": true,\n      "version": "one_pro_plus"\n    }\n  }\n}'
+2018-01-24 16:55:52,181 opentrons-app INFO [Line 904]     [AR] b'{\n  "versions": {\n    "config": {\n      "compatible": true,\n      "version": "v2.0.0"\n    },\n    "firmware": {\n      "compatible": true,\n      "version": "edge-1c222d9NOMSD"\n    },\n    "ot_version": {\n      "compatible": true,\n      "version": "one_pro_plus"\n    }\n  }\n}'
