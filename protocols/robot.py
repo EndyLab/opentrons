@@ -3,10 +3,10 @@
 from opentrons import robot, containers, instruments
 import os
 import IPython
-
-# This protocol sets up a T4 ligase reaction in a PCR strip.
+import glob
 
 # Configure the robot
+# Set up your deck layout here.
 
 #  Layout:
 #    A     B       C      D      E
@@ -61,7 +61,21 @@ p200 = instruments.Pipette(
 # Go higher between wells
 robot.arc_height=20
 
-print("Connecting to robot {}".format(os.environ['ROBOT_DEV']))
-robot.connect(os.environ['ROBOT_DEV'])
+# Determine the robot device we should be using.
+if not 'ROBOT_DEV' in os.environ:
+    print("Please select a robot device")
+    devs = glob.glob("/dev/ttyACM*")
+    for i, dev in enumerate(devs):
+        print("  {}: {}".format(i, dev))
+    robot_dev = input()
+    if robot_dev.isdigit():
+        robot_dev = devs[int(robot_dev)]
+
+    print()
+else:
+    robot_dev = os.environ['ROBOT_DEV']
+
+print("Connecting to robot {}".format(robot_dev))
+robot.connect(robot_dev)
 
 IPython.embed()
