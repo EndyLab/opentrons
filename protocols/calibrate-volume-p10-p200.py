@@ -29,7 +29,7 @@ p200 = instruments.Pipette(
 
 p10.pick_up_tip()
 for well in plate2.rows:
-    p10.aspirate(9, ddH2O)
+    p10.aspirate(2, ddH2O)
     p10.dispense(well.bottom())
     p10.blow_out()
     p10.touch_tip()
@@ -39,7 +39,7 @@ p10.drop_tip()
 p200.pick_up_tip()
 
 for well in plate1.rows:
-    p200.aspirate(200, ddH2O)
+    p200.aspirate(20, ddH2O)
     p200.blow_out(well.bottom())
     p200.touch_tip()
 
