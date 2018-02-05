@@ -7,47 +7,54 @@ import os
 import glob
 import re
 
-def change_calibration(turret,pipette,slot,container,axis,amount):
-    with open("../robots/da5id_dup/calibrations/calibrations.json","r") as json_file:
-        calibrations = json.load(json_file)
-        pipette = turret+":"+pipette
-        current_cali = calibrations["data"][pipette]["calibration_data"][slot]["children"][container]["delta"]
-        print(current_cali)
-        y_cali, z_cali, x_cali = re.match(
-            r'{"y": (-?[0-9]+\S[0-9]+), "z": (-?[0-9]+\S[0-9]+), "x": (-?[0-9]+\S[0-9]+)}',
-            current_cali).groups()
-        cali = dict({"y" : float(y_cali),"z" : float(z_cali),"x" : float(x_cali)})
-        cali[axis] +=  amount
-        re_cali = "{\"y\": %f, \"z\": %f, \"x\": %f}" % (cali["y"],cali["z"],cali["x"])
-        print(re_cali)
-
-        calibrations["data"]["a:p10-8"]["calibration_data"]["C3"]["children"]["PCR-strip-tall"]["delta"] = re_cali
-    with open("../robots/da5id_dup/calibrations/calibrations.json","w") as json_file:
-        json.dump(calibrations,json_file,indent=4)
-
-turret = "a"
-pipette = "p10-8"
-slot = "C3"
-container = "PCR-strip-tall"
-axis = "y"
-amount = -1
+import getch
 
 port = os.environ["ROBOT_DEV"]
 robot.connect(port)
 
+p10_tiprack = containers.load('tiprack-10ul', "E2")
+
+trash = containers.load('point', 'D1', 'holywastedplasticbatman')
+uncalibrated = containers.load('point', 'B2','uncalibrated')
+calibrated = containers.load('point', 'D2','calibrated')
+
+p10 = instruments.Pipette(
+    axis='a',
+    max_volume=10,
+    min_volume=0.5,
+    tip_racks=p10_tiprack,
+    trash_container=trash,
+    channels=8,
+    name='p10-8'
+    )
+
+def change_height(container):
+    x = 0
+    print("h:+0.5,j:+0.1,k:-0.1,l:-0.5")
+    while x == 0:
+        c = getch.getch()
+        if c == "h":
+            p10.robot._driver.move(z=0.5,mode="relative")
+        elif c == "j":
+            p10.robot._driver.move(z=0.1,mode="relative")
+        elif c == "k":
+            p10.robot._driver.move(z=-0.1,mode="relative")
+        elif c == "l":
+            p10.robot._driver.move(z=-0.5,mode="relative")
+        elif c == "x":
+            x = 1 
+    p10.calibrate_position((container))
+
+    return p10
+
 robot.home()
 
-p10_tipracks = [
-    containers.load('tiprack-10ul', locations[1,1])
-]
-
-uncalibrated = containers.load('point', "B2")
-calibrated = containers.load('point', "D2")
-
+p10.move_to(uncalibrated)
+change_height(uncalibrated)
 p10.move_to(uncalibrated)
 
-change_calibration(turret,pipette,slot,container,axis,amount)
 
+input("old script?")
 
 
 

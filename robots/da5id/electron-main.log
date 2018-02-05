@@ -1026,3 +1026,145 @@ OSError: [Errno 98] Address already in use: ('127.0.0.1', 31950)
     at endReadableNT (_stream_readable.js:974:12)
     at _combinedTickCallback (internal/process/next_tick.js:74:11)
     at process._tickCallback (internal/process/next_tick.js:98:9)
+2018-02-05T18:25:33.183Z - info: Starting App
+2018-02-05T18:25:33.253Z - info: Initializing Audo Updater
+2018-02-05T18:25:33.253Z - info: Setting AUTO UPDATE URL to http://ot-app-releases-2.herokuapp.com?version=2.5.2
+2018-02-05T18:25:33.254Z - info: Auto updating is enabled, checking for updates
+2018-02-05T18:25:35.344Z - info: Loading App UI at http://127.0.0.1:31950/
+2018-02-05T18:25:35.350Z - info: Dispatched .loadURL call
+2018-02-05T18:42:20.569Z - info: Electron App window closed, quitting App
+2018-02-05T18:42:20.606Z - error: Received an expected error while calling exit route StatusCodeError: 500 - "Internal Server Error"
+    at new StatusCodeError (/opt/Opentrons 2.0/resources/app.asar/node_modules/request-promise-core/lib/errors.js:32:15)
+    at Request.plumbing.callback (/opt/Opentrons 2.0/resources/app.asar/node_modules/request-promise-core/lib/plumbing.js:104:33)
+    at Request.RP$callback [as _callback] (/opt/Opentrons 2.0/resources/app.asar/node_modules/request-promise-core/lib/plumbing.js:46:31)
+    at Request.self.callback (/opt/Opentrons 2.0/resources/app.asar/node_modules/request/request.js:188:22)
+    at emitTwo (events.js:106:13)
+    at Request.emit (events.js:191:7)
+    at Request.<anonymous> (/opt/Opentrons 2.0/resources/app.asar/node_modules/request/request.js:1171:10)
+    at emitOne (events.js:96:13)
+    at Request.emit (events.js:188:7)
+    at IncomingMessage.<anonymous> (/opt/Opentrons 2.0/resources/app.asar/node_modules/request/request.js:1091:12)
+    at Object.onceWrapper (events.js:290:19)
+    at emitNone (events.js:91:20)
+    at IncomingMessage.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:974:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)
+2018-02-05T18:42:25.081Z - info: Starting App
+2018-02-05T18:42:25.153Z - info: Initializing Audo Updater
+2018-02-05T18:42:25.153Z - info: Setting AUTO UPDATE URL to http://ot-app-releases-2.herokuapp.com?version=2.5.2
+2018-02-05T18:42:25.154Z - info: Auto updating is enabled, checking for updates
+2018-02-05T18:42:27.221Z - info: Loading App UI at http://127.0.0.1:31950/
+2018-02-05T18:42:27.227Z - info: Dispatched .loadURL call
+2018-02-05T18:43:01.294Z - info: Electron App window closed, quitting App
+2018-02-05T18:43:06.857Z - info: Starting App
+2018-02-05T18:43:06.934Z - info: Initializing Audo Updater
+2018-02-05T18:43:06.934Z - info: Setting AUTO UPDATE URL to http://ot-app-releases-2.herokuapp.com?version=2.5.2
+2018-02-05T18:43:06.935Z - info: Auto updating is enabled, checking for updates
+2018-02-05T18:44:06.863Z - info: Starting App
+2018-02-05T18:44:06.959Z - info: Initializing Audo Updater
+2018-02-05T18:44:06.960Z - info: Setting AUTO UPDATE URL to http://ot-app-releases-2.herokuapp.com?version=2.5.2
+2018-02-05T18:44:06.960Z - info: Auto updating is enabled, checking for updates
+2018-02-05T18:50:56.803Z - info: Starting App
+2018-02-05T18:50:56.884Z - info: Initializing Audo Updater
+2018-02-05T18:50:56.885Z - info: Setting AUTO UPDATE URL to http://ot-app-releases-2.herokuapp.com?version=2.5.2
+2018-02-05T18:50:56.885Z - info: Auto updating is enabled, checking for updates
+2018-02-05T18:51:14.572Z - info: Starting App
+2018-02-05T18:51:14.708Z - info: Initializing Audo Updater
+2018-02-05T18:51:14.709Z - info: Setting AUTO UPDATE URL to http://ot-app-releases-2.herokuapp.com?version=2.5.2
+2018-02-05T18:51:14.710Z - info: Auto updating is enabled, checking for updates
+2018-02-05T18:51:26.559Z - info: Starting App
+2018-02-05T18:51:26.636Z - info: Initializing Audo Updater
+2018-02-05T18:51:26.637Z - info: Setting AUTO UPDATE URL to http://ot-app-releases-2.herokuapp.com?version=2.5.2
+2018-02-05T18:51:26.637Z - info: Auto updating is enabled, checking for updates
+2018-02-05T18:52:18.702Z - info: Starting App
+2018-02-05T18:52:18.777Z - info: Initializing Audo Updater
+2018-02-05T18:52:18.777Z - info: Setting AUTO UPDATE URL to http://ot-app-releases-2.herokuapp.com?version=2.5.2
+2018-02-05T18:52:18.778Z - info: Auto updating is enabled, checking for updates
+2018-02-05T18:52:23.196Z - info: Starting App
+2018-02-05T18:52:23.282Z - info: Initializing Audo Updater
+2018-02-05T18:52:23.283Z - info: Setting AUTO UPDATE URL to http://ot-app-releases-2.herokuapp.com?version=2.5.2
+2018-02-05T18:52:23.284Z - info: Auto updating is enabled, checking for updates
+2018-02-05T18:52:34.278Z - info: Electron App window closed, quitting App
+2018-02-05T18:52:34.283Z - info: Electron App window closed, quitting App
+2018-02-05T18:52:34.289Z - info: Electron App window closed, quitting App
+2018-02-05T18:52:34.290Z - info: Electron App window closed, quitting App
+2018-02-05T18:52:34.351Z - info: Electron App window closed, quitting App
+2018-02-05T18:53:32.788Z - info: Starting App
+2018-02-05T18:53:32.938Z - info: Initializing Audo Updater
+2018-02-05T18:53:32.938Z - info: Setting AUTO UPDATE URL to http://ot-app-releases-2.herokuapp.com?version=2.5.2
+2018-02-05T18:53:32.938Z - info: Auto updating is enabled, checking for updates
+2018-02-05T18:53:35.028Z - info: Loading App UI at http://127.0.0.1:31950/
+2018-02-05T18:53:35.041Z - info: Dispatched .loadURL call
+2018-02-05T18:53:43.736Z - info: Electron App window closed, quitting App
+2018-02-05T18:53:43.749Z - error: Received an expected error while calling exit route StatusCodeError: 500 - "Internal Server Error"
+    at new StatusCodeError (/opt/Opentrons 2.0/resources/app.asar/node_modules/request-promise-core/lib/errors.js:32:15)
+    at Request.plumbing.callback (/opt/Opentrons 2.0/resources/app.asar/node_modules/request-promise-core/lib/plumbing.js:104:33)
+    at Request.RP$callback [as _callback] (/opt/Opentrons 2.0/resources/app.asar/node_modules/request-promise-core/lib/plumbing.js:46:31)
+    at Request.self.callback (/opt/Opentrons 2.0/resources/app.asar/node_modules/request/request.js:188:22)
+    at emitTwo (events.js:106:13)
+    at Request.emit (events.js:191:7)
+    at Request.<anonymous> (/opt/Opentrons 2.0/resources/app.asar/node_modules/request/request.js:1171:10)
+    at emitOne (events.js:96:13)
+    at Request.emit (events.js:188:7)
+    at IncomingMessage.<anonymous> (/opt/Opentrons 2.0/resources/app.asar/node_modules/request/request.js:1091:12)
+    at Object.onceWrapper (events.js:290:19)
+    at emitNone (events.js:91:20)
+    at IncomingMessage.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:974:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)
+2018-02-05T18:53:55.898Z - info: Starting App
+2018-02-05T18:53:55.979Z - info: Initializing Audo Updater
+2018-02-05T18:53:55.980Z - info: Setting AUTO UPDATE URL to http://ot-app-releases-2.herokuapp.com?version=2.5.2
+2018-02-05T18:53:55.980Z - info: Auto updating is enabled, checking for updates
+2018-02-05T18:53:58.063Z - info: Loading App UI at http://127.0.0.1:31950/
+2018-02-05T18:53:58.069Z - info: Dispatched .loadURL call
+2018-02-05T18:55:13.151Z - info: Electron App window closed, quitting App
+2018-02-05T18:55:13.201Z - error: Received an expected error while calling exit route StatusCodeError: 500 - "Internal Server Error"
+    at new StatusCodeError (/opt/Opentrons 2.0/resources/app.asar/node_modules/request-promise-core/lib/errors.js:32:15)
+    at Request.plumbing.callback (/opt/Opentrons 2.0/resources/app.asar/node_modules/request-promise-core/lib/plumbing.js:104:33)
+    at Request.RP$callback [as _callback] (/opt/Opentrons 2.0/resources/app.asar/node_modules/request-promise-core/lib/plumbing.js:46:31)
+    at Request.self.callback (/opt/Opentrons 2.0/resources/app.asar/node_modules/request/request.js:188:22)
+    at emitTwo (events.js:106:13)
+    at Request.emit (events.js:191:7)
+    at Request.<anonymous> (/opt/Opentrons 2.0/resources/app.asar/node_modules/request/request.js:1171:10)
+    at emitOne (events.js:96:13)
+    at Request.emit (events.js:188:7)
+    at IncomingMessage.<anonymous> (/opt/Opentrons 2.0/resources/app.asar/node_modules/request/request.js:1091:12)
+    at Object.onceWrapper (events.js:290:19)
+    at emitNone (events.js:91:20)
+    at IncomingMessage.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:974:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)
+2018-02-05T18:55:16.791Z - info: Starting App
+2018-02-05T18:55:16.857Z - info: Initializing Audo Updater
+2018-02-05T18:55:16.858Z - info: Setting AUTO UPDATE URL to http://ot-app-releases-2.herokuapp.com?version=2.5.2
+2018-02-05T18:55:16.858Z - info: Auto updating is enabled, checking for updates
+2018-02-05T18:55:18.953Z - info: Loading App UI at http://127.0.0.1:31950/
+2018-02-05T18:55:18.960Z - info: Dispatched .loadURL call
+2018-02-05T20:11:51.159Z - info: Starting App
+2018-02-05T20:11:51.264Z - info: Initializing Audo Updater
+2018-02-05T20:11:51.265Z - info: Setting AUTO UPDATE URL to http://ot-app-releases-2.herokuapp.com?version=2.5.2
+2018-02-05T20:11:51.266Z - info: Auto updating is enabled, checking for updates
+2018-02-05T20:11:52.345Z - info: Loading App UI at http://127.0.0.1:31950/
+2018-02-05T20:11:52.348Z - info: Dispatched .loadURL call
+2018-02-05T20:12:23.306Z - info: Electron App window closed, quitting App
+2018-02-05T20:12:23.327Z - error: Received an expected error while calling exit route StatusCodeError: 500 - "Internal Server Error"
+    at new StatusCodeError (/opt/Opentrons 2.0/resources/app.asar/node_modules/request-promise-core/lib/errors.js:32:15)
+    at Request.plumbing.callback (/opt/Opentrons 2.0/resources/app.asar/node_modules/request-promise-core/lib/plumbing.js:104:33)
+    at Request.RP$callback [as _callback] (/opt/Opentrons 2.0/resources/app.asar/node_modules/request-promise-core/lib/plumbing.js:46:31)
+    at Request.self.callback (/opt/Opentrons 2.0/resources/app.asar/node_modules/request/request.js:188:22)
+    at emitTwo (events.js:106:13)
+    at Request.emit (events.js:191:7)
+    at Request.<anonymous> (/opt/Opentrons 2.0/resources/app.asar/node_modules/request/request.js:1171:10)
+    at emitOne (events.js:96:13)
+    at Request.emit (events.js:188:7)
+    at IncomingMessage.<anonymous> (/opt/Opentrons 2.0/resources/app.asar/node_modules/request/request.js:1091:12)
+    at Object.onceWrapper (events.js:290:19)
+    at emitNone (events.js:91:20)
+    at IncomingMessage.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:974:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)

@@ -18,6 +18,9 @@ agar_plate1 = containers.load('96-deep-well', 'D2')
 
 
 trash = containers.load('point', 'D1', 'holywastedplasticbatman')
+uncalibrated = containers.load('point', 'B2','uncalibrated')
+calibrated = containers.load('point', 'D2','calibrated')
+
 
 p10 = instruments.Pipette(
     axis='a',
@@ -38,6 +41,9 @@ p200 = instruments.Pipette(
     channels=1,
     name='p200-1'
 )
+
+p10.move_to(uncalibrated)
+p10.move_to(calibrated)
 
 p200.pick_up_tip()
 p200.aspirate(150,centrifuge_tube['A1'].bottom())
