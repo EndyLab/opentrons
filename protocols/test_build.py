@@ -2,6 +2,10 @@ from opentrons import robot, containers, instruments
 import argparse
 import sys
 
+import numpy as np
+import pandas as pd
+import os
+
 from datetime import datetime
 
 # Specify locations, note that locations are indexed by the spot in the array
@@ -15,12 +19,12 @@ locations = np.array([["tiprack-200", "A3"],
                     ["Tube Rack","B1"]])
 
 # Attach a location to each of the source plates
-layout = list(zip(pd.unique(plates),SOURCE_SLOTS[:len(plates)]))
-locations = np.append(locations,layout, axis=0)
+#layout = list(zip(pd.unique(plates),SOURCE_SLOTS[:len(plates)]))
+#locations = np.append(locations,layout, axis=0)
 
 # Fill in the data frame with the locations
-for row,col in locations:
-    layout_table.loc[col[1], col[0]] = row
+#for row,col in locations:
+#    layout_table.loc[col[1], col[0]] = row
 
 # Displays the required plate map and waits to proceed
 #print()
@@ -30,14 +34,19 @@ for row,col in locations:
 #print()
 
 # Make the dataframe to represent the OT-1 deck
-deck = ['A1','B2','C3','D2','E1']
-slots = pd.Series(deck)
-columns = sorted(slots.str[0].unique())
-rows = sorted(slots.str[1].unique(), reverse=True)
-layout_table = pd.DataFrame(index=rows, columns=columns)
-layout_table.fillna("---", inplace=True)
+#deck = ['A1','B2','C3','D2','E1']
+#slots = pd.Series(deck)
+#columns = sorted(slots.str[0].unique())
+#rows = sorted(slots.str[1].unique(), reverse=True)
+#layout_table = pd.DataFrame(index=rows, columns=columns)
+#layout_table.fillna("---", inplace=True)
+
+port = os.environ["ROBOT_DEV"]
+robot.connect(port)
 
 robot.home()
+
+input("pause")
 
 p200_tipracks = [
     containers.load('tiprack-200ul', locations[0,1]),
@@ -54,8 +63,8 @@ master = containers.load('PCR-strip-tall', locations[5,1])
 dest_plate = containers.load('96-PCR-tall', locations[6,1])
 
 source_plates = [
-    containers.load('96-flat', "D2")
-    containers.load('96-flat', "D3")
+    containers.load('96-flat', "D2"),
+    containers.load('96-flat', "D3"),
     containers.load('96-flat', "B2")
 ]
 
@@ -86,7 +95,7 @@ print("Starting run at: ",start)
 
 p10.pick_up_tip()
 for number in [0,1]:
-    p10.transfer(8, master['A1'].bottom(), dest_plate.rows(1), mix_before=(1,8), blow_out=True, new_tip='never')
+    p10.transfer(8, master['A1'].bottom(), dest_plate.rows(0).bottom(), mix_before=(1,8), blow_out=True, new_tip='never')
 p10.drop_tip()
 
 stop = datetime.now()

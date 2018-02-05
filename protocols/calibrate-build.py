@@ -4,7 +4,7 @@ p10_tiprack = containers.load('tiprack-10ul', 'E1')
 #p10_tiprack = containers.load('tiprack-10ul', 'E2')
 #p10_tiprack = containers.load('tiprack-10ul', 'E3')
 
-p200_tiprack = containers.load('tiprack-200ul', 'A1')
+p200_tiprack = containers.load('tiprack-200ul', 'A3')
 
 centrifuge_tube = containers.load('tube-rack-2ml','B1')
 tubes = containers.load('96-PCR-tall','C2')

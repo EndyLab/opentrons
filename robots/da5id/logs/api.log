@@ -1,0 +1,42 @@
+2018-01-30 17:29:29,418 opentrons.drivers.smoothie_drivers.v2_0_0.driver ERROR [Line 339]     Failed to send MOVE command. Will reconnect and try again in 1 seconds
+Traceback (most recent call last):
+  File "/home/koeng/.local/lib/python3.6/site-packages/opentrons/drivers/smoothie_drivers/v2_0_0/driver.py", line 339, in move
+    self.send_command(self.MOVE, **args, m400=True, timeout=300)
+  File "/home/koeng/.local/lib/python3.6/site-packages/opentrons/drivers/smoothie_drivers/v2_0_0/driver.py", line 279, in send_command
+    return self.readline_from_serial(timeout=timeout)
+  File "/home/koeng/.local/lib/python3.6/site-packages/opentrons/drivers/smoothie_drivers/v2_0_0/driver.py", line 176, in readline_from_serial
+    self.connection.wait_for_data(timeout=timeout)
+  File "/home/koeng/.local/lib/python3.6/site-packages/opentrons/drivers/connection.py", line 64, in wait_for_data
+    if self.data_available():
+  File "/home/koeng/.local/lib/python3.6/site-packages/opentrons/drivers/connection.py", line 54, in data_available
+    return int(self.serial_port.in_waiting)
+  File "/home/koeng/.local/lib/python3.6/site-packages/serial/serialposix.py", line 457, in in_waiting
+    return struct.unpack('I', s)[0]
+  File "/home/koeng/.local/lib/python3.6/site-packages/serial/serialposix.py", line 457, in in_waiting
+    return struct.unpack('I', s)[0]
+  File "/usr/lib/python3.6/bdb.py", line 48, in trace_dispatch
+    return self.dispatch_line(frame)
+  File "/usr/lib/python3.6/bdb.py", line 67, in dispatch_line
+    if self.quitting: raise BdbQuit
+bdb.BdbQuit
+2018-01-30 17:29:41,527 opentrons.drivers.smoothie_drivers.v2_0_0.driver ERROR [Line 339]     Failed to send MOVE command. Will reconnect and try again in 1 seconds
+Traceback (most recent call last):
+  File "/home/koeng/.local/lib/python3.6/site-packages/opentrons/drivers/smoothie_drivers/v2_0_0/driver.py", line 339, in move
+    self.send_command(self.MOVE, **args, m400=True, timeout=300)
+  File "/home/koeng/.local/lib/python3.6/site-packages/opentrons/drivers/smoothie_drivers/v2_0_0/driver.py", line 279, in send_command
+    return self.readline_from_serial(timeout=timeout)
+  File "/home/koeng/.local/lib/python3.6/site-packages/opentrons/drivers/smoothie_drivers/v2_0_0/driver.py", line 176, in readline_from_serial
+    self.connection.wait_for_data(timeout=timeout)
+  File "/home/koeng/.local/lib/python3.6/site-packages/opentrons/drivers/connection.py", line 64, in wait_for_data
+    if self.data_available():
+  File "/home/koeng/.local/lib/python3.6/site-packages/opentrons/drivers/connection.py", line 54, in data_available
+    return int(self.serial_port.in_waiting)
+  File "/home/koeng/.local/lib/python3.6/site-packages/serial/serialposix.py", line 456, in in_waiting
+    s = fcntl.ioctl(self.fd, TIOCINQ, TIOCM_zero_str)
+  File "./build.py", line 335, in <lambda>
+    signal.signal(signal.SIGINT, lambda *args: ipdb.set_trace())
+  File "/usr/lib/python3.6/bdb.py", line 52, in trace_dispatch
+    return self.dispatch_return(frame, arg)
+  File "/usr/lib/python3.6/bdb.py", line 96, in dispatch_return
+    if self.quitting: raise BdbQuit
+bdb.BdbQuit

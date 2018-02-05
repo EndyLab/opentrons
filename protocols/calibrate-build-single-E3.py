@@ -1,6 +1,6 @@
 from opentrons import robot, containers, instruments
 
-p10_tiprack_single = containers.load('tiprack-10ul', 'E2')
+p10_tiprack_single = containers.load('tiprack-10ul', 'E3')
 p200_tiprack = containers.load('tiprack-200ul', 'A3')
 
 tubes_single = containers.load('96-PCR-tall','C2')
@@ -9,8 +9,7 @@ source1_single = containers.load('96-flat','D2')
 source2_single = containers.load('96-flat','B3')
 source3_single = containers.load('96-flat','D3')
 source4_single = containers.load('96-flat','B2')
-
-trash = containers.load('point', 'B1', 'holywastedplasticbatman')
+trash = containers.load('point', 'D1', 'holywastedplasticbatman')
 
 p10single = instruments.Pipette(
     axis='a',

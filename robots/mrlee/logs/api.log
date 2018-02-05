@@ -1,0 +1,7 @@
+2018-01-31 16:18:59,796 opentrons.drivers.smoothie_drivers.v2_0_0.driver ERROR [Line 349]     Failed to send MOVE command. Will reconnect and try again in 1 seconds
+Traceback (most recent call last):
+  File "/home/koeng/.local/lib/python3.6/site-packages/opentrons/drivers/smoothie_drivers/v2_0_0/driver.py", line 340, in move
+    self.wait_for_ok()
+  File "/home/koeng/.local/lib/python3.6/site-packages/opentrons/drivers/smoothie_drivers/v2_0_0/driver.py", line 164, in wait_for_ok
+    '{0}: {1}'.format(self.SMOOTHIE_ERROR, res))
+RuntimeError: Received unexpected response from Smoothie: Build version: edge-1c222d9NOMSD, Build date: Mar 18 2017 19:01:47, MCU: LPC1768, System Clock: 100MHz
