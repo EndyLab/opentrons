@@ -18,7 +18,7 @@ agar_plate1 = containers.load('96-deep-well', 'D2')
 
 
 trash = containers.load('point', 'D1', 'holywastedplasticbatman')
-uncalibrated = containers.load('point', 'B2','uncalibrated')
+uncalibrated = containers.load('96-deep-well', 'B2','uncalibrated')
 calibrated = containers.load('point', 'D2','calibrated')
 
 
@@ -30,7 +30,7 @@ p10 = instruments.Pipette(
     trash_container=trash,
     channels=8,
     name='p10-8'
-)
+    )
 
 p200 = instruments.Pipette(
     axis='b',

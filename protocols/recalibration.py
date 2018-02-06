@@ -8,6 +8,7 @@ import glob
 import re
 
 import getch
+import IPython
 
 port = os.environ["ROBOT_DEV"]
 robot.connect(port)
@@ -15,7 +16,7 @@ robot.connect(port)
 p10_tiprack = containers.load('tiprack-10ul', "E2")
 
 trash = containers.load('point', 'D1', 'holywastedplasticbatman')
-uncalibrated = containers.load('point', 'B2','uncalibrated')
+uncalibrated = containers.load('96-deep-well', 'B2','uncalibrated')
 calibrated = containers.load('point', 'D2','calibrated')
 
 p10 = instruments.Pipette(
@@ -41,20 +42,25 @@ def change_height(container):
             p10.robot._driver.move(z=-0.1,mode="relative")
         elif c == "l":
             p10.robot._driver.move(z=-0.5,mode="relative")
+        elif c == "p":
+            p10.robot._driver.move(z=30,mode="relative")
         elif c == "x":
             x = 1 
-    p10.calibrate_position((container))
-
-    return p10
-
-robot.home()
-
-p10.move_to(uncalibrated)
-change_height(uncalibrated)
-p10.move_to(uncalibrated)
+    p10.calibrate_position((uncalibrated, uncalibrated[0].from_center(x=0, y=0, z=-1, reference=uncalibrated)))
 
 
-input("old script?")
+#robot.home()
+#IPython.embed()
+
+p10.move_to(uncalibrated[0].bottom())
+IPython.embed()
+print("reached plate")
+#change_height(uncalibrated)
+print(uncalibrated)
+#p10.move_to(calibrated)
+p10.move_to(uncalibrated[0].bottom())
+
+
 
 
 
