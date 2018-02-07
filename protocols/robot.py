@@ -38,8 +38,8 @@ p10_tipracks = [containers.load('tiprack-10ul', 'E2')]
 p200_tipracks = [containers.load('tiprack-200ul', 'A3')]
 
 source = [containers.load('96-flat', 'D2'),
-  containers.load('96-flat', 'D3')]
-dest = containers.load('96-PCR-flat', 'C2')
+containers.load('96-flat', 'D3')]
+dest = containers.load('96-PCR-tall', 'C2')
 master = containers.load('PCR-strip-tall', 'C3')
 reagents = containers.load('tube-rack-2ml', 'B1')
 trash = containers.load('point', 'D1', 'holywastedplasticbatman')

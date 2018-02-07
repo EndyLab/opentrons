@@ -1447,3 +1447,33 @@ OSError: [Errno 98] Address already in use: ('127.0.0.1', 31950)
     at endReadableNT (_stream_readable.js:974:12)
     at _combinedTickCallback (internal/process/next_tick.js:74:11)
     at process._tickCallback (internal/process/next_tick.js:98:9)
+2018-02-06T18:48:07.192Z - info: Starting App
+2018-02-06T18:48:07.277Z - info: Initializing Audo Updater
+2018-02-06T18:48:07.277Z - info: Setting AUTO UPDATE URL to http://ot-app-releases-2.herokuapp.com?version=2.5.2
+2018-02-06T18:48:07.278Z - info: Auto updating is enabled, checking for updates
+2018-02-06T18:48:09.332Z - info: Loading App UI at http://127.0.0.1:31950/
+2018-02-06T18:48:09.338Z - info: Dispatched .loadURL call
+2018-02-06T18:56:06.999Z - info: Electron App window closed, quitting App
+2018-02-06T18:56:07.048Z - error: Received an expected error while calling exit route StatusCodeError: 500 - "Internal Server Error"
+    at new StatusCodeError (/opt/Opentrons 2.0/resources/app.asar/node_modules/request-promise-core/lib/errors.js:32:15)
+    at Request.plumbing.callback (/opt/Opentrons 2.0/resources/app.asar/node_modules/request-promise-core/lib/plumbing.js:104:33)
+    at Request.RP$callback [as _callback] (/opt/Opentrons 2.0/resources/app.asar/node_modules/request-promise-core/lib/plumbing.js:46:31)
+    at Request.self.callback (/opt/Opentrons 2.0/resources/app.asar/node_modules/request/request.js:188:22)
+    at emitTwo (events.js:106:13)
+    at Request.emit (events.js:191:7)
+    at Request.<anonymous> (/opt/Opentrons 2.0/resources/app.asar/node_modules/request/request.js:1171:10)
+    at emitOne (events.js:96:13)
+    at Request.emit (events.js:188:7)
+    at IncomingMessage.<anonymous> (/opt/Opentrons 2.0/resources/app.asar/node_modules/request/request.js:1091:12)
+    at Object.onceWrapper (events.js:290:19)
+    at emitNone (events.js:91:20)
+    at IncomingMessage.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:974:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)
+2018-02-06T22:50:14.384Z - info: Starting App
+2018-02-06T22:50:14.472Z - info: Initializing Audo Updater
+2018-02-06T22:50:14.472Z - info: Setting AUTO UPDATE URL to http://ot-app-releases-2.herokuapp.com?version=2.5.2
+2018-02-06T22:50:14.473Z - info: Auto updating is enabled, checking for updates
+2018-02-06T22:50:16.546Z - info: Loading App UI at http://127.0.0.1:31950/
+2018-02-06T22:50:16.552Z - info: Dispatched .loadURL call
